@@ -10,6 +10,7 @@
   "author": "Dexrn ZacAttack <dexrn@hotmail.com> (https://dexrnzacattack.github.io/)",
   "license": "MIT",
   "dependencies": {
+    "@types/pako": "^2.0.3",
     "pako": "^2.1.0",
     "typescript": "^5.4.5"
   },

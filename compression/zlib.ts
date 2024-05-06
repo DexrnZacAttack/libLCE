@@ -21,14 +21,14 @@
  * SOFTWARE.
 */
 
-import pako from "pako";
+import { inflate, deflate } from "pako";
 
 /** Uses Pako to decompress zLib data. */
-function decompressZlib(data: Uint8Array): Uint8Array | undefined {
-    return pako.deflate(data) ?? undefined;
+export function decompressZlib(data: Uint8Array): Uint8Array | undefined {
+    return deflate(data) ?? undefined;
 }
 
 /** Uses Pako to zLib compress data. */
-function compressZlib(data: Uint8Array): Uint8Array | undefined {
-    return pako.inflate(data) ?? undefined;
+export function compressZlib(data: Uint8Array): Uint8Array | undefined {
+    return inflate(data) ?? undefined;
 }

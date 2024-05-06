@@ -21,14 +21,14 @@
  * SOFTWARE.
 */
 
-import pako from "pako";
+import { inflateRaw, deflateRaw } from "pako";
 
 /** Uses Pako to decompress RLE data. */
-export function decompressZlib(data: Uint8Array): Uint8Array | undefined {
-    return pako.deflateRaw(data) ?? undefined;
+export function decompressRLE(data: Uint8Array): Uint8Array | undefined {
+    return deflateRaw(data) ?? undefined;
 }
 
 /** Uses Pako to RLE compress data. */
-export function compressZlib(data: Uint8Array): Uint8Array | undefined {
-    return pako.inflateRaw(data) ?? undefined;
+export function compressRLE(data: Uint8Array): Uint8Array | undefined {
+    return inflateRaw(data) ?? undefined;
 }

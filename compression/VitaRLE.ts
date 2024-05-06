@@ -67,5 +67,6 @@ export function decompressVitaRLE(data: Uint8Array): Uint8Array {
  * @returns The compressed data
 */
 export function compressVitaRLE(data: Uint8Array) {
+    // TODO: IMPLEMENT THIS
     throw new NotImplementedException("Not implemented yet.");
 }

@@ -20,10 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-/**
- * Whether or not to write little endian or big endian.
-*/
-const lEndian: boolean = false; 
+// TODO: ADD COMPRESSION SUPPORT
 
 /**
  * This is the number of bytes that the header takes up, which is 8 (4 bytes offset, 4 bytes count.)
@@ -51,7 +48,11 @@ let encodedUFileName!: Uint8Array;
  */
 const textEncoder = new TextEncoder();
 
-export async function generateSave(files: [File, Buffer][]): Promise<File> {
+/** Generates a savefile.
+ * @param files Array of files to put in the savegame.
+ * @param lEndian Whether to use Little endian or not, default is no.
+ */
+export async function generateSave(files: [File, Buffer][], lEndian: boolean = false): Promise<File> {
     /**
      * This is used to keep track of what file we are on... only used in one place though. (sgCurrentFileOffset)
     */

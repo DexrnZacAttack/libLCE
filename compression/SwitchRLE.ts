@@ -21,6 +21,8 @@
  * SOFTWARE.
 */
 
+// TODO: IMPLEMENT THIS.
+
 import NotImplementedException from "../exception/NotImplemented";
 
 /**
