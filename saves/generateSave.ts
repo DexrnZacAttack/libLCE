@@ -20,8 +20,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-// TODO: ADD COMPRESSION SUPPORT
-
 /**
  * This is the number of bytes that the header takes up, which is 8 (4 bytes offset, 4 bytes count.)
 */
@@ -52,7 +50,7 @@ const textEncoder = new TextEncoder();
  * @param files Array of files to put in the savegame.
  * @param lEndian Whether to use Little endian or not, default is no.
  */
-export async function generateSave(files: [File, Buffer][], lEndian: boolean = false): Promise<File> {
+export function generateSave(files: [File, Buffer][], lEndian: boolean = false): File {
     /**
      * This is used to keep track of what file we are on... only used in one place though. (sgCurrentFileOffset)
     */

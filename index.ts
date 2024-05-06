@@ -22,9 +22,19 @@
 */
 
 // compression
-export * from "./compression/RLE.js";
+export { deflate as compressZlib, inflate as decompressZlib, deflateRaw as compressRLE, inflateRaw as decompressRLE } from "pako";
 export * from "./compression/VitaRLE.js";
-export * from "./compression/zlib.js";
 export * from "./compression/SwitchRLE.js";
 // saves
 export * from "./saves/generateSave.js";
+export * from "./saves/compressSave.js";
+
+export enum compressionTypes {
+    gzip = 1,
+    zlib,
+    rle,
+    vitarle,
+    switchrle,
+    lzx,
+    none
+}
