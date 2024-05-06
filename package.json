@@ -1,0 +1,19 @@
+{
+  "name": "liblce",
+  "version": "1.0.0",
+  "description": "A TS library for Minecraft Legacy Console Edition files + more",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Dexrn ZacAttack <dexrn@hotmail.com> (https://dexrnzacattack.github.io/)",
+  "license": "MIT",
+  "dependencies": {
+    "pako": "^2.1.0",
+    "typescript": "^5.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.8"
+  }
+}
