@@ -21,7 +21,10 @@
  * SOFTWARE.
 */
 
+// compression
 export * from "./compression/RLE.js";
 export * from "./compression/VitaRLE.js";
 export * from "./compression/zlib.js";
 export * from "./compression/SwitchRLE.js";
+// saves
+export * from "./saves/generateSave.js";
