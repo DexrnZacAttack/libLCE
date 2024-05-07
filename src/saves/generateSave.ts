@@ -60,7 +60,7 @@ export function generateSave(files: [File, Buffer][], lEndian: boolean = false):
      * This is the number of bytes (the length) of every file combined.
     */
     const filesLength: number = files.reduce(
-        (previous, [name, file]) => previous + file.byteLength,
+        (previous, [, file]) => previous + file.byteLength,
         0
     );
 

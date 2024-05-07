@@ -1,4 +1,4 @@
-import { compressionTypes, compressRLE, compressVitaRLE, compressZlib } from "../index.js";
+import { compressionTypes, compressRLE, compressZlib } from "../index.js";
 
 export async function compressSave(save: File, compType: compressionTypes, lEndian = false): Promise<File> {
     // arraybuffer variable
@@ -34,7 +34,7 @@ export async function compressSave(save: File, compType: compressionTypes, lEndi
     currentOffset += 8;
 
     for (var i: number = 0; i < compressedFile.length - 1; i++) {
-        comp.setUint8(currentOffset, compressedFile[i]);
+        comp.setUint8(currentOffset, compressedFile[i]!);
         currentOffset += 1;
     }
 
