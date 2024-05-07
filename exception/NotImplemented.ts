@@ -22,14 +22,12 @@
 */
 
 /** exception to say that something is not implemented */
-class NotImplementedException extends Error {
+export default class NotImplementedException extends Error {
 
-    constructor(public message: string) {
+    constructor(public override message: string) {
       super(message);
       this.name = "NotImplementedException";
       this.stack = (<any> new Error()).stack;
     }
   
 }
-
-export default NotImplementedException;

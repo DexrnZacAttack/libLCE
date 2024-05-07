@@ -1,6 +1,6 @@
 import { compressionTypes, compressRLE, compressVitaRLE, compressZlib } from "../index.js";
 
-export async function compressSave(save: File, compType, lEndian = false) {
+export async function compressSave(save: File, compType: compressionTypes, lEndian = false): Promise<File> {
     // arraybuffer variable
     const fileArray = await save.arrayBuffer();
     const fileBuffer = Buffer.from(fileArray);
