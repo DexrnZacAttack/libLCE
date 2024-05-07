@@ -21,52 +21,24 @@
  * SOFTWARE.
 */
 
-import NotImplementedException from "../exception/NotImplemented";
+// TODO: IMPLEMENT THIS.
+
+import NotImplementedException from "../exception/NotImplemented.js";
 
 /**
- * The VitaRLE code is Zugebot (jerrinth3glitch)'s code ported to TS.
- * https://github.com/zugebot/LegacyEditor
- * 
- * Big thanks to Offroaders for helping out with this, would've been barely possible without them!
-*/
-
-/**
- * Decompresses VitaRLE (used on PSVita Edition).
+ * Decompresses SwitchRLE (used on Nintendo Switch Edition).
  * @param data The compressed data
  * @returns The decompressed data
 */
-export function decompressVitaRLE(data: Uint8Array): Uint8Array {
-    const compressedLength = data.byteLength;
-    const result: number[] = [];
-    let readOffset = 0;
-    let writeOffset = 0;
-  
-    while (readOffset < compressedLength){
-      const suspectedTag: number = data[readOffset]!;
-      readOffset++;
-  
-      if (suspectedTag !== 0){
-        result[writeOffset] = suspectedTag;
-        writeOffset++;
-      } else {
-        const length: number = data[readOffset]!;
-        readOffset++;
-        for (let i = 0; i < length; i++){
-          result.push(0);
-          writeOffset++;
-        }
-      }
-    }
-  
-    return new Uint8Array(result);
+export function decompressSwitchRLE(data: Uint8Array): Uint8Array | undefined {
+    throw new NotImplementedException("Not implemented yet.");
 }
 
 /**
- * Compresses with VitaRLE (used on PSVita Edition).
- * @param data The data that you want to compress
- * @returns The compressed data
+ * Compresses with SwitchRLE (used on Nintendo Switch Edition).
+ * @param data The compressed data
+ * @returns The decompressed data
 */
-export function compressVitaRLE(data: Uint8Array) {
-    // TODO: IMPLEMENT THIS
+export function compressSwitchRLE(data: Uint8Array): Uint8Array | undefined {
     throw new NotImplementedException("Not implemented yet.");
 }
