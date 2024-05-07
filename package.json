@@ -9,7 +9,11 @@
     "build": "tsc --project ./tsconfig.build.json",
     "dev": "tsc --watch"
   },
-  "keywords": [],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DexrnZacAttack/libLCE.git"
+  },
+  "keywords": ["javascript", "library", "typescript", "minecraft", "minecraft-bedrock-edition", "minecraft-console", "legacy-console-edition", "minecraft-legacy-console-edition", "minecraft-lce", "grf", "nbt", "savegame", "mcs"],
   "author": "Dexrn ZacAttack <dexrn@hotmail.com> (https://dexrnzacattack.github.io/)",
   "license": "MIT",
   "dependencies": {
