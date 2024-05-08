@@ -26,7 +26,8 @@ export { deflate as compressZlib, inflate as decompressZlib, deflateRaw as compr
 export * from "./compression/VitaRLE.js";
 export * from "./compression/SwitchRLE.js";
 // saves
-export * from "./saves/generateSave.js";
+export * from "./saves/createSave.js";
+export * from "./saves/readSave.js";
 export * from "./saves/compressSave.js";
 
 export enum compressionTypes {

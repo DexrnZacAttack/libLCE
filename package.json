@@ -1,6 +1,6 @@
 {
   "name": "liblce",
-  "version": "1.0.0",
+  "version": "0.0.2",
   "description": "A TS library for Minecraft Legacy Console Edition files + more",
   "type": "module",
   "main": "./dist/index.js",
