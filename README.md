@@ -17,4 +17,4 @@ A TS library for Minecraft Legacy Console Edition files + more
 - [Legacy Edition Console Modding & Research](https://discord.gg/WGJDybEWJF)
 
 # Note
-This repo is not affiliated or related to Minecraft, Microsoft, Mojang, or any of their subsidiaries
+This repo is not affiliated with Minecraft, Microsoft, Mojang, or any of their subsidiaries
