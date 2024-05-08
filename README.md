@@ -1,7 +1,7 @@
 # LibLCE
 A TS library for Minecraft Legacy Console Edition files + more 
 
-[!image](/assets/cur_progress.png)
+![Progress](/assets/cur_progress.png)
 
 # Progress
 - [ ] Console compression types - 30% complete
