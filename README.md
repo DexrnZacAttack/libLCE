@@ -16,5 +16,5 @@ A TS library for Minecraft Legacy Console Edition files + more
 - [Offroaders123](https://github.com/offroaders123)
 - [Legacy Edition Console Modding & Research](https://discord.gg/WGJDybEWJF)
 
-# Note
-This repo is not affiliated with Minecraft, Microsoft, Mojang, or any of their subsidiaries
+# Legal Notice
+This repo is not affiliated with Mojang Studios nor Microsoft. Minecraft is a trademark of Mojang Studios and Microsoft.
