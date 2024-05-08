@@ -1,10 +1,12 @@
 # LibLCE
 A TS library for Minecraft Legacy Console Edition files + more 
 
+[!image](/assets/cur_progress.png)
+
 # Progress
-- [ ] Console compression types
+- [ ] Console compression types - 30% complete
 - [ ] Savegame parsing
-- [ ] Savegame creation
+- [ ] Savegame creation - 80% complete
 - [ ] Region parsing
 - [ ] Region creation
 - [ ] Chunk parsing
