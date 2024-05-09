@@ -7,6 +7,7 @@ A TS library for Minecraft Legacy Console Edition files + more
 - [ ] Console compression types - 30% complete
 - [x] Savegame parsing
 - [ ] Savegame creation - 80% complete
+- [ ] World folder parsing
 - [ ] Region parsing
 - [ ] Region creation
 - [ ] Chunk parsing

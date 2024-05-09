@@ -1,4 +1,4 @@
-interface Files {
+interface index {
     name: string,
     length: number,
     offset: number,
