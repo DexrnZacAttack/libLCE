@@ -23,22 +23,18 @@
 
 // TODO: IMPLEMENT THIS.
 
-import NotImplementedException from "../exception/NotImplemented.js";
-
 /**
  * Decompresses SwitchRLE (used on Nintendo Switch Edition).
  * @param data The compressed data
  * @returns The decompressed data
 */
-export function decompressSwitchRLE(data: Uint8Array): Uint8Array | undefined {
-    throw new NotImplementedException("Not implemented yet.");
-}
+/* export function decompressSwitchRLE(data: Uint8Array): Uint8Array | undefined {
+} */
 
 /**
  * Compresses with SwitchRLE (used on Nintendo Switch Edition).
  * @param data The compressed data
  * @returns The decompressed data
 */
-export function compressSwitchRLE(data: Uint8Array): Uint8Array | undefined {
-    throw new NotImplementedException("Not implemented yet.");
-}
+/* export function compressSwitchRLE(data: Uint8Array): Uint8Array | undefined {
+} */

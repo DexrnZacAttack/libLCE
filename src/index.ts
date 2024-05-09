@@ -32,6 +32,19 @@ export * from "./saves/compressSave.js";
 // world
 export * from "./world/parseWorldInfo.js";
 
+export interface World {
+    name: string,
+    thumbnail: File
+}
+
+export interface index {
+    name: string,
+    length: number,
+    offset: number,
+    timestamp: number,
+    data: File
+}
+
 export enum compressionTypes {
     gzip = 1,
     zlib,

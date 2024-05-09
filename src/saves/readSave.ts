@@ -21,9 +21,9 @@
  * SOFTWARE.
 */
 
-import { decompressZlib } from "../index.js";
+import { decompressZlib, index } from "../index.js";
 
-export async function readSave(saveFile: File, lEndian = false) {
+export async function readSave(saveFile: File, lEndian = false): Promise<index[]> {
     let save: index[] = []
 
     let sParserDV = new DataView(await saveFile.arrayBuffer());

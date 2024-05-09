@@ -21,7 +21,9 @@
  * SOFTWARE.
 */
 
-export async function parseWorldInfo(file: File, lEndian = false): Promise<World> {
+import { World } from "../index.js";
+
+export async function parseWorldInfo(file: File): Promise<World> {
     /** DV of file that was put in */
     let worldInfoDV = new DataView(await file.arrayBuffer());
 

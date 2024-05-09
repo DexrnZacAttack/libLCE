@@ -21,8 +21,6 @@
  * SOFTWARE.
 */
 
-import NotImplementedException from "../exception/NotImplemented.js";
-
 /**
  * The VitaRLE code is Zugebot (jerrinth3glitch)'s code ported to TS.
  * https://github.com/zugebot/LegacyEditor
@@ -63,10 +61,8 @@ export function decompressVitaRLE(data: Uint8Array): Uint8Array {
 
 /**
  * Compresses with VitaRLE (used on PSVita Edition).
- * @param data The data that you want to compress
- * @returns The compressed data
+ * @param data The compressed data
+ * @returns The decompressed data
 */
-export function compressVitaRLE(data: Uint8Array) {
-    // TODO: IMPLEMENT THIS
-    throw new NotImplementedException("Not implemented yet.");
-}
+/* export function compressVitaRLE(data: Uint8Array): Uint8Array | undefined {
+} */
