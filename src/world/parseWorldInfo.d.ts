@@ -21,13 +21,7 @@
  * SOFTWARE.
 */
 
-/** exception to say that something is not implemented */
-export default class NotImplementedException extends Error {
-
-    constructor(public override message: string) {
-      super(message);
-      this.name = "NotImplementedException";
-      this.stack = (<any> new Error()).stack;
-    }
-  
+interface World {
+ name: string,
+ thumbnail: File
 }

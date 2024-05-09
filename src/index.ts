@@ -29,6 +29,8 @@ export * from "./compression/SwitchRLE.js";
 export * from "./saves/createSave.js";
 export * from "./saves/readSave.js";
 export * from "./saves/compressSave.js";
+// world
+export * from "./world/parseWorldInfo.js";
 
 export enum compressionTypes {
     gzip = 1,

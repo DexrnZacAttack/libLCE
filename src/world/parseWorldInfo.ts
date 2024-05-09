@@ -21,13 +21,29 @@
  * SOFTWARE.
 */
 
-/** exception to say that something is not implemented */
-export default class NotImplementedException extends Error {
+export async function parseWorldInfo(file: File, lEndian = false): Promise<World> {
+    /** DV of file that was put in */
+    let worldInfoDV = new DataView(await file.arrayBuffer());
 
-    constructor(public override message: string) {
-      super(message);
-      this.name = "NotImplementedException";
-      this.stack = (<any> new Error()).stack;
+    if (worldInfoDV.byteLength == 0)
+        throw new Error(`File is of bad length ${worldInfoDV.byteLength}`);
+
+    /** header of the world (includes name and a few other things) */
+    const worldHeader = worldInfoDV.buffer.slice(0, 255);
+    /** length of world name (from byte 0 till 2 null bytes are encountered) */
+    var worldNameLength = 0;
+    for (let i = 0; i < worldHeader.byteLength; i++) {
+        if (worldInfoDV.getUint8(i) === 0x00 && worldInfoDV.getUint8(i + 1) === 0x00) {
+            worldNameLength = i;
+            break;
+        }
     }
-  
+
+    /** the world name */
+    const worldName = new TextDecoder('utf-16be').decode(worldInfoDV.buffer.slice(0, worldNameLength)).replace(/\0+$/, '');
+
+    /** the world thumbnail */
+    const thumbnail = new File([new Blob([worldInfoDV.buffer.slice(255, worldInfoDV.byteLength)])], "thumbnail.png");
+
+    return {"name": worldName, "thumbnail": thumbnail};
 }
