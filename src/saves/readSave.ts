@@ -67,7 +67,7 @@ export async function readSave(saveFile: File, lEndian = false): Promise<index[]
             currentStreamOffset += 4;
             const fileTimestamp = Number(sParserDV.getBigUint64(currentStreamOffset, lEndian));
             currentStreamOffset += 8;
-            const fileData: ArrayBuffer = sParserDV.buffer.slice(fileOffset - 8, fileOffset - 8 + fileLength);
+            const fileData: ArrayBuffer = sParserDV.buffer.slice(fileOffset, fileOffset + fileLength);
             save.push({"name": fileName, "length": fileLength, "offset": fileOffset, "timestamp": fileTimestamp, "data": new File( [new Blob( [ new Uint8Array(fileData) ] )], fileName )})
         }
     }
