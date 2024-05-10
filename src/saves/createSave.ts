@@ -86,7 +86,7 @@ export function generateSave(files: [File, Buffer][], lEndian: boolean = false):
     /**
      * This is the DataView object that contains the bytes of the savegame that we are creating.
      */
-    const sgDV = new DataView(Buffer.alloc(filesLength + headerLength + indexEntryLength * count).buffer);
+    const sgDV = new DataView(new ArrayBuffer(filesLength + headerLength + indexEntryLength * count));
 
     /**
      * For each file in the index, we keep an offset that says where the file starts, we use fIndex to see each file's offset.

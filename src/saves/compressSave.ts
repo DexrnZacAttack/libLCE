@@ -26,7 +26,7 @@ import { compressionTypes, compressRLE, compressZlib } from "../index.js";
 export async function compressSave(save: File, compType: compressionTypes, lEndian = false): Promise<File> {
     // arraybuffer variable
     const fileArray = await save.arrayBuffer();
-    const fileBuffer = Buffer.from(fileArray);
+    const fileArrayBuffer = new Uint8Array(fileArray);
     /** decompressed size as bigint */
     const fileSize = BigInt(fileArray.byteLength)
     /** keep track of current position in stream */
@@ -52,7 +52,7 @@ export async function compressSave(save: File, compType: compressionTypes, lEndi
     }
 
     /** allocate a dataview for the compressed data */
-    const comp = new DataView(Buffer.alloc(8 + compressedFile.length, fileBuffer).buffer, 0, compressedFile.length + 8);
+    const comp = new DataView(new Uint8Array([...fileArrayBuffer, ...compressedFile]).buffer);
     comp.setBigUint64(0, fileSize, lEndian)
     currentOffset += 8;
 

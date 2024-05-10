@@ -3,7 +3,7 @@
     "module": "NodeNext",
     "target": "ESNext",
     "isolatedModules": true,
-    "noEmit": true,
+    "lib": ["dom", "es2017"],
     "strict": true,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
