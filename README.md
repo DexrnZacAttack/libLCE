@@ -1,4 +1,4 @@
-# LibLCE
+# libLCE
 A TS library for Minecraft Legacy Console Edition files + more 
 
 ![Progress](/assets/cur_progress.png)

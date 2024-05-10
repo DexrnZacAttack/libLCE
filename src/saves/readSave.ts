@@ -30,14 +30,18 @@ export async function readSave(saveFile: File, lEndian = false): Promise<index[]
 
     let compressed: boolean = false;
     let decompressedSize: number = 0;
-
-    if (decompressZlib(sParserDV.buffer.slice(8))) {
-        compressed = true;
-        decompressedSize = Number(sParserDV.getBigUint64(0, lEndian));
+    try {
+        if (decompressZlib(sParserDV.buffer.slice(8))) {
+            
+            compressed = true;
+            decompressedSize = Number(sParserDV.getBigUint64(0, lEndian));
+            if (compressed === true && (decompressedSize ?? 0) !== 0) {
+                sParserDV = new DataView(decompressZlib(sParserDV.buffer.slice(8)).buffer);
+            }
+        }
+    } catch {
+        console.log("ZLib decompression failed, file probably isnt compressed.");
     }
-
-    if ((compressed ?? false) === true && (decompressedSize ?? 0) !== 0)
-        sParserDV = new DataView(decompressZlib(sParserDV.buffer.slice(8)).buffer);
 
     /** Keeps track of where we are in the DV stream. */
     let currentStreamOffset = 0;

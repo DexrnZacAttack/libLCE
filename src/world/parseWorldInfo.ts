@@ -23,6 +23,8 @@
 
 import { World } from "../index.js";
 
+// TODO: Parse info at bottom of image, parse extra parts of header.
+
 export async function parseWorldInfo(file: File): Promise<World> {
     /** DV of file that was put in */
     let worldInfoDV = new DataView(await file.arrayBuffer());
@@ -45,7 +47,7 @@ export async function parseWorldInfo(file: File): Promise<World> {
     const worldName = new TextDecoder('utf-16be').decode(worldInfoDV.buffer.slice(0, worldNameLength)).replace(/\0+$/, '');
 
     /** the world thumbnail */
-    const thumbnail = new File([new Blob([worldInfoDV.buffer.slice(255, worldInfoDV.byteLength)])], "thumbnail.png");
+    const thumbnail = new File([new Blob([worldInfoDV.buffer.slice(255, worldInfoDV.byteLength)])], "thumbnail.png", { type: "image/png" });
 
     return {"name": worldName, "thumbnail": thumbnail};
 }
