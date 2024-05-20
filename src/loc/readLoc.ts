@@ -1,4 +1,4 @@
-/**
+/*
  * MIT License
  * Copyright (c) 2024 Dexrn ZacAttack
  *
@@ -21,38 +21,22 @@
  * SOFTWARE.
 */
 
-// compression
-export { deflate as compressZlib, inflate as decompressZlib, deflateRaw as compressRLE, inflateRaw as decompressRLE } from "pako";
-export * from "./compression/VitaRLE.js";
-export * from "./compression/SwitchRLE.js";
-// saves
-export * from "./saves/createSave.js";
-export * from "./saves/readSave.js";
-export * from "./saves/compressSave.js";
-// world
-export * from "./world/parseWorldInfo.js";
-// loc
-export * from "./loc/readLoc.js";
+export async function readLoc(locFile: File, lEndian = false) {
 
-export interface World {
-    name: string,
-    thumbnail: File
-}
-
-export interface index {
-    name: string,
-    length: number,
-    offset: number,
-    timestamp: number,
-    data: File
-}
-
-export enum compressionTypes {
-    gzip = 1,
-    zlib,
-    rle,
-    vitarle,
-    switchrle,
-    lzx,
-    none
+    let locParserDV = new DataView(await locFile.arrayBuffer());
+    // istg I might just create my own modified dataview thingy that stores a pos internally.
+    let curPosition = 0;
+    const version = locParserDV.getUint32(curPosition, lEndian);
+    curPosition += 4;
+    const langCount = locParserDV.getUint32(curPosition, lEndian);
+    curPosition += 4;
+    const useUniqueIDs = locParserDV.getUint8(curPosition);
+    curPosition += 1;
+    const keyCount = locParserDV.getUint32(curPosition, lEndian);
+    curPosition += 4;
+    for (var i = 0; i < keyCount - 1; i++) {
+        if (useUniqueIDs) {
+            // and this is where it ends for now cuz im tired lollll
+        }
+    }
 }
