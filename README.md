@@ -19,6 +19,7 @@ A TS library for Minecraft Legacy Console Edition files + more
 - [zugebot](https://github.com/zugebot)
 - [EternalModz](https://github.com/EternalModz)
 - [PhoenixARC](https://github.com/PhoenixARC)
+- [Project Lodestone](https://github.com/Team-Lodestone)
 - [OMI-Filetype-Library](https://github.com/PhoenixARC/-OMI-Filetype-Library)
 - [Legacy Edition Console Modding & Research](https://discord.gg/WGJDybEWJF)
 
