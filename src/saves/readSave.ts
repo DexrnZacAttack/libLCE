@@ -21,21 +21,21 @@
  * SOFTWARE.
 */
 
-import { decompressZlib, index } from "../index.js";
+import { decompressZlib, index, save } from "../index.js";
 import { bReader } from "../io/bReader.js";
 
-export async function readSave(saveFile: File, lEndian = false): Promise<index[]> {
-    let save: index[] = []
+export async function readSave(saveFile: File, lEndian = false): Promise<save> {
+    const index: index[] = []
 
-    let sParserDV = new bReader(new DataView(await saveFile.arrayBuffer()), lEndian);
+    let saveReader = new bReader(new DataView(await saveFile.arrayBuffer()), lEndian);
 
     let decompressedSize: number = 0;
     try {
-        if (decompressZlib(sParserDV.slice(8))) {
+        if (decompressZlib(saveReader.slice(8))) {
             
-            decompressedSize = Number(sParserDV.readULong(lEndian));
+            decompressedSize = Number(saveReader.readULong());
             if ((decompressedSize ?? 0) !== 0) {
-                sParserDV = new bReader(new DataView(decompressZlib(sParserDV.slice(8)).buffer), lEndian);
+                saveReader = new bReader(new DataView(decompressZlib(saveReader.slice(8)).buffer), lEndian);
             }
         }
     } catch (e) {
@@ -43,32 +43,33 @@ export async function readSave(saveFile: File, lEndian = false): Promise<index[]
     }
 
     /** Where the index is located in the file */
-    const indexOffset = sParserDV.readUInt(lEndian);
+    const indexOffset = saveReader.readUInt();
 
     /** How many files are located in the index */
-    const indexCount = sParserDV.readUInt(lEndian);
+    const indexCount = saveReader.readUInt();
 
-    /** Unknown Int, might be BOM.
-     *  0A 00 0A 00 (LE)
-     *  00 0B 00 0B (BE)
-    */ 
-    const BOM = sParserDV.readUInt(lEndian);
-    sParserDV.incrementPos(indexOffset - 12);
+    // https://github.com/zugebot/legacyeditor for these 2 shorts
+    /** Minimum supported LCE version */
+    const fileMinimumVersion = saveReader.readShort();
+    /** Maximum supported LCE version */
+    const fileMaximumVersion = saveReader.readShort();
+    
+    saveReader.incrementPos(indexOffset - 12);
 
     for (var i = 0; i < indexCount; i++) {
-        while (sParserDV.getPos() + 144 <= sParserDV.byteLength()) {
-            const bytes = sParserDV.slice(sParserDV.getPos(), sParserDV.getPos() + 144);
-
+        while (saveReader.getPos() + 144 <= saveReader.byteLength()) {
             /** Name of the file in the index */
-            const fileName = new TextDecoder(lEndian === true ? 'utf-16le' : 'utf-16be').decode(bytes.slice(0, 128)).replace(/\0+$/, '');
-            sParserDV.incrementPos(128);
-            const fileLength = sParserDV.readUInt(lEndian);
-            const fileOffset = sParserDV.readUInt(lEndian);
-            const fileTimestamp = Number(sParserDV.readULong(lEndian));
-            const fileData: ArrayBuffer = sParserDV.slice(fileOffset, fileOffset + fileLength);
-            save.push({"name": fileName, "length": fileLength, "offset": fileOffset, "timestamp": fileTimestamp, "data": new File( [new Blob( [ new Uint8Array(fileData) ] )], fileName )})
+            const fileName = saveReader.readString16(128);
+            /** Length of file in the index */
+            const fileLength = saveReader.readUInt();
+            /** Location (Offset) of the file in the index */
+            const fileOffset = saveReader.readUInt();
+            /** Timestmap of the file (unusable due to how it's written.) */
+            const fileTimestamp = saveReader.readULong();
+            const fileData: ArrayBuffer = saveReader.slice(fileOffset, fileOffset + fileLength);
+            index.push({"name": fileName, "length": fileLength, "offset": fileOffset, "timestamp": fileTimestamp, "data": new File( [new Blob( [ new Uint8Array(fileData) ] )], fileName )})
         }
     }
 
-    return save;
+    return {"indexOffset": indexOffset, "fileCount": indexCount, "minVerSupported": fileMinimumVersion, "maxVerSupported": fileMaximumVersion, "fileIndex": index};
 }

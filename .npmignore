@@ -2,3 +2,4 @@
 tsconfig.json
 tsconfig.build.json
 /testing
+/node_modules

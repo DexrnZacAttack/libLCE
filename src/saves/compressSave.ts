@@ -21,13 +21,15 @@
  * SOFTWARE.
 */
 
+import { gzip } from "pako";
 import { compressionTypes, compressRLE, compressVitaRLE, compressZlib } from "../index.js";
 import { bWriter } from "../io/bWriter.js";
 
-export async function compressSave(save: File, compType: compressionTypes, lEndian = false): Promise<File> {
+export async function compressSave(file: File, compType: compressionTypes, lEndian = false): Promise<File> {
     // arraybuffer variable
-    const fileArray = await save.arrayBuffer();
+    const fileArray = await file.arrayBuffer();
     const fileArrayBuffer = new Uint8Array(fileArray);
+    
     /** decompressed size as bigint */
     const fileSize = BigInt(fileArray.byteLength)
 
@@ -35,9 +37,7 @@ export async function compressSave(save: File, compType: compressionTypes, lEndi
 
     switch (compType) {
         case compressionTypes.zlib:
-            compressedFile = compressZlib(fileArray, {
-                level: 6,
-              });
+            compressedFile = compressZlib(fileArray);
             break;
         case compressionTypes.rle:
             compressedFile = compressRLE(fileArray);
@@ -46,21 +46,25 @@ export async function compressSave(save: File, compType: compressionTypes, lEndi
             compressedFile = compressVitaRLE(new Uint8Array(fileArray));
             break;
         case compressionTypes.switchrle:
+            break;
         case compressionTypes.lzx:
+            break;
         case compressionTypes.gzip:
+            gzip(new Uint8Array(fileArray));
+            break;
         default:
             break;
         case compressionTypes.none:
-            return new File([new Blob([fileArray])], 'savegame.dat');
+            return new File([new Blob([fileArray])], file.name);
     }
 
     /** allocate a dataview for the compressed data */
-    const comp = new bWriter(new DataView(new Uint8Array([...fileArrayBuffer, ...compressedFile]).buffer), lEndian);
-    comp.writeLong(fileSize, lEndian)
+    const compWriter = new bWriter(new DataView(new Uint8Array([...fileArrayBuffer, ...compressedFile]).buffer), lEndian);
+    compWriter.writeLong(fileSize, lEndian)
 
-    for (var i: number = 0; i < compressedFile.length - 1; i++) {
-        comp.writeByte(compressedFile[i]!);
-    }
+    compressedFile.forEach(i => {
+        compWriter.writeByte(compressedFile[i]!);
+    });
 
-    return new File([new Blob([comp.getBuffer()])], 'savegame.dat');
+    return new File([new Blob([compWriter.getBuffer()])], file.name);
 }

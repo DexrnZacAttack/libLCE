@@ -39,11 +39,19 @@ export interface World {
     thumbnail: File
 }
 
+export interface save {
+    indexOffset: number,
+    fileCount: number,
+    minVerSupported: number,
+    maxVerSupported: number,
+    fileIndex: index[]
+}
+
 export interface index {
     name: string,
     length: number,
     offset: number,
-    timestamp: number,
+    timestamp: bigint,
     data: File
 }
 
