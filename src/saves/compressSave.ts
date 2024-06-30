@@ -21,7 +21,8 @@
  * SOFTWARE.
 */
 
-import { compressionTypes, compressRLE, compressZlib } from "../index.js";
+import { compressionTypes, compressRLE, compressVitaRLE, compressZlib } from "../index.js";
+import { bWriter } from "../io/bWriter.js";
 
 export async function compressSave(save: File, compType: compressionTypes, lEndian = false): Promise<File> {
     // arraybuffer variable
@@ -29,19 +30,21 @@ export async function compressSave(save: File, compType: compressionTypes, lEndi
     const fileArrayBuffer = new Uint8Array(fileArray);
     /** decompressed size as bigint */
     const fileSize = BigInt(fileArray.byteLength)
-    /** keep track of current position in stream */
-    let currentOffset = 0;
 
     let compressedFile = new Uint8Array(fileArray);
 
     switch (compType) {
         case compressionTypes.zlib:
-            compressedFile = compressZlib(fileArray);
+            compressedFile = compressZlib(fileArray, {
+                level: 6,
+              });
             break;
         case compressionTypes.rle:
             compressedFile = compressRLE(fileArray);
             break;
         case compressionTypes.vitarle:
+            compressedFile = compressVitaRLE(new Uint8Array(fileArray));
+            break;
         case compressionTypes.switchrle:
         case compressionTypes.lzx:
         case compressionTypes.gzip:
@@ -52,14 +55,12 @@ export async function compressSave(save: File, compType: compressionTypes, lEndi
     }
 
     /** allocate a dataview for the compressed data */
-    const comp = new DataView(new Uint8Array([...fileArrayBuffer, ...compressedFile]).buffer);
-    comp.setBigUint64(0, fileSize, lEndian)
-    currentOffset += 8;
+    const comp = new bWriter(new DataView(new Uint8Array([...fileArrayBuffer, ...compressedFile]).buffer), lEndian);
+    comp.writeLong(fileSize, lEndian)
 
     for (var i: number = 0; i < compressedFile.length - 1; i++) {
-        comp.setUint8(currentOffset, compressedFile[i]!);
-        currentOffset += 1;
+        comp.writeByte(compressedFile[i]!);
     }
 
-    return new File([new Blob([comp.buffer])], 'savegame.dat');
+    return new File([new Blob([comp.getBuffer()])], 'savegame.dat');
 }

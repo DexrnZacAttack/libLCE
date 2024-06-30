@@ -22,52 +22,50 @@
 */
 
 import { decompressZlib, index } from "../index.js";
+import { bReader } from "../io/bReader.js";
 
 export async function readSave(saveFile: File, lEndian = false): Promise<index[]> {
     let save: index[] = []
 
-    let sParserDV = new DataView(await saveFile.arrayBuffer());
+    let sParserDV = new bReader(new DataView(await saveFile.arrayBuffer()), lEndian);
 
-    let compressed: boolean = false;
     let decompressedSize: number = 0;
     try {
-        if (decompressZlib(sParserDV.buffer.slice(8))) {
+        if (decompressZlib(sParserDV.slice(8))) {
             
-            compressed = true;
-            decompressedSize = Number(sParserDV.getBigUint64(0, lEndian));
-            if (compressed === true && (decompressedSize ?? 0) !== 0) {
-                sParserDV = new DataView(decompressZlib(sParserDV.buffer.slice(8)).buffer);
+            decompressedSize = Number(sParserDV.readULong(lEndian));
+            if ((decompressedSize ?? 0) !== 0) {
+                sParserDV = new bReader(new DataView(decompressZlib(sParserDV.slice(8)).buffer), lEndian);
             }
         }
-    } catch {
+    } catch (e) {
         console.log("ZLib decompression failed, file probably isnt compressed.");
     }
 
-    /** Keeps track of where we are in the DV stream. */
-    let currentStreamOffset = 0;
-
     /** Where the index is located in the file */
-    const indexOffset = sParserDV.getUint32(currentStreamOffset, lEndian);
-    currentStreamOffset += 4;
+    const indexOffset = sParserDV.readUInt(lEndian);
 
     /** How many files are located in the index */
-    const indexCount = sParserDV.getUint32(currentStreamOffset, lEndian);
-    currentStreamOffset += 4 + indexOffset - 8;
+    const indexCount = sParserDV.readUInt(lEndian);
+
+    /** Unknown Int, might be BOM.
+     *  0A 00 0A 00 (LE)
+     *  00 0B 00 0B (BE)
+    */ 
+    const BOM = sParserDV.readUInt(lEndian);
+    sParserDV.incrementPos(indexOffset - 12);
 
     for (var i = 0; i < indexCount; i++) {
-        while (currentStreamOffset + 144 <= sParserDV.byteLength) {
-            const bytes = sParserDV.buffer.slice(currentStreamOffset, currentStreamOffset + 144);
+        while (sParserDV.getPos() + 144 <= sParserDV.byteLength()) {
+            const bytes = sParserDV.slice(sParserDV.getPos(), sParserDV.getPos() + 144);
 
             /** Name of the file in the index */
             const fileName = new TextDecoder(lEndian === true ? 'utf-16le' : 'utf-16be').decode(bytes.slice(0, 128)).replace(/\0+$/, '');
-            currentStreamOffset += 128;
-            const fileLength = sParserDV.getUint32(currentStreamOffset, lEndian);
-            currentStreamOffset += 4;
-            const fileOffset = sParserDV.getUint32(currentStreamOffset, lEndian);
-            currentStreamOffset += 4;
-            const fileTimestamp = Number(sParserDV.getBigUint64(currentStreamOffset, lEndian));
-            currentStreamOffset += 8;
-            const fileData: ArrayBuffer = sParserDV.buffer.slice(fileOffset, fileOffset + fileLength);
+            sParserDV.incrementPos(128);
+            const fileLength = sParserDV.readUInt(lEndian);
+            const fileOffset = sParserDV.readUInt(lEndian);
+            const fileTimestamp = Number(sParserDV.readULong(lEndian));
+            const fileData: ArrayBuffer = sParserDV.slice(fileOffset, fileOffset + fileLength);
             save.push({"name": fileName, "length": fileLength, "offset": fileOffset, "timestamp": fileTimestamp, "data": new File( [new Blob( [ new Uint8Array(fileData) ] )], fileName )})
         }
     }

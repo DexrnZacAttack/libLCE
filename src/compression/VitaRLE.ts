@@ -61,8 +61,53 @@ export function decompressVitaRLE(data: Uint8Array): Uint8Array {
 
 /**
  * Compresses with VitaRLE (used on PSVita Edition).
- * @param data The compressed data
- * @returns The decompressed data
+ * @param data The decompressed data
+ * @returns The compressed data
 */
-/* export function compressVitaRLE(data: Uint8Array): Uint8Array | undefined {
-} */
+export function compressVitaRLE(data: Uint8Array): Uint8Array {
+  const compressedLength = data.byteLength;
+  const result: number[] = [];
+  let readOffset = 0;
+  let writeOffset = 0;
+  let zeroCount = 0;
+
+  while (readOffset < compressedLength){
+    const suspectedTag: number = data[readOffset]!;
+    readOffset++;
+
+    if (suspectedTag !== 0){
+      if (zeroCount > 0) {
+        result[writeOffset] = 0;
+        writeOffset++;
+        result[writeOffset] = zeroCount;
+        writeOffset++;
+        zeroCount = 0;
+      }
+      result[writeOffset] = suspectedTag;
+      writeOffset++;
+    } else {
+      const length: number = data[readOffset]!;
+      readOffset++;
+      for (let i = 0; i < length; i++){
+        result.push(0);
+        writeOffset++;
+        zeroCount++;
+        if (zeroCount === 255 || readOffset === compressedLength - 1) {
+          result[writeOffset] = 0;
+          writeOffset++;
+          result[writeOffset] = zeroCount;
+          writeOffset++;
+          zeroCount = 0;
+        }
+      }
+    }
+  }
+
+  if (zeroCount > 0) {
+    result[writeOffset] = 0;
+    writeOffset++;
+    result[writeOffset] = zeroCount;
+  }
+
+  return new Uint8Array(result);
+}

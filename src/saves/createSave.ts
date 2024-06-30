@@ -21,10 +21,12 @@
  * SOFTWARE.
 */
 
+import { bWriter } from "../io/bWriter.js";
+
 /**
- * This is the number of bytes that the header takes up, which is 8 (4 bytes offset, 4 bytes count.)
+ * This is the number of bytes that the header takes up, which is 12 (4 bytes offset, 4 bytes count, 4 bytes unk (probs byte order))
 */
-const headerLength: number = 8;
+const headerLength: number = 12;
 
 /**
  * This is the number of bytes that an entry in the index takes up, which is 144.
@@ -77,42 +79,46 @@ export function generateSave(files: [File, Buffer][], lEndian: boolean = false):
 
     console.log(`There are ${count} files in the folder, of which take up ${filesLength} bytes space.`);
     /**
-     * This is used to keep track of where we are in the stream.
-     * Unfortunately, Buffer's (now DataView, but still the same issue) write functions don't increment anywhere... so we have to do it manually,
-     * which makes this code look a lot uglier.
-     */
-    let currentOffset: number = headerLength;
-
-    /**
      * This is the DataView object that contains the bytes of the savegame that we are creating.
      */
-    const sgDV = new DataView(new ArrayBuffer(filesLength + headerLength + indexEntryLength * count));
+    const sgDV = new bWriter(new DataView(new ArrayBuffer(filesLength + headerLength + indexEntryLength * count)), lEndian);
 
     /**
      * For each file in the index, we keep an offset that says where the file starts, we use fIndex to see each file's offset.
      */
     let sgCurrentFileOffset: Array<number> = [];
+
+    // Write offset and count to start of file
+    sgDV.writeUInt(offset, lEndian);
+    sgDV.writeUInt(count, lEndian);
+    if (lEndian) {
+        sgDV.writeByte(10);
+        sgDV.writeByte(0);
+        sgDV.writeByte(10);
+        sgDV.writeByte(0);
+    } else {
+        sgDV.writeByte(0);
+        sgDV.writeByte(11);
+        sgDV.writeByte(0);
+        sgDV.writeByte(11);
+    }
+
     // Write the files to the save.
     for (const [fileObj, file] of files) {
         uFileName = fileObj.name.replace("\\", "/");
         encodedUFileName = textEncoder.encode(uFileName);
         if (encodedUFileName.length !== 0) {
-            sgCurrentFileOffset.push(currentOffset);
+            sgCurrentFileOffset.push(sgDV.getPos());
             console.log(`Writing ${uFileName}...`);
             // for every byte in the file, write said byte.
             file.forEach((byte) => {
-                sgDV.setUint8(currentOffset, byte);
-                currentOffset += 1;
+                sgDV.writeByte(byte);
             });
         } else {
             // if the file's name is blank... don't bother writing it, as there may be something wrong with the file.
             console.log("File has no name... skipping!");
         }
     }
-
-    // Write offset and count to start of file
-    sgDV.setUint32(0, offset, lEndian);
-    sgDV.setUint32(4, count, lEndian);
 
     // Write index entries
     for (const [fileObj, file] of files) {
@@ -127,42 +133,36 @@ export function generateSave(files: [File, Buffer][], lEndian: boolean = false):
                 switch (lEndian) {
                     // if true write little endian utf16
                     case true:
-                        sgDV.setUint8(currentOffset, byte);
-                        currentOffset += 1;
-                        sgDV.setUint8(currentOffset, 0);
-                        currentOffset += 1;
+                        sgDV.writeByte(byte);
+                        sgDV.writeByte(0);
                         break;
                     default:
                     // if false (or "default") write big endian utf16
                     case false:
-                        sgDV.setUint8(currentOffset, 0);
-                        currentOffset += 1;
-                        sgDV.setUint8(currentOffset, byte);
-                        currentOffset += 1;
+                        sgDV.writeByte(0);
+                        sgDV.writeByte(byte);
                         break;
                 }
             });
             // add a shit ton of 0s before adding the rest of the info
             for (var i: number = 0; i < 128 - encodedUFileName.length * 2; i++) {
-                sgDV.setUint8(currentOffset, 0);
-                currentOffset += 1;
+                sgDV.writeByte(0);
             }
             // File Length
-            sgDV.setUint32(currentOffset, file.length ?? 0, lEndian);
-            currentOffset += 4;
+            sgDV.writeUInt(file.length ?? 0, lEndian);
+
             // File Offset
             if (file.length !== 0)
-                sgDV.setUint32(currentOffset, sgCurrentFileOffset[fIndex] ?? 0, lEndian);
+                sgDV.writeUInt(sgCurrentFileOffset[fIndex] ?? 0, lEndian);
             else
-                sgDV.setUint32(currentOffset, 0, lEndian);
-            currentOffset += 4;
-            // File Timestamp (Thanks to PhoenixARC for helping me find out what this is!)
-            sgDV.setBigUint64(currentOffset, BigInt(Date.now()), lEndian);
-            currentOffset += 8;
+                sgDV.writeUInt(0, lEndian);
+            
+            // Possibly timestamp, writing as so still allows for world loading.
+            sgDV.writeULong(BigInt(Date.now()), lEndian);
             fIndex++;
         } else {
             console.log("File has no name... unable to add to index!");
         }
     }
-    return new File([new Blob([sgDV.buffer])], 'savegame.dat');
+    return new File([new Blob([sgDV.getBuffer()])], 'savegame.dat');
 }
