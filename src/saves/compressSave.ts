@@ -33,7 +33,7 @@ export async function compressSave(file: File, compType: compressionTypes, lEndi
     /** decompressed size as bigint */
     const fileSize = BigInt(fileArray.byteLength)
 
-    let compressedFile = new Uint8Array(fileArray);
+    let compressedFile = new Uint8Array([]);
 
     switch (compType) {
         case compressionTypes.zlib:
@@ -58,13 +58,19 @@ export async function compressSave(file: File, compType: compressionTypes, lEndi
             return new File([new Blob([fileArray])], file.name);
     }
 
-    /** allocate a dataview for the compressed data */
     const compWriter = new bWriter(new DataView(new Uint8Array([...fileArrayBuffer, ...compressedFile]).buffer), lEndian);
-    compWriter.writeLong(fileSize, lEndian)
+    console.log(compWriter.getBuffer());
+    if (compType !== compressionTypes.vitarle) {
+        compWriter.writeLong(fileSize, lEndian);
+    } else {
+        compWriter.writeInt(0, lEndian);
+        compWriter.writeInt(compressedFile.length, lEndian);
+    }
 
-    compressedFile.forEach(i => {
+    console.log(compressedFile);
+    for (let i = 0; i < compressedFile.length; i++) {
         compWriter.writeByte(compressedFile[i]!);
-    });
+    }
 
     return new File([new Blob([compWriter.getBuffer()])], file.name);
 }

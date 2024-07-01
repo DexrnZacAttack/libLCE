@@ -29,7 +29,7 @@ export class bWriter {
      * @param start Where to begin
      * @param end Where to end
     */
-    slice(start: number, end: number | undefined = undefined): ArrayBuffer {
+    slice(start: number, end?: number): ArrayBuffer {
         return this.dvWrite.buffer.slice(start, end);
     }
 
@@ -81,7 +81,7 @@ export class bWriter {
     writeInt(value: number, isLittleEndian = this.isLittle): void {
         const int = this.dvWrite.setInt32(this.curPos, value, isLittleEndian);
         this.curPos += 4;
-        int;
+        return int;
     }
 
     /** Writes a ULong

@@ -24,7 +24,7 @@
 // compression
 export { deflate as compressZlib, inflate as decompressZlib, deflateRaw as compressRLE, inflateRaw as decompressRLE } from "pako";
 export * from "./compression/VitaRLE.js";
-export * from "./compression/SwitchRLE.js";
+export * from "./compression/SwitchPS4RLE.js";
 // saves
 export * from "./saves/createSave.js";
 export * from "./saves/readSave.js";
@@ -53,6 +53,21 @@ export interface index {
     offset: number,
     timestamp: bigint,
     data: File
+}
+
+export enum endianness {
+    big,
+    little
+}
+
+export enum clientTypes {
+    Xbox360,
+    XboxOne,
+    PS3,
+    Vita,
+    PS4,
+    WiiU,
+    Switch
 }
 
 export enum compressionTypes {

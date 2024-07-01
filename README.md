@@ -16,6 +16,7 @@ A TS library for Minecraft Legacy Console Edition files + more
   
 # Credits
 - [Offroaders123](https://github.com/offroaders123)
+- [LegacyEditor](https://github.com/zugebot/LegacyEditor)
 - [zugebot](https://github.com/zugebot)
 - [EternalModz](https://github.com/EternalModz)
 - [PhoenixARC](https://github.com/PhoenixARC)

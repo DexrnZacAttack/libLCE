@@ -21,15 +21,45 @@
  * SOFTWARE.
 */
 
-// TODO: IMPLEMENT THIS.
+import { bReader } from "../io/bReader.js";
 
 /**
- * Decompresses SwitchRLE (used on Nintendo Switch Edition).
+ * This code is Zugebot (jerrinth3glitch)'s code ported to TS.
+ * https://github.com/zugebot/LegacyEditor
+*/
+
+/**
+ * Decompresses Switch/PS4 RLE
  * @param data The compressed data
  * @returns The decompressed data
 */
-/* export function decompressSwitchRLE(data: Uint8Array): Uint8Array | undefined {
-} */
+// Note: This is ported from LegacyEditor's rle_nsxps4.cpp
+export function decompressSwitchPS4RLE(data: Uint8Array): Uint8Array | undefined {
+    const decompressedLength = data.byteLength;
+    const writer: number[] = [];
+    const reader = new bReader(new DataView(data.buffer));
+
+    while (reader.getPos() < decompressedLength) {
+        let byte = reader.readByte();
+        if (byte != 0) {
+            writer.push(byte);
+        } else {
+            let zeroCount = reader.readByte();
+
+            if (zeroCount == 0) {
+                const zeroCount1 = reader.readByte();
+                const zeroCount2 = reader.readByte();
+                zeroCount = zeroCount1 << 8 | zeroCount2;
+                zeroCount += 256;
+            }
+
+            for (let i = 0; i < zeroCount; i++) {
+                writer.push(0);
+            }
+        }
+    }
+    return new Uint8Array(writer);
+} 
 
 /**
  * Compresses with SwitchRLE (used on Nintendo Switch Edition).

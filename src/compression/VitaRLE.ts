@@ -19,12 +19,15 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
-*/
+ */
+
+import { bReader } from "../io/bReader.js";
+import { bWriter } from "../io/bWriter.js";
 
 /**
  * The VitaRLE code is Zugebot (jerrinth3glitch)'s code ported to TS.
  * https://github.com/zugebot/LegacyEditor
- * 
+ *
  * Big thanks to Offroaders for helping out with this, would've been barely possible without them!
 */
 
@@ -33,81 +36,104 @@
  * @param data The compressed data
  * @returns The decompressed data
 */
+// Note: This is ported from LegacyEditor's rle_vita.cpp
 export function decompressVitaRLE(data: Uint8Array): Uint8Array {
-    const compressedLength = data.byteLength;
-    const result: number[] = [];
-    let readOffset = 0;
-    let writeOffset = 0;
-  
-    while (readOffset < compressedLength){
-      const suspectedTag: number = data[readOffset]!;
-      readOffset++;
-  
-      if (suspectedTag !== 0){
-        result[writeOffset] = suspectedTag;
-        writeOffset++;
-      } else {
-        const length: number = data[readOffset]!;
-        readOffset++;
-        for (let i = 0; i < length; i++){
-          result.push(0);
-          writeOffset++;
-        }
-      }
-    }
-  
-    return new Uint8Array(result);
-}
-
-/**
- * Compresses with VitaRLE (used on PSVita Edition).
- * @param data The decompressed data
- * @returns The compressed data
-*/
-export function compressVitaRLE(data: Uint8Array): Uint8Array {
   const compressedLength = data.byteLength;
   const result: number[] = [];
   let readOffset = 0;
   let writeOffset = 0;
-  let zeroCount = 0;
 
-  while (readOffset < compressedLength){
+  while (readOffset < compressedLength) {
     const suspectedTag: number = data[readOffset]!;
     readOffset++;
 
-    if (suspectedTag !== 0){
-      if (zeroCount > 0) {
-        result[writeOffset] = 0;
-        writeOffset++;
-        result[writeOffset] = zeroCount;
-        writeOffset++;
-        zeroCount = 0;
-      }
+    if (suspectedTag !== 0) {
       result[writeOffset] = suspectedTag;
       writeOffset++;
     } else {
       const length: number = data[readOffset]!;
       readOffset++;
-      for (let i = 0; i < length; i++){
+      for (let i = 0; i < length; i++) {
         result.push(0);
         writeOffset++;
-        zeroCount++;
-        if (zeroCount === 255 || readOffset === compressedLength - 1) {
-          result[writeOffset] = 0;
-          writeOffset++;
-          result[writeOffset] = zeroCount;
-          writeOffset++;
-          zeroCount = 0;
-        }
+      }
+    }
+  }
+
+  return new Uint8Array(result);
+}
+
+function getCompressedSize(data: Uint8Array): number {
+  const sizeIn = data.byteLength;
+  const reader = new bReader(new DataView(data.buffer));
+  let zeroCount: number = 0;
+  let compressedSize: number = 0;
+
+  for (var i = 0; i < sizeIn; ++i) {
+    let val: number;
+    if ((val = reader.readByte()) != 0) {
+      if (zeroCount > 0) {
+        compressedSize += 2;
+        zeroCount = 0;
+      }
+      compressedSize += 1;
+    } else {
+      zeroCount++;
+      if (zeroCount == 255 || i == sizeIn - 1) {
+        compressedSize += 2;
+        zeroCount = 0;
       }
     }
   }
 
   if (zeroCount > 0) {
-    result[writeOffset] = 0;
-    writeOffset++;
-    result[writeOffset] = zeroCount;
+    compressedSize += 2;
   }
 
-  return new Uint8Array(result);
+  return compressedSize;
+}
+
+
+
+/**
+ * Compresses with VitaRLE (used on PSVita Edition).
+ * @param data The decompressed data
+ * @returns The compressed data
+ */
+// Note: This is ported from LegacyEditor's rle_vita.cpp
+// NOT WORKING!
+export function compressVitaRLE(data: Uint8Array): Uint8Array {
+
+  const writer = new bWriter(new DataView(new ArrayBuffer(getCompressedSize(data))));
+  const reader = new bReader(new DataView(data.buffer), false, 0);
+
+  let zeroCount: number = 0;
+
+  for (let i = 0; i < data.byteLength; ++i) {
+    let value: number;
+    if ((value = reader.readByte()) != 0x00) {
+      if (zeroCount > 0) {
+        writer.writeByte(0x00);
+        writer.writeByte(zeroCount);
+        zeroCount = 0;
+      }
+      writer.writeByte(value);
+    } else {
+      zeroCount++;
+      if (zeroCount == 255 || i == data.byteLength - 1) {
+        writer.writeByte(0x00);
+        writer.writeByte(zeroCount);
+        zeroCount = 0;
+      }
+    }
+  }
+
+  if (zeroCount > 0) {
+    writer.writeByte(0x00);
+    writer.writeByte(zeroCount);
+  }
+
+  console.log(reader);
+  console.log(writer);
+  return new Uint8Array(writer.getBuffer());
 }

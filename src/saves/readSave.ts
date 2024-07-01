@@ -64,8 +64,9 @@ export async function readSave(saveFile: File, lEndian = false): Promise<save> {
             const fileLength = saveReader.readUInt();
             /** Location (Offset) of the file in the index */
             const fileOffset = saveReader.readUInt();
-            /** Timestmap of the file (unusable due to how it's written.) */
+            /** Timestamp of the file (unusable due to how it's written.) */
             const fileTimestamp = saveReader.readULong();
+            
             const fileData: ArrayBuffer = saveReader.slice(fileOffset, fileOffset + fileLength);
             index.push({"name": fileName, "length": fileLength, "offset": fileOffset, "timestamp": fileTimestamp, "data": new File( [new Blob( [ new Uint8Array(fileData) ] )], fileName )})
         }
