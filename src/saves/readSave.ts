@@ -1,4 +1,4 @@
-/**
+/*
  * MIT License
  * Copyright (c) 2024 Dexrn ZacAttack
  *
@@ -51,8 +51,8 @@ export async function readSave(saveFile: File, lEndian = false): Promise<save> {
     // https://github.com/zugebot/legacyeditor for these 2 shorts
     /** Minimum supported LCE version */
     const fileMinimumVersion = saveReader.readShort();
-    /** Maximum supported LCE version */
-    const fileMaximumVersion = saveReader.readShort();
+    /** Current LCE file version */
+    const fileVersion = saveReader.readShort();
     
     saveReader.incrementPos(indexOffset - 12);
 
@@ -72,5 +72,5 @@ export async function readSave(saveFile: File, lEndian = false): Promise<save> {
         }
     }
 
-    return {"indexOffset": indexOffset, "fileCount": indexCount, "minVerSupported": fileMinimumVersion, "maxVerSupported": fileMaximumVersion, "fileIndex": index};
+    return {"indexOffset": indexOffset, "fileCount": indexCount, "fileMinVerSupported": fileMinimumVersion, "fileVersion": fileVersion, "fileIndex": index};
 }

@@ -38,6 +38,7 @@ import { bWriter } from "../io/bWriter.js";
 */
 // Note: This is ported from LegacyEditor's rle_vita.cpp
 export function decompressVitaRLE(data: Uint8Array): Uint8Array {
+  // TODO: use bReader bWriter once they are dynamically sizable
   const compressedLength = data.byteLength;
   const result: number[] = [];
   let readOffset = 0;
@@ -63,6 +64,7 @@ export function decompressVitaRLE(data: Uint8Array): Uint8Array {
   return new Uint8Array(result);
 }
 
+// TODO: remove these getSize functions, they are janky.
 function getCompressedSize(data: Uint8Array): number {
   const sizeIn = data.byteLength;
   const reader = new bReader(new DataView(data.buffer));
@@ -97,15 +99,14 @@ function getCompressedSize(data: Uint8Array): number {
 
 /**
  * Compresses with VitaRLE (used on PSVita Edition).
- * @param data The decompressed data
- * @returns The compressed data
+ * @param data Data to compress
+ * @returns Compressed data
  */
 // Note: This is ported from LegacyEditor's rle_vita.cpp
-// NOT WORKING!
 export function compressVitaRLE(data: Uint8Array): Uint8Array {
 
   const writer = new bWriter(new DataView(new ArrayBuffer(getCompressedSize(data))));
-  const reader = new bReader(new DataView(data.buffer), false, 0);
+  const reader = new bReader(new DataView(data.buffer));
 
   let zeroCount: number = 0;
 
@@ -133,7 +134,5 @@ export function compressVitaRLE(data: Uint8Array): Uint8Array {
     writer.writeByte(zeroCount);
   }
 
-  console.log(reader);
-  console.log(writer);
   return new Uint8Array(writer.getBuffer());
 }

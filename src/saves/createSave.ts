@@ -1,4 +1,4 @@
-/**
+/*
  * MIT License
  * Copyright (c) 2024 Dexrn ZacAttack
  *
@@ -40,15 +40,15 @@ const indexEntryLength: number = 144
 let uFileName!: string;
 
 interface saveOptions {
-    verMin: number;
-    verMax: number;
+    verMinimum: number;
+    verCurrent: number;
 }
 
 /** Generates a savefile.
  * @param files Array of files to put in the savegame.
  * @param lEndian Whether to use Little endian or not, default is no.
  */
-export function generateSave(files: [File, Buffer][], lEndian: boolean = false, saveOptions: saveOptions = {"verMin": 11, "verMax": 11}): File {
+export function generateSave(files: [File, Buffer][], lEndian: boolean = false, saveOptions: saveOptions = {"verMinimum": 11, "verCurrent": 11}): File {
     /**
      * This is used to keep track of what file we are on... only used in one place though. (sgCurrentFileOffset)
     */
@@ -83,8 +83,8 @@ export function generateSave(files: [File, Buffer][], lEndian: boolean = false, 
     saveWriter.writeUInt(offset, lEndian);
     saveWriter.writeUInt(count, lEndian);
     // https://github.com/zugebot/legacyeditor for both of these 2 shorts.
-    saveWriter.writeShort(saveOptions.verMin, lEndian);
-    saveWriter.writeShort(saveOptions.verMax, lEndian);
+    saveWriter.writeUShort(saveOptions.verMinimum, lEndian);
+    saveWriter.writeUShort(saveOptions.verCurrent, lEndian);
 
     /**
      * For each file in the index, we keep an offset that says where the file starts, we use fIndex to see each file's offset.

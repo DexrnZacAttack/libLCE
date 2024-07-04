@@ -4,10 +4,10 @@ A TS library for Minecraft Legacy Console Edition files + more
 ![Progress](/assets/cur_progress.png)
 
 # Progress
-- [ ] Console compression types - 30% complete
+- [ ] Console compression types - 50% complete
 - [x] Savegame parsing
-- [ ] Savegame creation - 90% complete
-- [ ] World info parsing - 30% complete
+- [x] Savegame creation
+- [ ] World info parsing - 50% complete
 - [ ] World folder parsing
 - [ ] Region parsing
 - [ ] Region creation
@@ -16,8 +16,9 @@ A TS library for Minecraft Legacy Console Edition files + more
   
 # Credits
 - [Offroaders123](https://github.com/offroaders123)
-- [LegacyEditor](https://github.com/zugebot/LegacyEditor)
+- [LegacyEditor](https://github.com/zugebot/LegacyEditor) (A lot of compression stuff was ported from this project)
 - [zugebot](https://github.com/zugebot)
+- [UtterEvergreen1](https://github.com/UtterEvergreen1)
 - [EternalModz](https://github.com/EternalModz)
 - [PhoenixARC](https://github.com/PhoenixARC)
 - [Project Lodestone](https://github.com/Team-Lodestone)

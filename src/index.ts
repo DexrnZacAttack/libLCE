@@ -1,4 +1,4 @@
-/**
+/*
  * MIT License
  * Copyright (c) 2024 Dexrn ZacAttack
  *
@@ -22,7 +22,8 @@
 */
 
 // compression
-export { deflate as compressZlib, inflate as decompressZlib, deflateRaw as compressRLE, inflateRaw as decompressRLE } from "pako";
+// maybe name these inflate, deflate.
+export { deflate as compressZlib, inflate as decompressZlib, deflateRaw as compressDeflate, inflateRaw as decompressDeflate } from "pako";
 export * from "./compression/VitaRLE.js";
 export * from "./compression/SwitchPS4RLE.js";
 // saves
@@ -30,20 +31,31 @@ export * from "./saves/createSave.js";
 export * from "./saves/readSave.js";
 export * from "./saves/compressSave.js";
 // world
-export * from "./world/parseWorldInfo.js";
+export * from "./world/readWorldInfo.js";
 // loc
 export * from "./loc/readLoc.js";
+// consoles
+export * from "./console/consoles.js";
+
+export interface worldInfo {
+    "4J_SEED": string,
+    "4J_HOSTOPTIONS": string,
+    "4J_TEXTUREPACK": string,
+    "4J_EXTRADATA": string,
+    "4J_#LOADS": string
+}
 
 export interface World {
-    name: string,
-    thumbnail: File
+    name?: string,
+    thumbnail: File,
+    worldInfo: worldInfo
 }
 
 export interface save {
     indexOffset: number,
     fileCount: number,
-    minVerSupported: number,
-    maxVerSupported: number,
+    fileMinVerSupported: number,
+    fileVersion: number,
     fileIndex: index[]
 }
 
@@ -60,7 +72,17 @@ export enum endianness {
     little
 }
 
-export enum clientTypes {
+// https://github.com/Team-Lodestone/Documentation/blob/main/LCE/LCE%20File%20Versions.md
+export enum fileVersion {
+    // version names are equivalent to the first version where the file version is used
+    // e.g TU5 is the first version to use file version 3.
+    TU0033,
+    TU0035,
+    TU0054,
+    TU5
+}
+
+export enum consoleTypes {
     Xbox360,
     XboxOne,
     PS3,
@@ -73,9 +95,9 @@ export enum clientTypes {
 export enum compressionTypes {
     gzip = 1,
     zlib,
-    rle,
+    deflate,
     vitarle,
-    switchrle,
+    switchps4rle,
     lzx,
     none
 }

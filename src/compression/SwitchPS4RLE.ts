@@ -1,4 +1,4 @@
-/**
+/*
  * MIT License
  * Copyright (c) 2024 Dexrn ZacAttack
  *
@@ -22,6 +22,7 @@
 */
 
 import { bReader } from "../io/bReader.js";
+import { bWriter } from "../io/bWriter.js";
 
 /**
  * This code is Zugebot (jerrinth3glitch)'s code ported to TS.
@@ -61,10 +62,70 @@ export function decompressSwitchPS4RLE(data: Uint8Array): Uint8Array | undefined
     return new Uint8Array(writer);
 } 
 
+// TODO: remove these getSize functions, they are janky.
+export function getCompressedSize(data: Uint8Array): number {
+    let compressedSize = 0;
+
+    const reader = new bReader(new DataView(data.buffer));
+
+    while (reader.getPos() < data.length) {
+        let value;
+        if ((value = reader.readByte()) != 0) {
+            compressedSize++;
+            continue;
+        }
+
+        let runCount = 1;
+        while (reader.getPos() + runCount < data.length && data[reader.getPos() + runCount] == 0) {
+            runCount++;
+        }
+
+        if (runCount < 256) {
+            compressedSize += 2;
+        } else {
+            compressedSize += 4;
+        }
+
+        reader.curPos += runCount;
+    }
+
+    return compressedSize;
+}
+
+
 /**
- * Compresses with SwitchRLE (used on Nintendo Switch Edition).
- * @param data The compressed data
- * @returns The decompressed data
+ * Compresses with Switch/PS4 RLE
+ * @param data Data to compress
+ * @returns Compressed data
 */
-/* export function compressSwitchRLE(data: Uint8Array): Uint8Array | undefined {
-} */
+// Note: This is ported from LegacyEditor's rle_nsxps4.cpp
+export function compressSwitchPS4RLE(data: Uint8Array): Uint8Array {
+    const writer = new bWriter(new DataView(new ArrayBuffer(getCompressedSize(data))));
+    const reader = new bReader(new DataView(data.buffer));
+
+    while (reader.getPos() < data.length) {
+        let value;
+        if ((value = reader.readByte()) != 0) {
+            writer.writeByte(value!);
+            continue;
+        }
+
+        let runCount = 1;
+        while (reader.getPos() + runCount < data.length && data[reader.getPos() + runCount] == 0) {
+            runCount++;
+        }
+
+        if (runCount < 256) {
+            writer.writeByte(0);
+            writer.writeByte(runCount);
+        } else {
+            writer.writeByte(0);
+            writer.writeByte(0);
+            writer.writeByte((runCount >> 8) - 1);
+            writer.writeByte(runCount & 255);
+        }
+
+        reader.curPos += runCount;
+    }
+    return new Uint8Array(writer.getBuffer());
+}

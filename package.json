@@ -1,6 +1,6 @@
 {
   "name": "liblce",
-  "version": "1.2.4",
+  "version": "1.2.5",
   "description": "A TS library for Minecraft Legacy Console Edition files + more",
   "type": "module",
   "main": "./dist/index.js",
@@ -32,6 +32,7 @@
   "license": "MIT",
   "dependencies": {
     "@types/pako": "^2.0.3",
+    "@vivaxy/png": "^1.3.0",
     "pako": "^2.1.0",
     "typescript": "^5.4.5"
   },
