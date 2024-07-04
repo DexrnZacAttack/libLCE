@@ -37,7 +37,7 @@ export async function compressSave(file: File, compType: compressionTypes, lEndi
         case compressionTypes.zlib:
             compressedFile = compressZlib(fileArray);
             break;
-        case compressionTypes.rle:
+        case compressionTypes.deflate:
             compressedFile = compressDeflate(fileArray);
             break;
         case compressionTypes.vitarle:

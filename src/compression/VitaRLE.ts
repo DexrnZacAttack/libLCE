@@ -1,4 +1,4 @@
-/**
+/*
  * MIT License
  * Copyright (c) 2024 Dexrn ZacAttack
  *
@@ -19,7 +19,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- */
+*/
 
 import { bReader } from "../io/bReader.js";
 import { bWriter } from "../io/bWriter.js";
@@ -72,8 +72,7 @@ function getCompressedSize(data: Uint8Array): number {
   let compressedSize: number = 0;
 
   for (var i = 0; i < sizeIn; ++i) {
-    let val: number;
-    if ((val = reader.readByte()) != 0) {
+    if (reader.readByte() != 0) {
       if (zeroCount > 0) {
         compressedSize += 2;
         zeroCount = 0;

@@ -69,8 +69,7 @@ export function getCompressedSize(data: Uint8Array): number {
     const reader = new bReader(new DataView(data.buffer));
 
     while (reader.getPos() < data.length) {
-        let value;
-        if ((value = reader.readByte()) != 0) {
+        if (reader.readByte() != 0) {
             compressedSize++;
             continue;
         }
