@@ -102,7 +102,6 @@ export class bReader {
     */
     readUInt(isLittleEndian = this.isLittle): number {
         const uint = this.dvRead.getUint32(this.curPos, isLittleEndian);
-        console.log(this.curPos);
         this.curPos += 4;
         return uint;
     }
@@ -175,6 +174,19 @@ export class bReader {
         return str;
     }
 
+    /** Reads a null-terminated UTF8 string */
+    readNullTerminatedString8(): string {
+        let str = "";
+        while (true) {
+            const byte = this.readByte();
+            if (byte === 0x00) {
+                break;
+            }
+            str += String.fromCharCode(byte);
+        }
+        return str;
+    }
+
     /** Increments the position in the stream
      * @param num How much to increment the position
     */
@@ -192,6 +204,20 @@ export class bReader {
     /** Returns the current position in the stream */
     getPos(): number {
         return this.curPos;
+    }
+
+    /** Sets the position in the string
+     * @param num What position to be at
+    */
+    setPos(num: number): void {
+        this.curPos = num;
+    }
+
+    /** Sets the endianness
+     * @param isLittleEndian If true, it gets set to Little Endian.
+    */
+    setEndianness(isLittleEndian: boolean): void {
+        this.isLittle = isLittleEndian;
     }
 
     /** Reads a Byte without incrementing the position in the stream

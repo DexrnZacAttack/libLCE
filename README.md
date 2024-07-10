@@ -13,6 +13,7 @@ A TS library for Minecraft Legacy Console Edition files + more
 - [ ] Region creation
 - [ ] Chunk parsing
 - [ ] Chunk creation
+- [ ] Other file formats
   
 # Credits
 - [Offroaders123](https://github.com/offroaders123)

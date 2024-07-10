@@ -36,6 +36,15 @@ export * from "./world/readWorldInfo.js";
 export * from "./loc/readLoc.js";
 // consoles
 export * from "./console/consoles.js";
+// msscmp
+export * from "./msscmp/readMSSCMP.js";
+
+export interface msscmpFile {
+    fileName: string,
+    fileSize: number,
+    sampleRate: number
+    file: File;
+}
 
 export interface worldInfo {
     "4J_SEED": string,

@@ -66,6 +66,16 @@ export class bWriter {
         });
     }
 
+    /** Writes bytes from an array.
+    * @param byte Byte to write
+    * @param amount Amount of bytes to write
+    */
+    writeAmountOfBytes(byte: number, amount: number): void {
+        console.log(amount);
+        for (var i = 0; i < amount; i++)
+            this.writeByte(byte);
+    }
+
     /** Writes a Byte
      * @param value The value to write.
     */
@@ -165,11 +175,15 @@ export class bWriter {
 
     /** Writes a UTF8 string
      * @param string The string to write
+     * @param isNullTerminated Determines whether or not to append a null byte to the end of the string
     */
-    writeString8(string: string) {
+    writeString8(string: string, isNullTerminated: boolean = false) {
         ([...string]).forEach((char) => {
                 this.writeByte(char.charCodeAt(0));
         });
+        if (isNullTerminated) {
+            this.writeByte(0);
+        }
     }
 
     /** Increments the position in the stream
@@ -186,8 +200,22 @@ export class bWriter {
         this.curPos -= num;
     }
 
+    /** Sets the position in the string
+     * @param num What position to be at
+    */
+    setPos(num: number): void {
+        this.curPos = num;
+    }
+
     /** Returns the current position in the stream */
     getPos(): number {
         return this.curPos;
+    }
+
+    /** Sets the endianness
+     * @param isLittleEndian If true, it gets set to Little Endian.
+    */
+    setEndianness(isLittleEndian: boolean): void {
+        this.isLittle = isLittleEndian;
     }
 }

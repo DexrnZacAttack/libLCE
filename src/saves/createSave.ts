@@ -132,7 +132,7 @@ export function generateSave(files: [File, Buffer][], lEndian: boolean = false, 
             saveWriter.writeULong(BigInt(Date.now()));
             fIndex++;
         } else {
-            console.log("File has no name... unable to add to index!");
+            console.warn("File has no name... unable to add to index!");
         }
     }
     return new File([new Blob([saveWriter.getBuffer()])], 'savegame.dat');
