@@ -29,9 +29,9 @@ import { bWriter } from "../io/bWriter.js";
 const headerLength: number = 12;
 
 /**
- * This is the number of bytes that an entry in the index takes up, which is 144.
+ * This is the number of bytes that an entry in the index takes up, which is 144 (136 for pre-release)
 */
-const indexEntryLength: number = 144
+let indexEntryLength: number = 144
 
 /**
  * This contains the current file's name.
@@ -70,7 +70,11 @@ export function generateSave(files: [File, Buffer][], lEndian: boolean = false, 
     /**
      * This is the second part of the 8 byte header containing the number of files that is in the index.
      */
-    const count: number = files.length;
+    let count: number = files.length;
+
+    if (saveOptions.verCurrent < 2) {
+        indexEntryLength = 136;
+    }
 
     console.log(`There are ${count} files in the folder, of which take up ${filesLength} bytes space.`);
     
@@ -81,7 +85,7 @@ export function generateSave(files: [File, Buffer][], lEndian: boolean = false, 
 
     // Write offset and count to start of file
     saveWriter.writeUInt(offset, lEndian);
-    saveWriter.writeUInt(count, lEndian);
+    saveWriter.writeUInt((saveOptions.verCurrent < 2 ? count * indexEntryLength : count), lEndian);
     // https://github.com/zugebot/legacyeditor for both of these 2 shorts.
     saveWriter.writeUShort(saveOptions.verMinimum, lEndian);
     saveWriter.writeUShort(saveOptions.verCurrent, lEndian);
@@ -128,8 +132,10 @@ export function generateSave(files: [File, Buffer][], lEndian: boolean = false, 
             else
                 saveWriter.writeUInt(0);
             
-            // Timestamp, not in the same format (consoles write some weird one based on reset time, or other factors)
-            saveWriter.writeULong(BigInt(Date.now()));
+            if (saveOptions.verCurrent > 1) {
+                // Timestamp, not in the same format (consoles write some weird one based on reset time, or other factors)
+                saveWriter.writeULong(BigInt(Date.now()));
+            }
             fIndex++;
         } else {
             console.warn("File has no name... unable to add to index!");

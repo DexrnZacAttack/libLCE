@@ -24,7 +24,12 @@
 import { decompressZlib, index, save } from "../index.js";
 import { bReader } from "../io/bReader.js";
 
-export async function readSave(saveFile: File, lEndian = false): Promise<save> {
+interface readOptions {
+    /** Ignores the version parameter which is used for endianness detection. */
+    ignoreVersion?: boolean
+}
+
+export async function readSave(saveFile: File, lEndian = false, ro: readOptions = {ignoreVersion: false}): Promise<save> {
     const index: index[] = []
 
     let saveReader = new bReader(new DataView(await saveFile.arrayBuffer()), lEndian);
@@ -42,30 +47,55 @@ export async function readSave(saveFile: File, lEndian = false): Promise<save> {
         console.log("ZLib decompression failed, file probably isnt compressed.");
     }
 
+    if (!ro.ignoreVersion) {
+        saveReader.setPos(10);
+        const ver = saveReader.readUShort();
+        // it works though...
+        if (ver > 50) {
+            console.warn(`Invalid version ${ver}, trying with reverse endian... To disable this behavior, you need to have ignoreVersion set to true in the ro param.`);
+            saveReader.setEndianness(!lEndian);
+        }
+        saveReader.setPos(0);
+    }
+
     /** Where the index is located in the file */
     const indexOffset = saveReader.readUInt();
 
+    
     /** How many files are located in the index */
-    const indexCount = saveReader.readUInt();
+    let indexCount = saveReader.readUInt();
 
     // https://github.com/zugebot/legacyeditor for these 2 shorts
     /** Minimum supported LCE version */
-    const fileMinimumVersion = saveReader.readShort();
+    const fileMinimumVersion = saveReader.readUShort();
     /** Current LCE file version */
-    const fileVersion = saveReader.readShort();
+    const fileVersion = saveReader.readUShort();
+
+    let indexEntrySize = 144;
+
+    if (fileVersion < 2) {
+        // pr versions have count in bytes.
+        indexEntrySize = 136;
+        indexCount = indexCount / indexEntrySize;
+    }
     
     saveReader.incrementPos(indexOffset - 12);
 
     for (var i = 0; i < indexCount; i++) {
-        while (saveReader.getPos() + 144 <= saveReader.byteLength()) {
+        while (saveReader.getPos() + indexEntrySize <= saveReader.byteLength()) {
             /** Name of the file in the index */
             const fileName = saveReader.readString16(128);
             /** Length of file in the index */
             const fileLength = saveReader.readUInt();
             /** Location (Offset) of the file in the index */
             const fileOffset = saveReader.readUInt();
+
             /** Timestamp of the file (unusable due to how it's written.) */
-            const fileTimestamp = saveReader.readULong();
+            let fileTimestamp = 0n;
+            if (fileVersion > 1) {
+                // pr versions don't include timestamp
+                fileTimestamp = saveReader.readULong();
+            }
             
             const fileData: ArrayBuffer = saveReader.slice(fileOffset, fileOffset + fileLength);
             index.push({"name": fileName, "length": fileLength, "offset": fileOffset, "timestamp": fileTimestamp, "data": new File( [new Blob( [ new Uint8Array(fileData) ] )], fileName )})
