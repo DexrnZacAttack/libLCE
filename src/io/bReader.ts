@@ -115,6 +115,43 @@ export class bReader {
         return int;
     }
 
+    /** Reads a UInt24
+     * @param isLittleEndian Whether or not to read as Little Endian
+     */
+    readUInt24(isLittleEndian = this.isLittle): number {
+        let uint24 = 0;
+        if (isLittleEndian) {
+            uint24 = this.readByte() |
+                    (this.readByte() << 8) |
+                    (this.readByte() << 16);
+        } else {
+            uint24 = (this.readByte() << 16) |
+                    (this.readByte() << 8) |
+                    this.readByte();
+        }
+        return uint24;
+    }
+
+    /** Reads an Int24
+     * @param isLittleEndian Whether or not to read as Little Endian
+     */
+    readInt24(isLittleEndian = this.isLittle): number {
+        let int24 = 0;
+        if (isLittleEndian) {
+            int24 = this.readByte() |
+                    (this.readByte() << 8) |
+                    (this.readByte() << 16);
+        } else {
+            int24 = (this.readByte() << 16) |
+                    (this.readByte() << 8) |
+                    this.readByte();
+        }
+        if (int24 & 0x800000) {
+            int24 |= 0xFF000000;
+        }
+        return int24;
+    }
+
     /** Reads a ULong
      * @param isLittleEndian Whether or not to read as Little Endian
     */
