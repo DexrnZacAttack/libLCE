@@ -21,46 +21,25 @@
  * SOFTWARE.
 */
 
+import { bCommons } from "./bCommons.js";
+
 // Dexrn: Scuffed BinaryWriter clone.
-export class bWriter {
+export class bWriter extends bCommons {
     // TODO: use sizable arrays instead of allocated at call time
-    dvWrite: DataView;
-    curPos: number;
-    isLittle: boolean;
 
     /** Creates an endianness-aware DataView with built in position tracking
-     * @param dvRead The DataView
+     * @param dvWrite The DataView
      * @param isLittle Whether or not to read as Little Endian
      * @param curPos Position to start at
     */
     constructor(dvWrite: DataView, isLittle: boolean = false, curPos = 0) {
-        this.dvWrite = dvWrite;
-        this.isLittle = isLittle;
-        this.curPos = curPos;
-    }
-
-    /** Returns the ArrayBuffer of the entire stream. */
-    getBuffer(): ArrayBuffer {
-        return this.dvWrite.buffer;
-    }
-
-    /** Equivalent to ArrayBuffer.byteLength */
-    byteLength(): number {
-        return this.dvWrite.buffer.byteLength;
-    }
-
-    /** Equivalent to ArrayBuffer.slice
-     * @param start Where to begin
-     * @param end Where to end
-    */
-    slice(start: number, end?: number): ArrayBuffer {
-        return this.dvWrite.buffer.slice(start, end);
+        super(dvWrite, isLittle, curPos);
     }
 
     /** Writes bytes from an array.
     * @param bytes Array of bytes to write
     */
-    write(bytes: Uint8Array): void {
+    public write(bytes: Uint8Array): void {
         bytes.forEach(byte => {
             this.writeByte(byte);
         });
@@ -70,8 +49,7 @@ export class bWriter {
     * @param byte Byte to write
     * @param amount Amount of bytes to write
     */
-    writeAmountOfBytes(byte: number, amount: number): void {
-        console.log(amount);
+    public writeAmountOfBytes(byte: number, amount: number): void {
         for (var i = 0; i < amount; i++)
             this.writeByte(byte);
     }
@@ -79,23 +57,23 @@ export class bWriter {
     /** Writes a Byte
      * @param value The value to write.
     */
-    writeByte(value: number): void {
-        this.dvWrite.setUint8(this.curPos++, value);
+    public writeByte(value: number): void {
+        this.dv.setUint8(this.curPos++, value);
     }
 
     /** Writes an SByte
      * @param value The value to write.
     */
-    writeSByte(value: number): void {
-        this.dvWrite.setInt8(this.curPos++, value);
+    public writeSByte(value: number): void {
+        this.dv.setInt8(this.curPos++, value);
     }
 
     /** Writes a UShort
      * @param value The value to write.
      * @param isLittleEndian Whether or not to write as Little Endian
     */
-    writeUShort(value: number, isLittleEndian = this.isLittle): void {
-        this.dvWrite.setUint16(this.curPos, value, isLittleEndian);
+    public writeUShort(value: number, isLittleEndian = this.isLittle): void {
+        this.dv.setUint16(this.curPos, value, isLittleEndian);
         this.curPos += 2;
     }
 
@@ -103,8 +81,8 @@ export class bWriter {
      * @param value The value to write.
      * @param isLittleEndian Whether or not to write as Little Endian
     */
-    writeShort(value: number, isLittleEndian = this.isLittle): void {
-        this.dvWrite.setInt16(this.curPos, value, isLittleEndian);
+    public writeShort(value: number, isLittleEndian = this.isLittle): void {
+        this.dv.setInt16(this.curPos, value, isLittleEndian);
         this.curPos += 2;
     }
 
@@ -112,8 +90,8 @@ export class bWriter {
      * @param value The value to write.
      * @param isLittleEndian Whether or not to write as Little Endian
     */
-    writeUInt(value: number, isLittleEndian = this.isLittle): void {
-        this.dvWrite.setUint32(this.curPos, value, isLittleEndian);
+    public writeUInt(value: number, isLittleEndian = this.isLittle): void {
+        this.dv.setUint32(this.curPos, value, isLittleEndian);
         this.curPos += 4;
     }
 
@@ -121,8 +99,8 @@ export class bWriter {
      * @param value The value to write.
      * @param isLittleEndian Whether or not to write as Little Endian
     */
-    writeInt(value: number, isLittleEndian = this.isLittle): void {
-        const int = this.dvWrite.setInt32(this.curPos, value, isLittleEndian);
+    public writeInt(value: number, isLittleEndian = this.isLittle): void {
+        const int = this.dv.setInt32(this.curPos, value, isLittleEndian);
         this.curPos += 4;
         return int;
     }
@@ -131,8 +109,8 @@ export class bWriter {
      * @param value The value to write.
      * @param isLittleEndian Whether or not to write as Little Endian
     */
-    writeULong(value: bigint, isLittleEndian = this.isLittle): void {
-        this.dvWrite.setBigUint64(this.curPos, value, isLittleEndian);
+    public writeULong(value: bigint, isLittleEndian = this.isLittle): void {
+        this.dv.setBigUint64(this.curPos, value, isLittleEndian);
         this.curPos += 8;
     }
 
@@ -140,8 +118,8 @@ export class bWriter {
      * @param value The value to write.
      * @param isLittleEndian Whether or not to write as Little Endian
     */
-    writeLong(value: bigint, isLittleEndian = this.isLittle): void {
-        this.dvWrite.setBigInt64(this.curPos, value, isLittleEndian);
+    public writeLong(value: bigint, isLittleEndian = this.isLittle): void {
+        this.dv.setBigInt64(this.curPos, value, isLittleEndian);
         this.curPos += 8;
     }
 
@@ -149,8 +127,8 @@ export class bWriter {
      * @param value The value to write.
      * @param isLittleEndian Whether or not to write as Little Endian
     */
-    writeFloat(value: number, isLittleEndian = this.isLittle): void {
-        this.dvWrite.setFloat32(this.curPos, value, isLittleEndian);
+    public writeFloat(value: number, isLittleEndian = this.isLittle): void {
+        this.dv.setFloat32(this.curPos, value, isLittleEndian);
         this.curPos += 4;
     }
 
@@ -158,8 +136,8 @@ export class bWriter {
      * @param value The value to write.
      * @param isLittleEndian Whether or not to write as Little Endian
     */
-    writeDouble(value: number, isLittleEndian = this.isLittle): void {
-        this.dvWrite.setFloat64(this.curPos, value, isLittleEndian);
+    public writeDouble(value: number, isLittleEndian = this.isLittle): void {
+        this.dv.setFloat64(this.curPos, value, isLittleEndian);
         this.curPos += 8;
     }
 
@@ -167,7 +145,7 @@ export class bWriter {
      * @param string The string to write
      * @param isLittleEndian Whether or not to write as Little Endian
     */
-    writeString16(string: string, isLittleEndian = this.isLittle) {
+    public writeString16(string: string, isLittleEndian = this.isLittle) {
         ([...string]).forEach((char) => {
                 this.writeShort((char.charCodeAt(0)), isLittleEndian);
         });
@@ -177,7 +155,7 @@ export class bWriter {
      * @param string The string to write
      * @param isNullTerminated Determines whether or not to append a null byte to the end of the string
     */
-    writeString8(string: string, isNullTerminated: boolean = false) {
+    public writeString8(string: string, isNullTerminated: boolean = false) {
         ([...string]).forEach((char) => {
                 this.writeByte(char.charCodeAt(0));
         });
@@ -186,36 +164,4 @@ export class bWriter {
         }
     }
 
-    /** Increments the position in the stream
-     * @param num How much to increment the position
-    */
-    incrementPos(num: number): void {
-        this.curPos += num;
-    }
-
-    /** Decrements the position in the stream
-     * @param num How much to decrement the position
-    */
-    decrementPos(num: number): void {
-        this.curPos -= num;
-    }
-
-    /** Sets the position in the string
-     * @param num What position to be at
-    */
-    setPos(num: number): void {
-        this.curPos = num;
-    }
-
-    /** Returns the current position in the stream */
-    getPos(): number {
-        return this.curPos;
-    }
-
-    /** Sets the endianness
-     * @param isLittleEndian If true, it gets set to Little Endian.
-    */
-    setEndianness(isLittleEndian: boolean): void {
-        this.isLittle = isLittleEndian;
-    }
 }

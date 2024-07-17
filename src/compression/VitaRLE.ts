@@ -133,5 +133,5 @@ export function compressVitaRLE(data: Uint8Array): Uint8Array {
     writer.writeByte(zeroCount);
   }
 
-  return new Uint8Array(writer.getBuffer());
+  return new Uint8Array(writer.buffer);
 }

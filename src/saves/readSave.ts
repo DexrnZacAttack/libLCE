@@ -21,7 +21,7 @@
  * SOFTWARE.
 */
 
-import { decompressZlib, index, save } from "../index.js";
+import { decompressZlib, index, save, saveVersion } from "../index.js";
 import { bReader } from "../io/bReader.js";
 
 interface readOptions {
@@ -73,8 +73,11 @@ export async function readSave(saveFile: File, lEndian = false, ro: readOptions 
 
     let indexEntrySize = 144;
 
-    if (fileVersion < 2) {
-        // pr versions have count in bytes.
+    /** Determines whether or not the save file is ver 0-1 which has a slightly different format. */
+    const isPreReleaseSF = fileVersion == saveVersion.TU0033;
+
+    if (isPreReleaseSF) {
+        // first 2 pr versions have count in bytes.
         indexEntrySize = 136;
         indexCount = indexCount / indexEntrySize;
     }
@@ -82,7 +85,7 @@ export async function readSave(saveFile: File, lEndian = false, ro: readOptions 
     saveReader.incrementPos(indexOffset - 12);
 
     for (var i = 0; i < indexCount; i++) {
-        while (saveReader.getPos() + indexEntrySize <= saveReader.byteLength()) {
+        while (saveReader.pos + indexEntrySize <= saveReader.byteLength) {
             /** Name of the file in the index */
             const fileName = saveReader.readString16(128);
             /** Length of file in the index */
@@ -92,8 +95,8 @@ export async function readSave(saveFile: File, lEndian = false, ro: readOptions 
 
             /** Timestamp of the file (unusable due to how it's written.) */
             let fileTimestamp = 0n;
-            if (fileVersion > 1) {
-                // pr versions don't include timestamp
+            if (!isPreReleaseSF) {
+                // first 2 pr versions don't include timestamp
                 fileTimestamp = saveReader.readULong();
             }
             

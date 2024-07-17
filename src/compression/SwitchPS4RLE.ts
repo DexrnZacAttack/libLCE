@@ -40,7 +40,7 @@ export function decompressSwitchPS4RLE(data: Uint8Array): Uint8Array | undefined
     const writer: number[] = [];
     const reader = new bReader(new DataView(data.buffer));
 
-    while (reader.getPos() < decompressedLength) {
+    while (reader.pos < decompressedLength) {
         let byte = reader.readByte();
         if (byte != 0) {
             writer.push(byte);
@@ -68,14 +68,14 @@ export function getCompressedSize(data: Uint8Array): number {
 
     const reader = new bReader(new DataView(data.buffer));
 
-    while (reader.getPos() < data.length) {
+    while (reader.pos < data.length) {
         if (reader.readByte() != 0) {
             compressedSize++;
             continue;
         }
 
         let runCount = 1;
-        while (reader.getPos() + runCount < data.length && data[reader.getPos() + runCount] == 0) {
+        while (reader.pos + runCount < data.length && data[reader.pos + runCount] == 0) {
             runCount++;
         }
 
@@ -85,7 +85,7 @@ export function getCompressedSize(data: Uint8Array): number {
             compressedSize += 4;
         }
 
-        reader.curPos += runCount;
+        reader.incrementPos(runCount);
     }
 
     return compressedSize;
@@ -102,7 +102,7 @@ export function compressSwitchPS4RLE(data: Uint8Array): Uint8Array {
     const writer = new bWriter(new DataView(new ArrayBuffer(getCompressedSize(data))));
     const reader = new bReader(new DataView(data.buffer));
 
-    while (reader.getPos() < data.length) {
+    while (reader.pos < data.length) {
         let value;
         if ((value = reader.readByte()) != 0) {
             writer.writeByte(value!);
@@ -110,7 +110,7 @@ export function compressSwitchPS4RLE(data: Uint8Array): Uint8Array {
         }
 
         let runCount = 1;
-        while (reader.getPos() + runCount < data.length && data[reader.getPos() + runCount] == 0) {
+        while (reader.pos + runCount < data.length && data[reader.pos + runCount] == 0) {
             runCount++;
         }
 
@@ -124,7 +124,7 @@ export function compressSwitchPS4RLE(data: Uint8Array): Uint8Array {
             writer.writeByte(runCount & 255);
         }
 
-        reader.curPos += runCount;
+        reader.incrementPos(runCount);
     }
-    return new Uint8Array(writer.getBuffer());
+    return new Uint8Array(writer.buffer);
 }

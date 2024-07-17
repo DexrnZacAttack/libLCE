@@ -70,5 +70,5 @@ export async function compressSave(file: File, compType: compressionTypes, lEndi
         compWriter.writeByte(compressedFile[i]!);
     }
 
-    return new File([new Blob([compWriter.getBuffer()])], file.name);
+    return new File([new Blob([compWriter.buffer])], file.name);
 }

@@ -82,11 +82,10 @@ export enum endianness {
 }
 
 // https://github.com/Team-Lodestone/Documentation/blob/main/LCE/LCE%20File%20Versions.md
-export enum fileVersion {
+export enum saveVersion {
     // version names are equivalent to the first version where the file version is used
     // e.g TU5 is the first version to use file version 3.
-    TU0033,
-    TU0035,
+    TU0033 = 1,
     TU0054,
     TU5
 }

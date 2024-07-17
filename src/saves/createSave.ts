@@ -21,10 +21,11 @@
  * SOFTWARE.
 */
 
+import { saveVersion } from "../index.js";
 import { bWriter } from "../io/bWriter.js";
 
 /**
- * This is the number of bytes that the header takes up, which is 12 (4 bytes offset, 4 bytes count, 4 bytes unk (probs byte order))
+ * This is the number of bytes that the header takes up, which is 12 (4 bytes offset, 4 bytes count, 2 bytes minimum version, 2 bytes file version)
 */
 const headerLength: number = 12;
 
@@ -49,7 +50,10 @@ interface saveOptions {
  * @param lEndian Whether to use Little endian or not, default is no.
  */
 export function generateSave(files: [File, Buffer][], lEndian: boolean = false, saveOptions: saveOptions = {"verMinimum": 11, "verCurrent": 11}): File {
-    /**
+    /** Determines whether or not the save file is ver 0-1 which has a slightly different format. */
+    const isPreReleaseSF = saveOptions.verCurrent == saveVersion.TU0033;
+
+    /*
      * This is used to keep track of what file we are on... only used in one place though. (sgCurrentFileOffset)
     */
     let fIndex: number = 0;
@@ -64,15 +68,15 @@ export function generateSave(files: [File, Buffer][], lEndian: boolean = false, 
 
     /**
      * This is the first part of the 8 byte header containing the offset of the index in the savegame... the index is what holds all of the file names and their info.
-     */
+    */
     const offset: number = filesLength + headerLength;
 
     /**
      * This is the second part of the 8 byte header containing the number of files that is in the index.
-     */
+    */
     let count: number = files.length;
 
-    if (saveOptions.verCurrent < 2) {
+    if (isPreReleaseSF) {
         indexEntryLength = 136;
     }
 
@@ -80,7 +84,7 @@ export function generateSave(files: [File, Buffer][], lEndian: boolean = false, 
     
     /**
      * This is the DataView object that contains the bytes of the savegame that we are creating.
-     */
+    */
     const saveWriter = new bWriter(new DataView(new ArrayBuffer(filesLength + headerLength + indexEntryLength * count)), lEndian);
 
     // Write offset and count to start of file
@@ -92,13 +96,13 @@ export function generateSave(files: [File, Buffer][], lEndian: boolean = false, 
 
     /**
      * For each file in the index, we keep an offset that says where the file starts, we use fIndex to see each file's offset.
-     */
+    */
         let sgCurrentFileOffset: Array<number> = [];
         // Write the files to the save.
         for (const [fileObj, file] of files) {
             uFileName = fileObj.name.replace("\\", "/");
             if (uFileName.length !== 0) {
-                sgCurrentFileOffset.push(saveWriter.getPos());
+                sgCurrentFileOffset.push(saveWriter.pos);
                 console.log(`Writing ${uFileName}...`);
                 // for every byte in the file, write said byte.
                 file.forEach((byte) => {
@@ -132,7 +136,7 @@ export function generateSave(files: [File, Buffer][], lEndian: boolean = false, 
             else
                 saveWriter.writeUInt(0);
             
-            if (saveOptions.verCurrent > 1) {
+            if (!isPreReleaseSF) {
                 // Timestamp, not in the same format (consoles write some weird one based on reset time, or other factors)
                 saveWriter.writeULong(BigInt(Date.now()));
             }
@@ -141,5 +145,5 @@ export function generateSave(files: [File, Buffer][], lEndian: boolean = false, 
             console.warn("File has no name... unable to add to index!");
         }
     }
-    return new File([new Blob([saveWriter.getBuffer()])], 'savegame.dat');
+    return new File([new Blob([saveWriter.buffer])], 'savegame.dat');
 }
