@@ -1,24 +1,12 @@
 /*
- * MIT License
- * Copyright (c) 2024 Dexrn ZacAttack
+ * Copyright (c) 2024 DexrnZacAttack
+ * This file is part of libLCE.
+ * https://github.com/DexrnZacAttack/libLCE
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * File Contributors (based off of GitHub commits):
+ * - DexrnZacAttack
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * Licensed under the MIT License. See LICENSE file for details.
 */
 
 import { getImageOffset } from "../console/consoles.js";
@@ -65,7 +53,7 @@ export async function parseWorldInfo(file: File, console: consoleTypes): Promise
     }
 
     /** Image data */
-    const imageData = new Uint8Array(reader.read(reader.byteLength() - imageOffset));
+    const imageData = new Uint8Array(reader.read(reader.byteLength - imageOffset));
 
     // console.log(Array.from(imageData, byte => byte.toString(16).padStart(2, '0')).join(' '));
     const worldInfo = png.decode(imageData).text;
