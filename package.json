@@ -33,6 +33,7 @@
   "dependencies": {
     "@types/pako": "^2.0.3",
     "@vivaxy/png": "^1.3.0",
+    "binaryio.js": "^1.1.0",
     "crc": "^4.3.2",
     "pako": "^2.1.0",
     "typescript": "^5.4.5"

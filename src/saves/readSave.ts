@@ -14,7 +14,7 @@
 */
 
 import { decompressZlib, index, save, saveVersion } from "../index.js";
-import { bReader } from "../io/bReader.js";
+import { bReader } from 'binaryio.js';
 
 interface readOptions {
     /** Ignores the version parameter which is used for endianness detection. */
@@ -24,27 +24,31 @@ interface readOptions {
 export async function readSave(saveFile: File, lEndian = false, ro: readOptions = {ignoreVersion: false}): Promise<save> {
     const index: index[] = []
 
-    let saveReader = new bReader(new DataView(await saveFile.arrayBuffer()), lEndian);
+    let saveReader = new bReader(await saveFile.arrayBuffer(), lEndian);
 
     let decompressedSize: number = 0;
     try {
         const decompressTest = new Uint8Array(saveReader.slice(8));
-        if (decompressZlib(decompressTest)) {
-            decompressedSize = Number(saveReader.readULong());
-            if ((decompressedSize ?? 0) !== 0) {
-                saveReader = new bReader(new DataView(decompressZlib(decompressTest).buffer), lEndian);
+        if (decompressTest[0] === 0x78 && decompressTest[1] === 0x9C) {
+            if (decompressZlib(decompressTest)) {
+                decompressedSize = Number(saveReader.readULong());
+                if ((decompressedSize ?? 0) !== 0) {
+                    saveReader = new bReader(decompressZlib(decompressTest), lEndian);
+                }
             }
+        } else {
+            console.log(`No ZLib header, not gonna attempt decompress.`)
         }
     } catch (e) {
         console.warn("ZLib decompression failed, library returned message: " + e);
-        console.log("This may be intended behavior if the file is indeed not compressed.");
+        console.log("This may be intended behavior if the file is indeed not compressed, but unlikely as the ZLib header check passed.");
     }
 
     if (!ro.ignoreVersion) {
         saveReader.setPos(10);
         const ver = saveReader.readUShort();
         // it works though...
-        if (ver > 50) {
+        if (ver > 20) {
             console.warn(`Invalid version ${ver}, trying with reverse endian... To disable this behavior, you need to have ignoreVersion set to true in the ro param.`);
             saveReader.setEndianness(!lEndian);
         }
@@ -66,7 +70,7 @@ export async function readSave(saveFile: File, lEndian = false, ro: readOptions 
 
     let indexEntrySize = 144;
 
-    /** Determines whether or not the save file is ver 0-1 which has a slightly different format. */
+    /** Determines whether the save file is ver 0-1 which has a slightly different format. */
     const isPreReleaseSF = fileVersion == saveVersion.TU0033;
 
     if (isPreReleaseSF) {
@@ -90,11 +94,11 @@ export async function readSave(saveFile: File, lEndian = false, ro: readOptions 
             let fileTimestamp = 0n;
             if (!isPreReleaseSF) {
                 // first 2 pr versions don't include timestamp
-                fileTimestamp = saveReader.readULong();
+                fileTimestamp = saveReader.readULong() as bigint;
             }
             
             const fileData: ArrayBuffer = saveReader.slice(fileOffset, fileOffset + fileLength);
-            index.push({"name": fileName, "length": fileLength, "offset": fileOffset, "timestamp": fileTimestamp, "data": new File( [new Blob( [ new Uint8Array(fileData) ] )], fileName )})
+            index.push({"name": fileName, "length": fileLength, "offset": fileOffset, "timestamp": fileTimestamp, "data": new File( [new Blob( [ fileData ] )], fileName )})
         }
     }
 

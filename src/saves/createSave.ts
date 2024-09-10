@@ -14,12 +14,17 @@
 */
 
 import { saveVersion } from "../index.js";
-import { bWriter } from "../io/bWriter.js";
+import { bWriter, bTypes } from 'binaryio.js';
 
 /**
  * This is the number of bytes that the header takes up, which is 12 (4 bytes offset, 4 bytes count, 2 bytes minimum version, 2 bytes file version)
 */
 const headerLength: number = 12;
+
+/**
+ * This is the max size that a filename can be.
+*/
+const maxFileNameSize: number = 128 / 2;
 
 /**
  * This is the number of bytes that an entry in the index takes up, which is 144 (136 for pre-release)
@@ -73,11 +78,21 @@ export function generateSave(files: [File, Buffer][], lEndian: boolean = false, 
     }
 
     console.log(`There are ${count} files in the folder, of which take up ${filesLength} bytes space.`);
-    
+
+    const freeSpace = bTypes.UINT_MAX_VALUE - (headerLength + (indexEntryLength * count));
+    if (filesLength > freeSpace) {
+        throw new RangeError(`Cannot place index due to total file size (${filesLength}) exceeding the max file size of ${freeSpace}.`);
+    }
+
+    for (const [fileObj] of files) {
+        if (fileObj.name.length > maxFileNameSize)
+            throw new RangeError(`File '${fileObj.name}' exceeds the maximum filename length of ${maxFileNameSize} characters by ${fileObj.name.length - maxFileNameSize} characters.\n`);
+    }
+
     /**
      * This is the DataView object that contains the bytes of the savegame that we are creating.
     */
-    const saveWriter = new bWriter(new DataView(new ArrayBuffer(filesLength + headerLength + indexEntryLength * count)), lEndian);
+    const saveWriter = new bWriter(new Uint8Array(new ArrayBuffer(headerLength + filesLength + (indexEntryLength * count))), lEndian);
 
     // Write offset and count to start of file
     saveWriter.writeUInt(offset, lEndian);
@@ -89,53 +104,43 @@ export function generateSave(files: [File, Buffer][], lEndian: boolean = false, 
     /**
      * For each file in the index, we keep an offset that says where the file starts, we use fIndex to see each file's offset.
     */
-        let sgCurrentFileOffset: Array<number> = [];
-        // Write the files to the save.
-        for (const [fileObj, file] of files) {
-            uFileName = fileObj.name.replace("\\", "/");
-            if (uFileName.length !== 0) {
-                sgCurrentFileOffset.push(saveWriter.pos);
-                console.log(`Writing ${uFileName}...`);
-                // for every byte in the file, write said byte.
-                file.forEach((byte) => {
-                    saveWriter.writeByte(byte);
-                });
-            } else {
-                // if the file's name is blank... don't bother writing it, as there may be something wrong with the file.
-                console.log("File has no name... skipping!");
-            }
-        }
+    let sgCurrentFileOffset: Array<number> = [];
+    // Write the files to the save.
+    for (const [fileObj, file] of files) {
+        uFileName = fileObj.name.replace("\\", "/");
+        sgCurrentFileOffset.push(saveWriter.pos);
+        console.log(`Writing ${uFileName}...`);
+        // for every byte in the file, write said byte.
+        file.forEach((byte) => {
+            saveWriter.writeByte(byte);
+        });
+    }
 
     // Write index entries
     for (const [fileObj, file] of files) {
 
         uFileName = fileObj.name.replace("\\", "/");
-        // if the filename doesn't have a name, don't write it... otherwise write it.
-        if (uFileName.length !== 0) {
-            console.log(`Writing "${uFileName}" to index...`);
-            // Write the file name in UTF16
-            saveWriter.writeString16(uFileName);
-            // add a shit ton of 0s before adding the rest of the info
-            for (var i: number = 0; i < 128 - uFileName.length * 2; i++) {
-                saveWriter.writeByte(0);
-            }
-            // File Length
-            saveWriter.writeUInt(file.length ?? 0);
-
-            // File Offset
-            if (file.length !== 0)
-                saveWriter.writeUInt(sgCurrentFileOffset[fIndex] ?? 0);
-            else
-                saveWriter.writeUInt(0);
-            
-            if (!isPreReleaseSF) {
-                // Timestamp, not in the same format (consoles write some weird one based on reset time, or other factors)
-                saveWriter.writeULong(BigInt(Date.now()));
-            }
-            fIndex++;
-        } else {
-            console.warn("File has no name... unable to add to index!");
+        console.log(`Writing "${uFileName}" to index...`);
+        // Write the file name in UTF16
+        saveWriter.writeString16(uFileName);
+        // add padding before adding the rest of the info
+        for (var i: number = 0; i < maxFileNameSize - (uFileName.length * 2); i++) {
+            saveWriter.writeByte(0);
         }
+        // File Length
+        saveWriter.writeUInt(file.length ?? 0);
+
+        // File Offset
+        if (file.length !== 0)
+            saveWriter.writeUInt(sgCurrentFileOffset[fIndex] ?? 0);
+        else
+            saveWriter.writeUInt(0);
+        
+        if (!isPreReleaseSF) {
+            // Timestamp, not in the same format (consoles write some weird one based on reset time, or other factors)
+            saveWriter.writeULong(BigInt(Date.now()));
+        }
+        fIndex++;
     }
-    return new File([new Blob([saveWriter.buffer])], 'savegame.dat');
+    return new File([new Blob([saveWriter.arrayBuffer])], 'savegame.dat');
 }

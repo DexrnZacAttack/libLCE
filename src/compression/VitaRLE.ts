@@ -12,8 +12,7 @@
  * Licensed under the MIT License. See LICENSE file for details.
 */
 
-import { bReader } from "../io/bReader.js";
-import { bWriter } from "../io/bWriter.js";
+import {bReader, bWriter} from "binaryio.js";
 
 /**
  * The VitaRLE code is Zugebot (jerrinth3glitch)'s code ported to TS.
@@ -58,7 +57,7 @@ export function decompressVitaRLE(data: Uint8Array): Uint8Array {
 // TODO: remove these getSize functions, they are janky.
 function getCompressedSize(data: Uint8Array): number {
   const sizeIn = data.byteLength;
-  const reader = new bReader(new DataView(data.buffer));
+  const reader = new bReader(data);
   let zeroCount: number = 0;
   let compressedSize: number = 0;
 
@@ -95,8 +94,8 @@ function getCompressedSize(data: Uint8Array): number {
 // Note: This is ported from LegacyEditor's rle_vita.cpp
 export function compressVitaRLE(data: Uint8Array): Uint8Array {
 
-  const writer = new bWriter(new DataView(new ArrayBuffer(getCompressedSize(data))));
-  const reader = new bReader(new DataView(data.buffer));
+  const writer = new bWriter(new ArrayBuffer(getCompressedSize(data)));
+  const reader = new bReader(data);
 
   let zeroCount: number = 0;
 
@@ -124,5 +123,5 @@ export function compressVitaRLE(data: Uint8Array): Uint8Array {
     writer.writeByte(zeroCount);
   }
 
-  return new Uint8Array(writer.buffer);
+  return new Uint8Array(writer.arrayBuffer);
 }

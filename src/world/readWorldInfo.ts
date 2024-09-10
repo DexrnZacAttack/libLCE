@@ -11,7 +11,7 @@
 
 import { getImageOffset } from "../console/consoles.js";
 import { consoleTypes, World, worldInfo } from "../index.js";
-import { bReader } from "../io/bReader.js";
+import { bReader } from "binaryio.js";
 import * as png from '@vivaxy/png';
 
 // TODO: fix this below
@@ -32,7 +32,7 @@ function parse4JtEXt(data: {"wInfo": string}): worldInfo {
 }
 
 export async function parseWorldInfo(file: File, console: consoleTypes): Promise<World> {
-    let reader = new bReader(new DataView(await file.arrayBuffer()));
+    let reader = new bReader(await file.arrayBuffer());
     const imageOffset = getImageOffset(console);
 
     let worldName;
@@ -40,16 +40,9 @@ export async function parseWorldInfo(file: File, console: consoleTypes): Promise
     if (imageOffset !== 0) {
         /** header of the world (includes name and a few other things) */
         const worldHeader = new Uint8Array(reader.read(imageOffset));
-        /** length of world name (from byte 0 till 2 null bytes are encountered) */
-        var worldNameLength = 0;
-        for (let i = 0; i < worldHeader.byteLength; i++) {
-            if (worldHeader[i] === 0x00 && worldHeader[i + 1] === 0x00) {
-                worldNameLength = i;
-                break;
-            }
-        }
         /** the world name */
-        worldName = new TextDecoder('utf-16be').decode(reader.slice(0, worldNameLength)).replace(/\0+$/, '');
+        reader.setPos(0);
+        worldName = reader.readNullTerminatedString16();
     }
 
     /** Image data */

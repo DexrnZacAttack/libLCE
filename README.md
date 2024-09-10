@@ -4,6 +4,9 @@ A TS library for Minecraft Legacy Console Edition files + more
 
 ![Progress](/assets/cur_progress.png)
 
+[![npm](https://img.shields.io/npm/v/liblce.svg)](https://www.npmjs.com/package/liblce)
+[![downloads](https://img.shields.io/npm/dm/liblce.svg)](https://www.npmjs.com/package/liblce)
+
 ## Progress
 
 - [ ] Console compression types - 50% complete
@@ -16,6 +19,10 @@ A TS library for Minecraft Legacy Console Edition files + more
 - [ ] Chunk parsing
 - [ ] Chunk creation
 - [ ] Other file formats
+  - [x] ARC
+  - [ ] LOC
+  - [ ] PCK
+  - [x] MSSCMP (Mostly working, but the format seems to be different depending on console.)
   
 ## Credits
 

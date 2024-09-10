@@ -12,8 +12,7 @@
  * Licensed under the MIT License. See LICENSE file for details.
 */
 
-import { bReader } from "../io/bReader.js";
-import { bWriter } from "../io/bWriter.js";
+import {bReader, bWriter} from "binaryio.js";
 
 /**
  * This code is Zugebot (jerrinth3glitch)'s code ported to TS.
@@ -29,7 +28,7 @@ import { bWriter } from "../io/bWriter.js";
 export function decompressSwitchPS4RLE(data: Uint8Array): Uint8Array | undefined {
     const decompressedLength = data.byteLength;
     const writer: number[] = [];
-    const reader = new bReader(new DataView(data.buffer));
+    const reader = new bReader(data);
 
     while (reader.pos < decompressedLength) {
         let byte = reader.readByte();
@@ -57,7 +56,7 @@ export function decompressSwitchPS4RLE(data: Uint8Array): Uint8Array | undefined
 export function getCompressedSize(data: Uint8Array): number {
     let compressedSize = 0;
 
-    const reader = new bReader(new DataView(data.buffer));
+    const reader = new bReader(data);
 
     while (reader.pos < data.length) {
         if (reader.readByte() != 0) {
@@ -90,8 +89,8 @@ export function getCompressedSize(data: Uint8Array): number {
 */
 // Note: This is ported from LegacyEditor's rle_nsxps4.cpp
 export function compressSwitchPS4RLE(data: Uint8Array): Uint8Array {
-    const writer = new bWriter(new DataView(new ArrayBuffer(getCompressedSize(data))));
-    const reader = new bReader(new DataView(data.buffer));
+    const writer = new bWriter(new ArrayBuffer(getCompressedSize(data)));
+    const reader = new bReader(data);
 
     while (reader.pos < data.length) {
         let value;
@@ -117,5 +116,5 @@ export function compressSwitchPS4RLE(data: Uint8Array): Uint8Array {
 
         reader.incrementPos(runCount);
     }
-    return new Uint8Array(writer.buffer);
+    return new Uint8Array(writer.arrayBuffer);
 }

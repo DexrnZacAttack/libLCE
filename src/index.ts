@@ -57,6 +57,18 @@ export interface save {
     fileIndex: index[]
 }
 
+export interface arc {
+    fileCount: number,
+    fileIndex: ArcIndex[]
+}
+
+export interface ArcIndex {
+    name: string,
+    length: number,
+    offset: number,
+    data: File
+}
+
 export interface index {
     name: string,
     length: number,
@@ -75,8 +87,14 @@ export enum saveVersion {
     // version names are equivalent to the first version where the file version is used
     // e.g TU5 is the first version to use file version 3.
     TU0033 = 1,
-    TU0054,
-    TU5
+    TU0054 = 2,
+    TU5 = 3,
+    TU9 = 5,
+    TU14 = 6,
+    TU17 = 8,
+    TU19 = 9,
+    TU36 = 10,
+    TU69 = 11
 }
 
 export enum consoleTypes {

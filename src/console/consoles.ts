@@ -9,8 +9,14 @@
  * Licensed under the MIT License. See LICENSE file for details.
 */
 
-import { consoleTypes, compressionTypes, endianness } from "../index.js";
- 
+import {compressionTypes, consoleTypes, endianness} from "../index.js";
+
+interface consoleCompression {
+    saveCompression: compressionTypes,
+    regionCompression: compressionTypes,
+    chunkCompression: compressionTypes
+}
+
 export function getSaveCompression(console: consoleTypes) {
     const compTypesMap = new Map([
         [consoleTypes.Xbox360, compressionTypes.lzx],
@@ -22,6 +28,52 @@ export function getSaveCompression(console: consoleTypes) {
         [consoleTypes.Switch, compressionTypes.none]
     ])
     return compTypesMap.get(console) || compressionTypes.none;
+}
+
+export function getCompression(console: consoleTypes): consoleCompression {
+    const compTypesMap = new Map<consoleTypes, consoleCompression>([
+        [consoleTypes.Xbox360, {
+            saveCompression: compressionTypes.lzx,
+            regionCompression: compressionTypes.none,
+            chunkCompression: compressionTypes.lzx
+        }],
+        [consoleTypes.XboxOne, {
+            saveCompression: compressionTypes.zlib,
+            regionCompression: compressionTypes.none,
+            chunkCompression: compressionTypes.zlib
+        }],
+        [consoleTypes.PS3, {
+            saveCompression: compressionTypes.deflate,
+            regionCompression: compressionTypes.none,
+            chunkCompression: compressionTypes.deflate
+        }],
+        [consoleTypes.Vita, {
+            saveCompression: compressionTypes.vitarle,
+            regionCompression: compressionTypes.none,
+            chunkCompression: compressionTypes.zlib
+        }],
+        [consoleTypes.PS4, {
+            saveCompression: compressionTypes.zlib,
+            regionCompression: compressionTypes.none,
+            chunkCompression: compressionTypes.zlib
+        }],
+        [consoleTypes.WiiU, {
+            saveCompression: compressionTypes.zlib,
+            regionCompression: compressionTypes.none,
+            chunkCompression: compressionTypes.zlib
+        }],
+        [consoleTypes.Switch, {
+            saveCompression: compressionTypes.zlib,
+            regionCompression: compressionTypes.switchps4rle,
+            chunkCompression: compressionTypes.zlib
+        }]
+    ]);
+
+    return compTypesMap.get(console) || {
+        saveCompression: compressionTypes.none,
+        regionCompression: compressionTypes.none,
+        chunkCompression: compressionTypes.none
+    };
 }
 
 export function getEndianness(console: consoleTypes) {

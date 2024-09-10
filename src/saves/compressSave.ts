@@ -12,7 +12,7 @@
 
 import { gzip } from "pako";
 import { compressionTypes, compressDeflate, compressSwitchPS4RLE, compressVitaRLE, compressZlib } from "../index.js";
-import { bWriter } from "../io/bWriter.js";
+import { bWriter } from "binaryio.js";
 
 export async function compressSave(file: File, compType: compressionTypes, lEndian = false): Promise<File> {
     const fileArray = await file.arrayBuffer();
@@ -47,7 +47,7 @@ export async function compressSave(file: File, compType: compressionTypes, lEndi
     }
 
     // I was stumped for about ~2 days wondering why my compression stuff is so messed up... this line here was the culprit.
-    const compWriter = new bWriter(new DataView(new Uint8Array(8 + compressedFile.length).buffer), lEndian);
+    const compWriter = new bWriter(new Uint8Array(8 + compressedFile.length), lEndian);
     if (compType !== compressionTypes.vitarle) {
         compWriter.writeLong(fileSize, lEndian);
     } else {
@@ -59,5 +59,5 @@ export async function compressSave(file: File, compType: compressionTypes, lEndi
         compWriter.writeByte(compressedFile[i]!);
     }
 
-    return new File([new Blob([compWriter.buffer])], file.name);
+    return new File([new Blob([compWriter.arrayBuffer])], file.name);
 }

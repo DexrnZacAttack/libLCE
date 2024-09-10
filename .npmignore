@@ -3,3 +3,5 @@ tsconfig.json
 tsconfig.build.json
 /testing
 /node_modules
+.vscode
+/testing_internal
