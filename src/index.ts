@@ -23,6 +23,9 @@ export * from "./saves/compressSave.js";
 export * from "./world/readWorldInfo.js";
 // loc
 export * from "./loc/readLoc.js";
+// arc
+export * from "./arc/readArc.js";
+export * from "./arc/writeArc.js";
 // consoles
 export * from "./console/consoles.js";
 // msscmp

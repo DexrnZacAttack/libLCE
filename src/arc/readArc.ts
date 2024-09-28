@@ -18,17 +18,17 @@ export async function readARC(arc: File): Promise<arc> {
     let arcReader = new bReader(await arc.arrayBuffer(), false);
 
     /** How many files are in the index */
-    const indexCount = await arcReader.readUInt();
+    const indexCount = arcReader.readUInt();
     
     for (var i = 0; i < indexCount; i++) {
             /** Size of the file name */
-            const fileNameSize = await arcReader.readUShort();
+            const fileNameSize = arcReader.readUShort();
             /** Name of the file */
-            const fileName = await arcReader.readString8(fileNameSize);
+            const fileName = arcReader.readString8(fileNameSize);
             /** Location (offset) of the file */
-            const fileOffset = await arcReader.readUInt();
+            const fileOffset = arcReader.readUInt();
             /** Length (size) of the file */
-            const fileLength = await arcReader.readUInt();
+            const fileLength = arcReader.readUInt();
 
             const fileData: ArrayBuffer = arcReader.slice(fileOffset, fileOffset + fileLength);
             index.push({"name": fileName, "length": fileLength, "offset": fileOffset, "data": new File( [new Blob( [ fileData ] )], fileName )})
