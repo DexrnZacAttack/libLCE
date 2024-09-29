@@ -46,36 +46,27 @@ interface saveOptions {
  * @param files Array of files to put in the savegame.
  * @param lEndian Whether to use Little endian or not, default is no.
  */
-export function generateSave(files: [File, Buffer][], lEndian: boolean = false, saveOptions: saveOptions = {"verMinimum": 11, "verCurrent": 11}): File {
+export async function writeSave(files: File[], lEndian: boolean = false, saveOptions: saveOptions = {"verMinimum": 11, "verCurrent": 11}): Promise<File> {
     /** Determines whether or not the save file is ver 0-1 which has a slightly different format. */
     const isPreReleaseSF = saveOptions.verCurrent == saveVersion.TU0033;
 
-    /*
-     * This is used to keep track of what file we are on... only used in one place though. (sgCurrentFileOffset)
-    */
+    /** Keeps track of what file we are on... only used in one place though. (sgCurrentFileOffset) */
     let fIndex: number = 0;
     
-    /**
-     * This is the number of bytes (the length) of every file combined.
-    */
+    /** This is the number of bytes (the length) of every file combined. */
     const filesLength: number = files.reduce(
-        (previous, [, file]) => previous + file.byteLength,
+        (previous, file) => previous + file.size,
         0
     );
 
-    /**
-     * This is the first part of the 8 byte header containing the offset of the index in the savegame... the index is what holds all of the file names and their info.
-    */
+    /** This is the first part of the 8 byte header containing the offset of the index in the savegame... the index is what holds all of the file names and their info. */
     const offset: number = filesLength + headerLength;
 
-    /**
-     * This is the second part of the 8 byte header containing the number of files that is in the index.
-    */
+    /** This is the second part of the 8 byte header containing the number of files that is in the index. */
     let count: number = files.length;
 
-    if (isPreReleaseSF) {
+    if (isPreReleaseSF)
         indexEntryLength = 136;
-    }
 
     console.log(`There are ${count} files in the folder, of which take up ${filesLength} bytes space.`);
 
@@ -84,62 +75,57 @@ export function generateSave(files: [File, Buffer][], lEndian: boolean = false, 
         throw new RangeError(`Cannot place index due to total file size (${filesLength}) exceeding the max file size of ${freeSpace}.`);
     }
 
-    for (const [fileObj] of files) {
-        if (fileObj.name.length > maxFileNameSize)
-            throw new RangeError(`File '${fileObj.name}' exceeds the maximum filename length of ${maxFileNameSize} characters by ${fileObj.name.length - maxFileNameSize} characters.\n`);
+    for (const file of files) {
+        if (file.name.length > maxFileNameSize)
+            throw new RangeError(`File '${file.name}' exceeds the maximum filename length of ${maxFileNameSize} characters by ${file.name.length - maxFileNameSize} characters.\n`);
     }
 
     /**
-     * This is the DataView object that contains the bytes of the savegame that we are creating.
+     * This is the writer
     */
-    const saveWriter = new bWriter(new Uint8Array(new ArrayBuffer(headerLength + filesLength + (indexEntryLength * count))), lEndian);
+    const saveWriter = new bWriter(new ArrayBuffer(headerLength + filesLength + (indexEntryLength * count)), lEndian);
 
-    // Write offset and count to start of file
+    // Write offset, count, and versions to start of file
     saveWriter.writeUInt(offset, lEndian);
     saveWriter.writeUInt((saveOptions.verCurrent < 2 ? count * indexEntryLength : count), lEndian);
-    // https://github.com/zugebot/legacyeditor for both of these 2 shorts.
     saveWriter.writeUShort(saveOptions.verMinimum, lEndian);
     saveWriter.writeUShort(saveOptions.verCurrent, lEndian);
 
-    /**
-     * For each file in the index, we keep an offset that says where the file starts, we use fIndex to see each file's offset.
-    */
-    let sgCurrentFileOffset: Array<number> = [];
-    // Write the files to the save.
-    for (const [fileObj, file] of files) {
-        uFileName = fileObj.name.replace("\\", "/");
-        sgCurrentFileOffset.push(saveWriter.pos);
+    /** Stores all file index locations */
+    let fileIndexOffsets: Array<number> = [];
+
+    // Write the file data
+    for (const file of files) {
+        uFileName = file.name.replace("\\", "/");
+        fileIndexOffsets.push(saveWriter.pos);
         console.log(`Writing ${uFileName}...`);
-        // for every byte in the file, write said byte.
-        file.forEach((byte) => {
-            saveWriter.writeByte(byte);
-        });
+        // Write the bytes of the actual file
+        saveWriter.write(new Uint8Array(await file.arrayBuffer()));
     }
 
     // Write index entries
-    for (const [fileObj, file] of files) {
-
-        uFileName = fileObj.name.replace("\\", "/");
+    for (const file of files) {
+        uFileName = file.name.replace("\\", "/");
         console.log(`Writing "${uFileName}" to index...`);
         // Write the file name in UTF16
         saveWriter.writeString16(uFileName);
         // add padding before adding the rest of the info
-        for (var i: number = 0; i < maxFileNameSize - (uFileName.length * 2); i++) {
+        for (var i: number = 0; i < maxFileNameSize * 2 - (uFileName.length * 2); i++)
             saveWriter.writeByte(0);
-        }
+        
         // File Length
-        saveWriter.writeUInt(file.length ?? 0);
+        saveWriter.writeUInt(file.size ?? 0);
 
         // File Offset
-        if (file.length !== 0)
-            saveWriter.writeUInt(sgCurrentFileOffset[fIndex] ?? 0);
+        if (file.size !== 0)
+            saveWriter.writeUInt(fileIndexOffsets[fIndex] ?? 0);
         else
             saveWriter.writeUInt(0);
         
-        if (!isPreReleaseSF) {
-            // Timestamp, not in the same format (consoles write some weird one based on reset time, or other factors)
+        // Timestamp, not in the same format (consoles write some weird one based on reset time, or other factors)
+        if (!isPreReleaseSF)
             saveWriter.writeULong(BigInt(Date.now()));
-        }
+
         fIndex++;
     }
     return new File([new Blob([saveWriter.arrayBuffer])], 'savegame.dat');

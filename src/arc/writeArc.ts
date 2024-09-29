@@ -8,6 +8,7 @@
  * 
  * Licensed under the MIT License. See LICENSE file for details.
 */
+
 import { bWriter, bTypes } from "binaryio.js";
 
 export async function writeArc(files: File[]): Promise<File> {
@@ -20,7 +21,7 @@ export async function writeArc(files: File[]): Promise<File> {
 
     files.forEach(file => {
         if (file.name.length > bTypes.USHORT_MAX_VALUE)
-            throw new RangeError(`File name (${file.name}) would exceed ${bTypes.USHORT_MAX_VALUE} in size, which is bigger than a unsigned short can store.`);
+            throw new RangeError(`File name (${file.name}) would exceed ${bTypes.USHORT_MAX_VALUE} bytes in size, which is bigger than a unsigned short can store.`);
 
         indexSize += 2 + file.name.length + 4 + 4;
         filesSize += file.size;
