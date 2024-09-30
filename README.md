@@ -2,7 +2,10 @@
 
 A TS library for Minecraft Legacy Console Edition files + more 
 
-![Progress](/assets/cur_progress.png)
+> [!NOTE]
+> This project is still in development, check out the [progress](#progress) below.
+
+![Progress bar](/assets/cur_progress.png)
 
 [![npm](https://img.shields.io/npm/v/liblce.svg)](https://www.npmjs.com/package/liblce)
 [![downloads](https://img.shields.io/npm/dm/liblce.svg)](https://www.npmjs.com/package/liblce)
@@ -10,19 +13,34 @@ A TS library for Minecraft Legacy Console Edition files + more
 ## Progress
 
 - [ ] Console compression types - 50% complete
-- [x] Savegame parsing
-- [x] Savegame creation
-- [ ] World info parsing - 50% complete
-- [ ] World folder parsing
-- [ ] Region parsing
-- [ ] Region creation
-- [ ] Chunk parsing
-- [ ] Chunk creation
+- [x] Savegame
+  - [X] Reading
+  - [X] Writing
+- [ ] World info - 30% complete
+  - [ ] Reading
+  - [ ] Writing
+- [ ] World folder
+  - [ ] Reading
+  - [ ] Writing
+- [ ] Region
+  - [ ] Reading
+  - [ ] Writing
+- [ ] Chunks
+  - [ ] Reading
+  - [ ] Writing
 - [ ] Other file formats
-  - [x] ARC
+  - [X] ARC
+    - [X] Reading
+    - [X] Writing
   - [ ] LOC
+    - [X] Reading
+    - [ ] Writing
   - [ ] PCK
-  - [x] MSSCMP (Mostly working, but the format seems to be different depending on console.)
+    - [ ] Reading
+    - [ ] Writing
+  - [ ] MSSCMP (Mostly working, but needs a total rewrite.)
+    - [X] Reading
+    - [ ] Writing
   
 ## Credits
 

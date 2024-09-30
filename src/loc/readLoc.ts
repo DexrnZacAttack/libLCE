@@ -11,9 +11,60 @@
 
 import { bReader } from "binaryio.js";
 
+interface Keys {
+    useUniqueIDs: boolean;
+    count: number;
+    keys: number[];
+}
 
-export async function readLoc(locFile: File, lEndian = false) {
+interface Loc {
+    version: number;
+    count: number;
+    keys: Keys;
+    languageIds: string[];
+    languages: Language[];
+};
 
-    let reader = new bReader(await locFile.arrayBuffer());
-    // TODO: write this after learning the format.
+interface Language {
+    language: string;
+    stringCount: number;
+    strings: string[];
+};
+
+export async function readLOC(locFile: File, lEndian = false): Promise<Loc> {
+
+    let reader = new bReader(await locFile.arrayBuffer(), lEndian);
+
+    const version = reader.readUInt();
+    const count = reader.readUInt();
+
+    const keys: Keys = {useUniqueIDs: false, count: 0, keys: []};
+    const languageIds: string[] = [];
+    const languages: Language[] = [];
+
+    if (version === 2) {
+        keys.useUniqueIDs = reader.readByte() == 1;
+        keys.count = reader.readUInt();
+        for (var i = 0; i < keys.count; i++)
+            keys.keys.push(reader.readUInt());
+    }
+
+    for (var i = 0; i < count; i++) {
+        languageIds.push(reader.readString8());
+        reader.readUInt();
+    }
+
+    for (var i = 0; i < count; i++) {
+        if (reader.readUInt() > 1)
+             reader.readByte(); 
+        const langName = reader.readString8();
+        const stringCount = reader.readUInt();
+        let strings: string[] = [];
+        for (var s = 0; s < stringCount; s++)
+            strings.push(reader.readString8());
+
+        languages.push({language: langName, stringCount, strings});
+    }
+
+    return {version, count, keys, languageIds, languages}
 }
