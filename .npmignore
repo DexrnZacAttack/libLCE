@@ -5,3 +5,4 @@ tsconfig.build.json
 /node_modules
 .vscode
 /testing_internal
+/.idea

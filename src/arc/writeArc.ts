@@ -46,7 +46,7 @@ export async function writeArc(files: File[]): Promise<File> {
 
     for (const file of files) {
         // Write the size of the file name 
-        writer.writeUShort(file.name.length);
+        writer.writeUShort(new TextEncoder().encode(file.name).length);
         // Write the file name
         writer.writeString8(file.name, false);
         // Write the offset

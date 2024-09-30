@@ -21,10 +21,8 @@ export async function readARC(arc: File): Promise<arc> {
     const indexCount = arcReader.readUInt();
     
     for (var i = 0; i < indexCount; i++) {
-            /** Size of the file name */
-            const fileNameSize = arcReader.readUShort();
             /** Name of the file */
-            const fileName = arcReader.readString8(fileNameSize);
+            const fileName = arcReader.readString8();
             /** Location (offset) of the file */
             const fileOffset = arcReader.readUInt();
             /** Length (size) of the file */
