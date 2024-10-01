@@ -32,7 +32,7 @@ export async function readMSSCMP(file: File, newGen?: boolean, lEndian?: boolean
     reader.setPos(0x18);
     if (reader.readUInt() === reader.readUInt() && typeof newGen === 'undefined') {
         newGen = false;
-    } else {
+    } else if (typeof newGen === 'undefined') {
         newGen = true;
     }
 
