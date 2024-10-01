@@ -38,7 +38,7 @@ A TS library for Minecraft Legacy Console Edition files + more
   - [ ] PCK
     - [ ] Reading
     - [ ] Writing
-  - [ ] MSSCMP (Mostly working, but needs a total rewrite.)
+  - [ ] MSSCMP
     - [X] Reading
     - [ ] Writing
   
