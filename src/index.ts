@@ -29,16 +29,16 @@ export * from "./arc/writeArc.js";
 // consoles
 export * from "./console/consoles.js";
 // msscmp
-export * from "./msscmp/readMSSCMP.js";
+export * from "./msscmp/readMsscmp.js";
 
-export interface msscmpFile {
+export interface MsscmpFile {
     fileName: string,
     fileSize: number,
     sampleRate: number
     file: File;
 }
 
-export interface worldInfo {
+export interface WorldInfo {
     "4J_SEED": string,
     "4J_HOSTOPTIONS": string,
     "4J_TEXTUREPACK": string,
@@ -49,18 +49,18 @@ export interface worldInfo {
 export interface World {
     name?: string,
     thumbnail: File,
-    worldInfo: worldInfo
+    worldInfo: WorldInfo
 }
 
-export interface save {
+export interface Savegame {
     indexOffset: number,
     fileCount: number,
     fileMinVerSupported: number,
     fileVersion: number,
-    fileIndex: index[]
+    fileIndex: SaveIndex[]
 }
 
-export interface arc {
+export interface Arc {
     fileCount: number,
     fileIndex: ArcIndex[]
 }
@@ -72,7 +72,7 @@ export interface ArcIndex {
     data: File
 }
 
-export interface index {
+export interface SaveIndex {
     name: string,
     length: number,
     offset: number,
@@ -80,13 +80,13 @@ export interface index {
     data: File
 }
 
-export enum endianness {
+export enum Endianness {
     big,
     little
 }
 
 // https://github.com/Team-Lodestone/Documentation/blob/main/LCE/LCE%20File%20Versions.md
-export enum saveVersion {
+export enum SaveVersion {
     // version names are equivalent to the first version where the file version is used
     // e.g TU5 is the first version to use file version 3.
     TU0033 = 1,
@@ -100,7 +100,7 @@ export enum saveVersion {
     TU69 = 11
 }
 
-export enum consoleTypes {
+export enum ConsoleTypes {
     Xbox360,
     XboxOne,
     PS3,
@@ -110,7 +110,7 @@ export enum consoleTypes {
     Switch
 }
 
-export enum compressionTypes {
+export enum CompressionTypes {
     gzip = 1,
     zlib,
     deflate,

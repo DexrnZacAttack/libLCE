@@ -9,95 +9,95 @@
  * Licensed under the MIT License. See LICENSE file for details.
 */
 
-import {compressionTypes, consoleTypes, endianness} from "../index.js";
+import {CompressionTypes, ConsoleTypes, Endianness} from "../index.js";
 
 interface consoleCompression {
-    saveCompression: compressionTypes,
-    regionCompression: compressionTypes,
-    chunkCompression: compressionTypes
+    saveCompression: CompressionTypes,
+    regionCompression: CompressionTypes,
+    chunkCompression: CompressionTypes
 }
 
-export function getSaveCompression(console: consoleTypes) {
+export function getSaveCompression(console: ConsoleTypes) {
     const compTypesMap = new Map([
-        [consoleTypes.Xbox360, compressionTypes.lzx],
-        [consoleTypes.XboxOne, compressionTypes.zlib],
-        [consoleTypes.PS3, compressionTypes.deflate],
-        [consoleTypes.Vita, compressionTypes.vitarle],
-        [consoleTypes.PS4, compressionTypes.zlib],
-        [consoleTypes.WiiU, compressionTypes.zlib],
-        [consoleTypes.Switch, compressionTypes.none]
+        [ConsoleTypes.Xbox360, CompressionTypes.lzx],
+        [ConsoleTypes.XboxOne, CompressionTypes.zlib],
+        [ConsoleTypes.PS3, CompressionTypes.deflate],
+        [ConsoleTypes.Vita, CompressionTypes.vitarle],
+        [ConsoleTypes.PS4, CompressionTypes.zlib],
+        [ConsoleTypes.WiiU, CompressionTypes.zlib],
+        [ConsoleTypes.Switch, CompressionTypes.none]
     ])
-    return compTypesMap.get(console) || compressionTypes.none;
+    return compTypesMap.get(console) || CompressionTypes.none;
 }
 
-export function getCompression(console: consoleTypes): consoleCompression {
-    const compTypesMap = new Map<consoleTypes, consoleCompression>([
-        [consoleTypes.Xbox360, {
-            saveCompression: compressionTypes.lzx,
-            regionCompression: compressionTypes.none,
-            chunkCompression: compressionTypes.lzx
+export function getCompression(console: ConsoleTypes): consoleCompression {
+    const compTypesMap = new Map<ConsoleTypes, consoleCompression>([
+        [ConsoleTypes.Xbox360, {
+            saveCompression: CompressionTypes.lzx,
+            regionCompression: CompressionTypes.none,
+            chunkCompression: CompressionTypes.lzx
         }],
-        [consoleTypes.XboxOne, {
-            saveCompression: compressionTypes.zlib,
-            regionCompression: compressionTypes.none,
-            chunkCompression: compressionTypes.zlib
+        [ConsoleTypes.XboxOne, {
+            saveCompression: CompressionTypes.zlib,
+            regionCompression: CompressionTypes.none,
+            chunkCompression: CompressionTypes.zlib
         }],
-        [consoleTypes.PS3, {
-            saveCompression: compressionTypes.deflate,
-            regionCompression: compressionTypes.none,
-            chunkCompression: compressionTypes.deflate
+        [ConsoleTypes.PS3, {
+            saveCompression: CompressionTypes.deflate,
+            regionCompression: CompressionTypes.none,
+            chunkCompression: CompressionTypes.deflate
         }],
-        [consoleTypes.Vita, {
-            saveCompression: compressionTypes.vitarle,
-            regionCompression: compressionTypes.none,
-            chunkCompression: compressionTypes.zlib
+        [ConsoleTypes.Vita, {
+            saveCompression: CompressionTypes.vitarle,
+            regionCompression: CompressionTypes.none,
+            chunkCompression: CompressionTypes.zlib
         }],
-        [consoleTypes.PS4, {
-            saveCompression: compressionTypes.zlib,
-            regionCompression: compressionTypes.none,
-            chunkCompression: compressionTypes.zlib
+        [ConsoleTypes.PS4, {
+            saveCompression: CompressionTypes.zlib,
+            regionCompression: CompressionTypes.none,
+            chunkCompression: CompressionTypes.zlib
         }],
-        [consoleTypes.WiiU, {
-            saveCompression: compressionTypes.zlib,
-            regionCompression: compressionTypes.none,
-            chunkCompression: compressionTypes.zlib
+        [ConsoleTypes.WiiU, {
+            saveCompression: CompressionTypes.zlib,
+            regionCompression: CompressionTypes.none,
+            chunkCompression: CompressionTypes.zlib
         }],
-        [consoleTypes.Switch, {
-            saveCompression: compressionTypes.zlib,
-            regionCompression: compressionTypes.switchps4rle,
-            chunkCompression: compressionTypes.zlib
+        [ConsoleTypes.Switch, {
+            saveCompression: CompressionTypes.zlib,
+            regionCompression: CompressionTypes.switchps4rle,
+            chunkCompression: CompressionTypes.zlib
         }]
     ]);
 
     return compTypesMap.get(console) || {
-        saveCompression: compressionTypes.none,
-        regionCompression: compressionTypes.none,
-        chunkCompression: compressionTypes.none
+        saveCompression: CompressionTypes.none,
+        regionCompression: CompressionTypes.none,
+        chunkCompression: CompressionTypes.none
     };
 }
 
-export function getEndianness(console: consoleTypes) {
+export function getEndianness(console: ConsoleTypes) {
     const endiannessMap = new Map([
-        [consoleTypes.Xbox360, endianness.big],
-        [consoleTypes.XboxOne, endianness.little],
-        [consoleTypes.PS3, endianness.big],
-        [consoleTypes.Vita, endianness.little],
-        [consoleTypes.PS4, endianness.little],
-        [consoleTypes.WiiU, endianness.big],
-        [consoleTypes.Switch, endianness.little]
+        [ConsoleTypes.Xbox360, Endianness.big],
+        [ConsoleTypes.XboxOne, Endianness.little],
+        [ConsoleTypes.PS3, Endianness.big],
+        [ConsoleTypes.Vita, Endianness.little],
+        [ConsoleTypes.PS4, Endianness.little],
+        [ConsoleTypes.WiiU, Endianness.big],
+        [ConsoleTypes.Switch, Endianness.little]
     ])
-    return endiannessMap.get(console) || endianness.big;
+    return endiannessMap.get(console) || Endianness.big;
 }
 
-export function getImageOffset(console: consoleTypes) {
+export function getImageOffset(console: ConsoleTypes) {
     const imageOffsets = new Map([
-        [consoleTypes.Xbox360, 0], // doesn't use
-        [consoleTypes.XboxOne, 0], // unk
-        [consoleTypes.PS3, 0], // unk
-        [consoleTypes.Vita, 0], // unk
-        [consoleTypes.PS4, 0],
-        [consoleTypes.WiiU, 256],
-        [consoleTypes.Switch, 0] // unk
+        [ConsoleTypes.Xbox360, 0], // doesn't use
+        [ConsoleTypes.XboxOne, 0], // unk
+        [ConsoleTypes.PS3, 0], // unk
+        [ConsoleTypes.Vita, 0], // unk
+        [ConsoleTypes.PS4, 0],
+        [ConsoleTypes.WiiU, 256],
+        [ConsoleTypes.Switch, 0] // unk
     ])
     return imageOffsets.get(console) || 0;
 }

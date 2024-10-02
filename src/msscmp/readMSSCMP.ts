@@ -9,12 +9,12 @@
  * Licensed under the MIT License. See LICENSE file for details.
 */
 
-import {msscmpFile} from "../index.js";
+import {MsscmpFile} from "../index.js";
 import {bReader} from "binaryio.js";
 
-export async function readMSSCMP(file: File, newGen?: boolean, lEndian?: boolean): Promise<msscmpFile[]> {
+export async function readMSSCMP(file: File, newGen?: boolean, lEndian?: boolean): Promise<MsscmpFile[]> {
 
-    const files: msscmpFile[] = [];
+    const files: MsscmpFile[] = [];
     const reader = new bReader(await file.arrayBuffer(), lEndian);
 
     const magic = reader.readString8(4);

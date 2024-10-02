@@ -6,3 +6,4 @@ tsconfig.build.json
 .vscode
 /testing_internal
 /.idea
+/staging

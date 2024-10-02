@@ -13,7 +13,7 @@
  * Licensed under the MIT License. See LICENSE file for details.
 */
 
-import { saveVersion } from "../index.js";
+import { SaveVersion } from "../index.js";
 import { bWriter, bTypes } from 'binaryio.js';
 
 /**
@@ -48,7 +48,7 @@ interface saveOptions {
  */
 export async function writeSave(files: File[], lEndian: boolean = false, saveOptions: saveOptions = {"verMinimum": 11, "verCurrent": 11}): Promise<File> {
     /** Determines whether or not the save file is ver 0-1 which has a slightly different format. */
-    const isPreReleaseSF = saveOptions.verCurrent == saveVersion.TU0033;
+    const isPreReleaseSF = saveOptions.verCurrent == SaveVersion.TU0033;
 
     /** Keeps track of what file we are on... only used in one place though. (sgCurrentFileOffset) */
     let fIndex: number = 0;

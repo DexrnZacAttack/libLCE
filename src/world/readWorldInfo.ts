@@ -10,14 +10,14 @@
 */
 
 import { getImageOffset } from "../console/consoles.js";
-import { consoleTypes, World, worldInfo } from "../index.js";
+import { ConsoleTypes, World, WorldInfo } from "../index.js";
 import { bReader } from "binaryio.js";
 import * as png from '@vivaxy/png';
 
 // TODO: fix this below
 // TODO: make writer
 
-function parse4JtEXt(data: {"wInfo": string}): worldInfo {
+function parse4JtEXt(data: {"wInfo": string}): WorldInfo {
     // this is a bad way of doing it!!!!
     const textChunks = data.wInfo.split('\x00');
     const parsed: Record<string, string> = {};
@@ -28,10 +28,10 @@ function parse4JtEXt(data: {"wInfo": string}): worldInfo {
         parsed[key] = value;
     }
     
-    return parsed as unknown as worldInfo;
+    return parsed as unknown as WorldInfo;
 }
 
-export async function parseWorldInfo(file: File, console: consoleTypes): Promise<World> {
+export async function parseWorldInfo(file: File, console: ConsoleTypes): Promise<World> {
     let reader = new bReader(await file.arrayBuffer());
     const imageOffset = getImageOffset(console);
 

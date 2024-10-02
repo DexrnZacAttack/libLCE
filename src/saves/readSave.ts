@@ -13,7 +13,7 @@
  * Licensed under the MIT License. See LICENSE file for details.
 */
 
-import { decompressZlib, index, save, saveVersion } from "../index.js";
+import { decompressZlib, SaveIndex, Savegame, SaveVersion } from "../index.js";
 import { bReader } from 'binaryio.js';
 
 interface readOptions {
@@ -21,8 +21,8 @@ interface readOptions {
     ignoreVersion?: boolean
 }
 
-export async function readSave(saveFile: File, lEndian = false, ro: readOptions = {ignoreVersion: false}): Promise<save> {
-    const index: index[] = []
+export async function readSave(saveFile: File, lEndian = false, ro: readOptions = {ignoreVersion: false}): Promise<Savegame> {
+    const index: SaveIndex[] = []
 
     let saveReader = new bReader(await saveFile.arrayBuffer(), lEndian);
 
@@ -71,7 +71,7 @@ export async function readSave(saveFile: File, lEndian = false, ro: readOptions 
     let indexEntrySize = 144;
 
     /** Determines whether the save file is ver 0-1 which has a slightly different format. */
-    const isPreReleaseSF = fileVersion == saveVersion.TU0033;
+    const isPreReleaseSF = fileVersion == SaveVersion.TU0033;
 
     if (isPreReleaseSF) {
         // first 2 pr versions have count in bytes.

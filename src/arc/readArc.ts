@@ -10,9 +10,9 @@
 */
 
 import { bReader } from 'binaryio.js';
-import { arc, ArcIndex } from '../index.js';
+import { Arc, ArcIndex } from '../index.js';
 
-export async function readARC(arc: File): Promise<arc> {
+export async function readARC(arc: File): Promise<Arc> {
     const index: ArcIndex[] = []
 
     let arcReader = new bReader(await arc.arrayBuffer(), false);
