@@ -3,9 +3,7 @@ import { readdir, readFile, stat, writeFile } from "fs/promises";
 import path, { join, resolve, relative } from "path";
 
 import { CompressionTypes, compressSave, writeSave, readARC, readSave, writeArc, readMSSCMP } from "../src/index.js"; 
-import { existsSync, lstatSync, readdirSync, readFileSync, statSync } from "fs";
-
-const path2Folder: string = resolve("./example");
+import { existsSync, lstatSync, mkdirSync, readdirSync, readFileSync, statSync } from "fs";
 
 async function runArcTest(): Promise<ArrayBuffer> {
     try {
@@ -16,6 +14,7 @@ async function runArcTest(): Promise<ArrayBuffer> {
 }
 
 async function getFiles(): Promise<File[]> {
+    const path2Folder: string = resolve("./example");
     const files: File[] = await Promise.all(
         (
             await readdir(path2Folder, { recursive: true, withFileTypes: true })
@@ -58,6 +57,10 @@ async function runMSSCMPTest() {
 
 
 async function runTests() {
+    if (!existsSync("results")) {
+        mkdirSync("results");
+    }
+
     console.log("Generating uncompressed ARC");
     writeFile("results/example_arc.arc", new DataView(await runArcTest()));
 
