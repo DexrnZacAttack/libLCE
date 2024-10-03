@@ -11,7 +11,6 @@
 */
 
 // compression
-// maybe name these inflate, deflate.
 export { deflate as compressZlib, inflate as decompressZlib, deflateRaw as compressDeflate, inflateRaw as decompressDeflate } from "pako";
 export * from "./compression/VitaRLE.js";
 export * from "./compression/SwitchPS4RLE.js";
