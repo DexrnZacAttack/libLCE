@@ -14,50 +14,47 @@ import { gzip } from "pako";
 import { CompressionTypes, compressDeflate, compressSwitchPS4RLE, compressVitaRLE, compressZlib } from "../index.js";
 import { bWriter } from "binaryio.js";
 
-export async function compressSave(file: File, compType: CompressionTypes, lEndian = false): Promise<File> {
-    const fileArray = await file.arrayBuffer();
-    
+export function compressSave(save: Uint8Array | ArrayBuffer, compType: CompressionTypes, lEndian = false): Uint8Array {
     /** decompressed size as bigint */
-    const fileSize = BigInt(fileArray.byteLength)
+    const fileSize = BigInt(save.byteLength)
 
     let compressedFile = new Uint8Array([]);
 
     switch (compType) {
         case CompressionTypes.zlib:
-            compressedFile = compressZlib(fileArray);
+            compressedFile = compressZlib(save);
             break;
         case CompressionTypes.deflate:
-            compressedFile = compressDeflate(fileArray);
+            compressedFile = compressDeflate(save);
             break;
         case CompressionTypes.vitarle:
-            compressedFile = compressVitaRLE(new Uint8Array(fileArray));
+            compressedFile = compressVitaRLE(new Uint8Array(save));
             break;
         case CompressionTypes.switchps4rle:
             // they do not compress saves with this by default.
-            compressedFile = compressSwitchPS4RLE(new Uint8Array(fileArray));
+            compressedFile = compressSwitchPS4RLE(new Uint8Array(save));
         case CompressionTypes.lzx:
             break;
         case CompressionTypes.gzip:
-            gzip(new Uint8Array(fileArray));
+            gzip(new Uint8Array(save));
             break;
         default:
             break;
         case CompressionTypes.none:
-            return new File([new Blob([fileArray])], file.name);
+            return new Uint8Array(save);
     }
 
-    // I was stumped for about ~2 days wondering why my compression stuff is so messed up... this line here was the culprit.
     const compWriter = new bWriter(new Uint8Array(8 + compressedFile.length), lEndian);
     if (compType !== CompressionTypes.vitarle) {
         compWriter.writeLong(fileSize, lEndian);
     } else {
         compWriter.writeInt(0, lEndian);
-        compWriter.writeInt(fileArray.byteLength, lEndian);
+        compWriter.writeInt(save.byteLength, lEndian);
     }
 
     for (let i = 0; i < compressedFile.length; i++) {
         compWriter.writeByte(compressedFile[i]!);
     }
 
-    return new File([new Blob([compWriter.arrayBuffer])], file.name);
+    return new Uint8Array(compWriter.arrayBuffer);
 }

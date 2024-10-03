@@ -131,8 +131,8 @@ dist
 
 # extra
 /.vscode
-/testing
 /.idea
 /testing_internal
-/testing
+/testing/reading/msscmp
+/testing/results
 /staging

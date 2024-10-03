@@ -92,10 +92,10 @@ export async function readSave(saveFile: File, lEndian = false, ro: readOptions 
 
             /** Timestamp of the file (unusable due to how it's written.) */
             let fileTimestamp = 0n;
-            if (!isPreReleaseSF) {
-                // first 2 pr versions don't include timestamp
+
+            // first 2 pr versions don't include timestamp
+            if (!isPreReleaseSF)
                 fileTimestamp = saveReader.readULong() as bigint;
-            }
             
             const fileData: ArrayBuffer = saveReader.slice(fileOffset, fileOffset + fileLength);
             index.push({"name": fileName, "length": fileLength, "offset": fileOffset, "timestamp": fileTimestamp, "data": new File( [new Blob( [ fileData ] )], fileName )})
