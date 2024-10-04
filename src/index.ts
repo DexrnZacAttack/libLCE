@@ -75,7 +75,8 @@ export interface PckKV {
 
 export interface PckFileData {
     file: PckFileEntry;
-    fileKV: PckKV;
+    fileKV: PckKV[];
+    data: Uint8Array;
 };
 
 export interface PckFile {

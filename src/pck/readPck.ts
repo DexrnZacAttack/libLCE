@@ -24,7 +24,6 @@ export async function readPCK(file: File, isLittle = false): Promise<PckFile> {
 
     const lookupTable: LookupTable[] = [];
     const fileTable: PckFileEntry[] = [];
-    const KVTable: PckKV[] = [];
     const PckFiles: PckFileData[] = [];
 
     const lookupTableCount = reader.readUInt();
@@ -42,18 +41,17 @@ export async function readPCK(file: File, isLittle = false): Promise<PckFile> {
     }
 
     for (var i = 0; i < fileTableCount; i++) {
+        const KVTable: PckKV[] = [];
         var propertyCount = reader.readUInt();
         for (var j = 0; j < propertyCount; j++) {
             const key = reader.readUInt();
             const value = reader.readString16(reader.readUInt() * 2);
             reader.readUInt();
-            KVTable.push({ key, value });
+            KVTable.push({key, value});
         }
-        reader.read(fileTable[i]?.size!);
-    }
-
-    for (var i = 0; i < fileTableCount; i++) {
-        PckFiles.push({ file: fileTable[i]!, fileKV: KVTable[i]! });
+        
+        const data = new Uint8Array(reader.read(fileTable[i]?.size!));
+        PckFiles.push({ file: fileTable[i]!, fileKV: KVTable, data });
     }
 
     return {
