@@ -29,6 +29,8 @@ export * from "./arc/writeArc.js";
 export * from "./console/consoles.js";
 // msscmp
 export * from "./msscmp/readMsscmp.js";
+// pck
+export * from "./pck/readPck.js";
 
 export interface MsscmpFile {
     fileName: string,
@@ -36,6 +38,51 @@ export interface MsscmpFile {
     sampleRate: number
     file: File;
 }
+
+export interface LookupTable {
+    offset: number;
+    name: string;
+};
+
+export enum PckFileTypes {
+    Skin,
+    Cape,
+    Texture,
+    UiInfo,
+    Info,
+    TexturePackInfo,
+    Localization,
+    GameRules,
+    Audio,
+    Colors,
+    GameRulesHeader,
+    SkinData,
+    Models,
+    Behaviors,
+    Material
+};
+
+export interface PckFileEntry {
+    size: number;
+    type: PckFileTypes;
+    name: string;
+};
+
+export interface PckKV {
+    key: number;
+    value: string;
+};
+
+export interface PckFileData {
+    file: PckFileEntry;
+    fileKV: PckKV;
+};
+
+export interface PckFile {
+    version: number;
+    lookupTable: LookupTable[]
+    fileTable: PckFileData[];
+};
 
 export interface WorldInfo {
     "4J_SEED": string,

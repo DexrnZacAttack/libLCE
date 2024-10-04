@@ -47,7 +47,7 @@ async function runMSSCMPTest() {
             const filePath = path.join("reading\\MSSCMP", file);
             if (statSync(filePath).isFile()) {
                 console.log(`Reading MSSCMP ${filePath}`)
-                await readMSSCMP(new File([readFileSync(filePath).buffer], "msscmptest"));
+                await readMSSCMP(new File([readFileSync(filePath)], "msscmptest"));
             }
         }
     } catch (error) {

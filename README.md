@@ -42,7 +42,7 @@ A TS library for Minecraft Legacy Console Edition files + more
     - [X] Reading
     - [ ] Writing
   - [ ] PCK
-    - [ ] Reading
+    - [X] Reading
     - [ ] Writing
   - [ ] MSSCMP
     - [X] Reading

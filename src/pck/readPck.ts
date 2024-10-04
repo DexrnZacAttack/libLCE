@@ -15,72 +15,50 @@
 */
 
 import { bReader } from "binaryio.js";
+import { LookupTable, PckFileData, PckFile, PckFileEntry, PckKV, PckFileTypes } from "../index.js";
 
-interface LookupTable {
-    offset: number;
-    name: string;
-};
-
-enum PckFileTypes {
-    Skin,
-    Cape,
-    Texture,
-    UiInfo,
-    Info,
-    TexturePackInfo,
-    Localization,
-    GameRules,
-    Audio,
-    Colors,
-    GameRulesHeader,
-    SkinData,
-    Models,
-    Behaviors,
-    Material
-};
-
-interface FileEntry {
-    size: number;
-    type: PckFileTypes;
-    name: string;
-};
-
-interface FileDataEntry {
-    key: number;
-    name: string;
-    data: Uint8Array;
-};
-
-export async function readPCK(file: File, isLittle = false) {
+export async function readPCK(file: File, isLittle = false): Promise<PckFile> {
     const reader = new bReader(await file.arrayBuffer(), isLittle);
 
-    const pckType = reader.readUInt();
+    const version = reader.readUInt();
 
     const lookupTable: LookupTable[] = [];
-    const fileTable: FileEntry[] = [];
-    const fileDataTable: FileDataEntry[] = [];
+    const fileTable: PckFileEntry[] = [];
+    const KVTable: PckKV[] = [];
+    const PckFiles: PckFileData[] = [];
 
     const lookupTableCount = reader.readUInt();
 
-    console.log(reader.pos);
     for (var i = 0; i < lookupTableCount; i++) {
-        lookupTable.push({offset: reader.readUInt(), name: reader.readString16(reader.readUInt() * 2)});
+        lookupTable.push({ offset: reader.readUInt(), name: reader.readString16(reader.readUInt() * 2) });
         reader.readUInt();
     }
 
     const fileTableCount = reader.readUInt();
 
     for (var i = 0; i < fileTableCount; i++) {
-        fileTable.push({size: reader.readUInt(), type: reader.readUInt() as PckFileTypes, name: reader.readString16(reader.readUInt() * 2)});
+        fileTable.push({ size: reader.readUInt(), type: reader.readUInt() as PckFileTypes, name: reader.readString16(reader.readUInt() * 2) });
         reader.readUInt();
     }
 
-    const fileDataTableCount = reader.readUInt();
+    for (var i = 0; i < fileTableCount; i++) {
+        var propertyCount = reader.readUInt();
+        for (var j = 0; j < propertyCount; j++) {
+            const key = reader.readUInt();
+            const value = reader.readString16(reader.readUInt() * 2);
+            reader.readUInt();
+            KVTable.push({ key, value });
+        }
+        reader.read(fileTable[i]?.size!);
+    }
 
-    for (var i = 0; i < lookupTableCount; i++) {
-        const key = reader.readUInt();
-        const name = reader.readString16(reader.readUInt() * 2);
-        console.log(fileTable[lookupTable[i]?.offset!]?.size)
-        console.log(lookupTable[i]?.name!);
+    for (var i = 0; i < fileTableCount; i++) {
+        PckFiles.push({ file: fileTable[i]!, fileKV: KVTable[i]! });
+    }
+
+    return {
+        version,
+        lookupTable: lookupTable,
+        fileTable: PckFiles
     }
 }
