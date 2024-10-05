@@ -7,3 +7,4 @@ tsconfig.build.json
 /testing_internal
 /.idea
 /staging
+.github

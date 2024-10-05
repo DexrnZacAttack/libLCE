@@ -25,12 +25,12 @@ export * from "./loc/readLoc.js";
 // arc
 export * from "./arc/readArc.js";
 export * from "./arc/writeArc.js";
-// consoles
-export * from "./console/consoles.js";
 // msscmp
 export * from "./msscmp/readMsscmp.js";
 // pck
 export * from "./pck/readPck.js";
+// consoles
+export * from "./console/consoles.js";
 
 export interface MsscmpFile {
     fileName: string,
@@ -81,6 +81,7 @@ export interface PckFileData {
 
 export interface PckFile {
     version: number;
+    xmlVersion?: number;
     lookupTable: LookupTable[]
     fileTable: PckFileData[];
 };

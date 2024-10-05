@@ -2,7 +2,7 @@ import { readdir, readFile, stat, writeFile } from "fs/promises";
 
 import path, { join, resolve, relative } from "path";
 
-import { CompressionTypes, compressSave, writeSave, readARC, readSave, writeArc, readMSSCMP } from "../src/index.js"; 
+import { CompressionTypes, compressSave, writeSave, readARC, readSave, writeArc, readMSSCMP, readPCK } from "../src/index.js"; 
 import { existsSync, lstatSync, mkdirSync, readdirSync, readFileSync, statSync } from "fs";
 
 async function runArcTest(): Promise<ArrayBuffer> {
@@ -55,6 +55,22 @@ async function runMSSCMPTest() {
     }
 }
 
+async function runPCKTest() {
+    try {
+        const files = readdirSync("reading\\PCK");
+
+        for (const file of files) {
+            const filePath = path.join("reading\\PCK", file);
+            if (statSync(filePath).isFile()) {
+                console.log(`Reading PCK ${filePath}`)
+                await readPCK(new File([readFileSync(filePath)], "pcktest"));
+            }
+        }
+    } catch (error) {
+        console.error('Error reading PCK:', error);
+    }
+}
+
 
 async function runTests() {
     if (!existsSync("results")) {
@@ -90,7 +106,13 @@ async function runTests() {
     // To run this test, place .MSSCMP files "./reading/MSSCMP".
     if (existsSync("reading/MSSCMP") && lstatSync("reading/MSSCMP").isDirectory()) {
         console.log("Reading MSSCMPs");
-        runMSSCMPTest();
+        await runMSSCMPTest();
+    }
+
+    // To run this test, place .PCK files "./reading/PCK".
+    if (existsSync("reading/PCK") && lstatSync("reading/PCK").isDirectory()) {
+        console.log("Reading PCKs");
+        await runPCKTest();
     }
 }
 

@@ -5,7 +5,6 @@
  *
  * File Contributors (based off of GitHub commits):
  * - DexrnZacAttack
- * - Offroaders123
  * 
  * Other credits:
  * - NessieHax
@@ -17,9 +16,14 @@
 import { bReader } from "binaryio.js";
 import { LookupTable, PckFileData, PckFile, PckFileEntry, PckKV, PckFileTypes } from "../index.js";
 
-export async function readPCK(file: File, isLittle = false): Promise<PckFile> {
+export async function readPCK(file: File, isLittle?: boolean): Promise<PckFile> {
     const reader = new bReader(await file.arrayBuffer(), isLittle);
+    let readXMLVersion = false;
 
+    if (typeof isLittle === 'undefined' && reader.readUInt() > 4)
+        reader.setEndianness(true);
+
+    reader.setPos(0);
     const version = reader.readUInt();
 
     const lookupTable: LookupTable[] = [];
@@ -29,9 +33,22 @@ export async function readPCK(file: File, isLittle = false): Promise<PckFile> {
     const lookupTableCount = reader.readUInt();
 
     for (var i = 0; i < lookupTableCount; i++) {
-        lookupTable.push({ offset: reader.readUInt(), name: reader.readString16(reader.readUInt() * 2) });
+        const offset = reader.readUInt();
+        const name = reader.readString16(reader.readUInt() * 2);
+
+        if (name == "XMLVERSION")
+            readXMLVersion = true;
+
+        lookupTable.push({ offset, name});
         reader.readUInt();
     }
+    
+    let xmlVersion;
+
+    if (readXMLVersion)
+        xmlVersion = reader.readUInt();
+
+    readXMLVersion = false;
 
     const fileTableCount = reader.readUInt();
 
@@ -56,6 +73,7 @@ export async function readPCK(file: File, isLittle = false): Promise<PckFile> {
 
     return {
         version,
+        xmlVersion,
         lookupTable: lookupTable,
         fileTable: PckFiles
     }
