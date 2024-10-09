@@ -12,49 +12,41 @@
 import { getImageOffset } from "../console/consoles.js";
 import { ConsoleTypes, World, WorldInfo } from "../index.js";
 import { bReader } from "binaryio.js";
-import * as png from '@vivaxy/png';
+import extractChunks from "png-chunks-extract";
 
-// TODO: fix this below
 // TODO: make writer
+export function readWorldInfo(data: Uint8Array, consoleType: ConsoleTypes): World {
+    let reader = new bReader(data);
+    const imageOffset = getImageOffset(consoleType);
 
-function parse4JtEXt(data: {"wInfo": string}): WorldInfo {
-    // this is a bad way of doing it!!!!
-    const textChunks = data.wInfo.split('\x00');
-    const parsed: Record<string, string> = {};
-
-    for (let i = 0; i < textChunks.length - 1; i += 2) {
-        const key = textChunks[i]!.trim();
-        const value = textChunks[i + 1]!.trim();
-        parsed[key] = value;
-    }
-    
-    return parsed as unknown as WorldInfo;
-}
-
-export async function parseWorldInfo(file: File, console: ConsoleTypes): Promise<World> {
-    let reader = new bReader(await file.arrayBuffer());
-    const imageOffset = getImageOffset(console);
-
-    let worldName;
+    let worldName = "Not in file";
 
     if (imageOffset !== 0) {
-        /** header of the world (includes name and a few other things) */
-        const worldHeader = new Uint8Array(reader.read(imageOffset));
-        /** the world name */
-        reader.setPos(0);
         worldName = reader.readNullTerminatedString16();
+        reader.setPos(imageOffset);
     }
 
-    /** Image data */
     const imageData = new Uint8Array(reader.read(reader.byteLength - imageOffset));
+    const tEXt = extractChunks(imageData).filter(chunk => chunk.name === 'tEXt').pop()?.data! // get last tEXt chunk
 
-    // console.log(Array.from(imageData, byte => byte.toString(16).padStart(2, '0')).join(' '));
-    const worldInfo = png.decode(imageData).text;
-    // todo: FIX THIS EWWWWWW
-    let worldInfoFixed = parse4JtEXt({'wInfo': Object.keys(worldInfo!).map(key => key + '\x00' + worldInfo![key]).join('')});
+    const kv = [];
+    const wInfoReader = new bReader(tEXt);
 
-    /** the world thumbnail */
-    const thumbnail = new File([new Blob([imageData])], "thumbnail.png", { type: "image/png" });
+    while (wInfoReader.pos < wInfoReader.byteLength) {
+        const tKv = wInfoReader.readNullTerminatedString8();
+        if (tKv != "")
+            kv.push(tKv);
+    }
 
-    return worldName ? {"name": worldName, "thumbnail": thumbnail, "worldInfo": worldInfoFixed} : {"thumbnail": thumbnail, "worldInfo": worldInfoFixed};
+    const worldInfo: Partial<WorldInfo> = {};
+
+    for (let i = 0; i < kv.length; i += 2) {
+        const key = kv[i] as keyof WorldInfo;
+        const value = kv[i + 1];
+        
+        worldInfo[key] = value;
+    }
+
+
+    return {name: worldName, thumbnail: imageData, worldInfo: worldInfo as WorldInfo};
 }

@@ -92,11 +92,12 @@ export interface WorldInfo {
     "4J_TEXTUREPACK": string,
     "4J_EXTRADATA": string,
     "4J_#LOADS": string
+    "4J_BASESAVENAME": string
 }
 
 export interface World {
     name?: string,
-    thumbnail: File,
+    thumbnail: Uint8Array,
     worldInfo: WorldInfo
 }
 
