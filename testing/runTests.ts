@@ -2,8 +2,9 @@ import { readdir, readFile, stat, writeFile } from "fs/promises";
 
 import path, { join, resolve, relative } from "path";
 
-import { CompressionTypes, compressSave, writeSave, readARC, readSave, writeArc, readMSSCMP, readPCK } from "../src/index.js"; 
+import { CompressionTypes, compressSave, writeSave, readARC, readSave, writeArc, readMSSCMP, readPCK, writeCOL, readCOL } from "../src/index.js"; 
 import { existsSync, lstatSync, mkdirSync, readdirSync, readFileSync, statSync } from "fs";
+import { RGBColor } from "binaryio.js";
 
 async function runArcTest(): Promise<ArrayBuffer> {
     try {
@@ -77,8 +78,17 @@ async function runTests() {
         mkdirSync("results");
     }
 
-    console.log("Generating uncompressed ARC");
+    console.log("Generating ARC");
     writeFile("results/example_arc.arc", new DataView(await runArcTest()));
+
+    console.log("Generating COL");
+    writeFile("results/example_col.col", new Uint8Array(writeCOL({version: 1,
+        colors: [{name: "Hello, world!",
+            color: new RGBColor(0x18, 0x34, 0xAD, 0xFF)}],
+             worldColors: [{name: "libLCE COL world color writing test",
+                waterColor: new RGBColor(0x18, 0x7A, 0x92, 0xFF),
+                 underwaterColor: new RGBColor(0x33, 0x4E, 0xC4, 0xFF),
+                  fogColor: new RGBColor(0x00, 0x41, 0x91, 0xFF)}]})));
 
     console.log("Generating uncompressed save");
     writeFile("results/example_save_uncompressed.dat", new DataView(await runSaveTest()));
@@ -102,6 +112,9 @@ async function runTests() {
 
     console.log("Reading generated arc");
     console.log(await readARC(new File([await readFile("results/example_arc.arc")], "example_arc.arc")));
+
+    console.log("Reading generated col");
+    console.log(readCOL(new Uint8Array((await readFile("results/example_col.col")).buffer)));
 
     // To run this test, place .MSSCMP files "./reading/MSSCMP".
     if (existsSync("reading/MSSCMP") && lstatSync("reading/MSSCMP").isDirectory()) {

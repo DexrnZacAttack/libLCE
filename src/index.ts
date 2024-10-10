@@ -10,6 +10,8 @@
  * Licensed under the MIT License. See LICENSE file for details.
 */
 
+import { RGBA, RGBColor } from "binaryio.js";
+
 // compression
 export { deflate as compressZlib, inflate as decompressZlib, deflateRaw as compressDeflate, inflateRaw as decompressDeflate } from "pako";
 export * from "./compression/VitaRLE.js";
@@ -29,6 +31,9 @@ export * from "./arc/writeArc.js";
 export * from "./msscmp/readMsscmp.js";
 // pck
 export * from "./pck/readPck.js";
+// col
+export * from "./col/readCol.js";
+export * from "./col/writeCol.js";
 // consoles
 export * from "./console/consoles.js";
 
@@ -112,6 +117,24 @@ export interface Savegame {
 export interface Arc {
     fileCount: number,
     fileIndex: ArcIndex[]
+}
+
+export interface ColColor {
+    name: string;
+    color: RGBColor;
+};
+
+export interface ColWorldColor {
+    name: string;
+    waterColor: RGBColor;
+    underwaterColor: RGBColor;
+    fogColor: RGBColor;
+};
+
+export interface Col {
+    version: number;
+    colors: ColColor[];
+    worldColors?: ColWorldColor[];
 }
 
 export interface ArcIndex {
