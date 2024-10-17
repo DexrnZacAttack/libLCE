@@ -10,36 +10,17 @@
 */
 
 import { bReader } from "binaryio.js";
+import { Keys, LangId, Language, Loc } from "../index.js";
 
-interface Keys {
-    useUniqueIDs: boolean;
-    count: number;
-    keys: number[];
-}
+export async function readLOC(locFile: File): Promise<Loc> {
 
-interface Loc {
-    version: number;
-    count: number;
-    keys: Keys;
-    languageIds: string[];
-    languages: Language[];
-};
-
-interface Language {
-    language: string;
-    stringCount: number;
-    strings: string[];
-};
-
-export async function readLOC(locFile: File, lEndian = false): Promise<Loc> {
-
-    let reader = new bReader(await locFile.arrayBuffer(), lEndian);
+    let reader = new bReader(await locFile.arrayBuffer());
 
     const version = reader.readUInt();
     const count = reader.readUInt();
 
     const keys: Keys = {useUniqueIDs: false, count: 0, keys: []};
-    const languageIds: string[] = [];
+    const languageIds: LangId[] = [];
     const languages: Language[] = [];
 
     if (version === 2) {
@@ -50,20 +31,21 @@ export async function readLOC(locFile: File, lEndian = false): Promise<Loc> {
     }
 
     for (var i = 0; i < count; i++) {
-        languageIds.push(reader.readString8());
-        reader.readUInt();
+        languageIds.push({name: reader.readString8(), unk: reader.readUInt()});
     }
 
     for (var i = 0; i < count; i++) {
-        if (reader.readUInt() > 1)
-             reader.readByte(); 
+        let byte;
+        const shouldReadByte = reader.readUInt();
+        if (shouldReadByte > 1)
+            byte = reader.readByte(); 
         const langName = reader.readString8();
         const stringCount = reader.readUInt();
         let strings: string[] = [];
         for (var s = 0; s < stringCount; s++)
             strings.push(reader.readString8());
 
-        languages.push({language: langName, stringCount, strings});
+        languages.push({language: langName, stringCount, strings, shouldReadByte, byte});
     }
 
     return {version, count, keys, languageIds, languages}

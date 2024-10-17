@@ -38,9 +38,9 @@ A TS library for Minecraft Legacy Console Edition files + more
   - [X] ARC
     - [X] Reading
     - [X] Writing
-  - [ ] LOC
+  - [X] LOC
     - [X] Reading
-    - [ ] Writing
+    - [X] Writing
   - [ ] PCK
     - [X] Reading
     - [ ] Writing

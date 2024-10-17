@@ -1,3 +1,14 @@
+/*
+ * Copyright (c) 2024 DexrnZacAttack
+ * This file is part of libLCE.
+ * https://github.com/DexrnZacAttack/libLCE
+ *
+ * File Contributors (based off of GitHub commits):
+ * - DexrnZacAttack
+ * 
+ * Licensed under the MIT License. See LICENSE file for details.
+*/
+
 import { bReader, RGBFormat, RGBColor } from "binaryio.js";
 import { Col, ColColor, ColWorldColor } from "../index.js";
 

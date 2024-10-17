@@ -49,6 +49,34 @@ export interface LookupTable {
     name: string;
 };
 
+export interface LangId {
+    name: string;
+    unk: number;
+}
+
+
+export interface Keys {
+    useUniqueIDs: boolean;
+    count: number;
+    keys: number[];
+}
+
+export interface Loc {
+    version: number;
+    count: number;
+    keys?: Keys;
+    languageIds: LangId[];
+    languages: Language[];
+};
+
+export interface Language {
+    shouldReadByte: number;
+    byte?: number;
+    language: string;
+    stringCount: number;
+    strings: string[];
+};
+
 export enum PckFileTypes {
     Skin,
     Cape,
