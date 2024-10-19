@@ -28,7 +28,9 @@ mod tests {
     #[test]
     // apache2 debian default page
     fn it_works() {
-        let file = File::open("media.arc");
-        let save = arc::read_arc::<_>(file.unwrap());
+        let arc_file = File::open("testing/media.arc");
+        let arc = arc::read_arc::<_>(arc_file.unwrap());
+        let save_file = File::open("testing/savegame.dat");
+        let save = saves::read_save::<_, BigEndian>(save_file.unwrap());
     }
 }

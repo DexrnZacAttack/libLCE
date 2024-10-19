@@ -7,7 +7,7 @@
 */
 
 use std::io::{Read, Seek, SeekFrom};
-use byteorder::{ByteOrder, ReadBytesExt};
+use byteorder::{BigEndian, ByteOrder, ReadBytesExt};
 use crate::util;
 
 #[derive(Default, Debug)]
@@ -35,11 +35,7 @@ pub fn read_save<R: Read + Seek + std::fmt::Debug, B: ByteOrder>(mut reader: R) 
         reader.seek(SeekFrom::Start((index_offset + (144 * i)) as u64)).unwrap();
 
         // why do I have to do so much jank to read a UTF16 string from a byte array
-        let mut buffer = [0u8; 0x80];
-        reader.read_exact(&mut buffer);
-        let u16_string = util::array::u8_to_u16_array::<B>(&buffer).unwrap();
-        let utf16_string = String::from_utf16(&u16_string).unwrap();
-        let name = utf16_string.trim_end_matches('\0').to_string();
+        let name = util::string::read_utf16::<_, B>(&mut reader, 0x80).trim_end_matches('\0').to_string();
         let size: u32 = reader.read_u32::<B>().unwrap();
         let offset = reader.read_u32::<B>().unwrap();
         let timestamp = reader.read_u64::<B>().unwrap();
