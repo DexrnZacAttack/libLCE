@@ -2,5 +2,6 @@
 /.idea
 /testing/
 /testing
-testing/media.arc
+testing/testfiles/media.arc
 /testing/*
+output.txt

@@ -10,7 +10,7 @@ use std::io;
 use byteorder::ByteOrder;
 
 // cuz you can't read utf16 string from [u8] or whatever it is (there's like 90 different array types help)
-pub(crate) fn u8_to_u16_array<B: ByteOrder>(array: &[u8]) -> io::Result<Vec<u16>> {
+pub(crate) fn u8_to_u16_vec<B: ByteOrder>(array: Vec<u8>) -> io::Result<Vec<u16>> {
     let mut u16_array = Vec::new();
 
     for chunk in array.chunks(2) {
