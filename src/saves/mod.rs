@@ -21,6 +21,20 @@ pub struct Save {
     index: Vec<SaveIndexFile>
 }
 
+enum SaveVersion {
+    // version names are equivalent to the first version where the file version is used
+    // e.g TU5 is the first version to use file version 3.
+    TU0033 = 1,
+    TU0054 = 2,
+    TU5 = 3,
+    TU9 = 5,
+    TU14 = 6,
+    TU17 = 8,
+    TU19 = 9,
+    TU36 = 10,
+    TU69 = 11
+}
+
 pub enum SaveCompression {
     ZLIB,
     LZX,
@@ -30,7 +44,17 @@ pub enum SaveCompression {
 pub fn read_save<R: Read + Seek + std::fmt::Debug, B: ByteOrder>(mut reader: R) -> Save {
     let mut save = Save::default();
     let index_offset = reader.read_u32::<B>().unwrap();
-    let index_count = reader.read_u32::<B>().unwrap();
+    let mut index_count = reader.read_u32::<B>().unwrap();
+    let minimum_version = reader.read_u16::<B>().unwrap();
+    let current_version = reader.read_u16::<B>().unwrap();
+
+    let mut is_prerelease = false;
+
+    if (current_version == SaveVersion::TU0033 as u16) {
+        is_prerelease = true;
+        index_count = index_count / 136;
+    }
+
     save.file_count = index_count;
     println!("Offset: {:?}, Count: {:?}", index_offset, index_count);
 
@@ -41,7 +65,12 @@ pub fn read_save<R: Read + Seek + std::fmt::Debug, B: ByteOrder>(mut reader: R) 
         let name = util::string::read_utf16::<_, B>(&mut reader, 0x80);
         let size: u32 = reader.read_u32::<B>().unwrap();
         let offset = reader.read_u32::<B>().unwrap();
-        let timestamp = reader.read_u64::<B>().unwrap();
+
+        let mut timestamp = 0;
+
+        if (!is_prerelease) {
+            timestamp = reader.read_u64::<B>().unwrap();
+        }
 
         let mut buffer = vec![0u8; size as usize];
         reader.seek(SeekFrom::Start(offset as u64)).unwrap();
@@ -54,9 +83,15 @@ pub fn read_save<R: Read + Seek + std::fmt::Debug, B: ByteOrder>(mut reader: R) 
 }
 
 pub(crate) fn write_save<B: ByteOrder>(mut files: Vec<BasicFile>, minimum_version: u16, current_version: u16) -> BasicFile {
+    let mut is_prerelease = false;
+
+    if (current_version == SaveVersion::TU0033 as u16) {
+        is_prerelease = true;
+    }
+
     let mut writer = Cursor::new(Vec::new());
     writer.write_u32::<B>(0).unwrap(); // write temp offset
-    writer.write_u32::<B>(files.len() as u32).unwrap(); // file count
+    writer.write_u32::<B>(if is_prerelease { (files.len() * 136) as u32 } else { files.len() as u32 }).unwrap(); // file count
     writer.write_u16::<B>(minimum_version).unwrap();
     writer.write_u16::<B>(current_version).unwrap();
 
@@ -76,7 +111,9 @@ pub(crate) fn write_save<B: ByteOrder>(mut files: Vec<BasicFile>, minimum_versio
         write_utf16_padded::<_, B>(&mut writer, &mut files[i].name, 0x40, true, false);
         writer.write_u32::<B>(files[i].data.len() as u32).unwrap();
         writer.write_u32::<B>(offsets[i]).unwrap();
-        writer.write_u64::<B>(SystemTime::now().duration_since(UNIX_EPOCH).expect("Time went backwards, are you a time traveler?").as_secs()).unwrap();
+        if (!is_prerelease) {
+            writer.write_u64::<B>(SystemTime::now().duration_since(UNIX_EPOCH).expect("Time went backwards, are you a time traveler?").as_secs()).unwrap();
+        }
     }
 
     let mut data = Vec::new();
