@@ -2,7 +2,7 @@ import { readdir, readFile, stat, writeFile } from "fs/promises";
 
 import path, { join, resolve, relative } from "path";
 
-import { CompressionTypes, compressSave, writeSave, readARC, readSave, writeArc, readMSSCMP, readPCK, writeCOL, readCOL } from "../src/index.js"; 
+import { CompressionTypes, compressSave, writeSave, readARC, readSave, writeArc, readMSSCMP, readPCK, writeCOL, readCOL, decompressSave } from "../src/index.js"; 
 import { existsSync, lstatSync, mkdirSync, readdirSync, readFileSync, statSync } from "fs";
 import { RGBColor } from "binaryio.js";
 
@@ -94,21 +94,22 @@ async function runTests() {
     writeFile("results/example_save_uncompressed.dat", new DataView(await runSaveTest()));
     
     console.log("Generating Zlib-compressed save");
-    writeFile("results/example_save_zlib.dat", new DataView(compressSave(await runSaveTest(), CompressionTypes.zlib).buffer));
+    writeFile("results/example_save_zlib.dat", new DataView(compressSave(await runSaveTest(), CompressionTypes.Zlib).buffer));
 
     console.log("Generating Vita RLE-compressed save");
-    writeFile("results/example_save_vitarle.dat", new DataView(compressSave(await runSaveTest(), CompressionTypes.vitarle).buffer));
+    writeFile("results/example_save_vitarle.dat", new DataView(compressSave(await runSaveTest(), CompressionTypes.VitaRle).buffer));
 
-    console.log("Generating Switch/PS4 RLE-compressed save");
-    writeFile("results/example_save_switchPs4Rle.dat", new DataView(compressSave(await runSaveTest(), CompressionTypes.switchps4rle).buffer));
+    console.log("Generating Split Save RLE-compressed save");
+    writeFile("results/example_save_splitsaverle.dat", new DataView(compressSave(await runSaveTest(), CompressionTypes.SplitSaveRle).buffer));
 
     console.log("Reading uncompressed save");
     console.log(await readSave(new File([await readFile("results/example_save_uncompressed.dat")], "example_save_uncompressed.dat")));
     console.log("Reading ZLib save");
     console.log(await readSave(new File([await readFile("results/example_save_zlib.dat")], "example_save_zlib.dat")));
-    // do these later
-    // console.log(await readSave(new File([await readFile("results/example_save_vitarle.dat")], "example_save_vitarle.dat")));
-    // console.log(await readSave(new File([await readFile("results/example_save_switchPs4Rle.dat")], "example_save_switchPs4Rle.dat")));
+    console.log("Reading Vita RLE-compressed save");
+    console.log(await readSave(new File([decompressSave(await readFile("results/example_save_vitarle.dat"), CompressionTypes.VitaRle)], "example_save_vitarle.dat")));
+    console.log("Reading Split Save RLE-compressed save");
+    console.log(await readSave(new File([decompressSave(await readFile("results/example_save_splitsaverle.dat"), CompressionTypes.SplitSaveRle)], "example_save_zlib.dat")));
 
     console.log("Reading generated arc");
     console.log(await readARC(new File([await readFile("results/example_arc.arc")], "example_arc.arc")));

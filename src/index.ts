@@ -15,11 +15,11 @@ import { RGBA, RGBColor } from "binaryio.js";
 // compression
 export { deflate as compressZlib, inflate as decompressZlib, deflateRaw as compressDeflate, inflateRaw as decompressDeflate } from "pako";
 export * from "./compression/VitaRLE.js";
-export * from "./compression/SwitchPS4RLE.js";
+export * from "./compression/SplitSaveRLE.js";
 // saves
 export * from "./saves/createSave.js";
 export * from "./saves/readSave.js";
-export * from "./saves/compressSave.js";
+export * from "./saves/saveCompression.js";
 // world
 export * from "./world/readWorldInfo.js";
 // loc
@@ -211,11 +211,11 @@ export enum ConsoleTypes {
 }
 
 export enum CompressionTypes {
-    gzip = 1,
-    zlib,
-    deflate,
-    vitarle,
-    switchps4rle,
-    lzx,
-    none
+    Gzip = 1,
+    Zlib,
+    Deflate,
+    VitaRle,
+    SplitSaveRle,
+    Lzx,
+    None
 }

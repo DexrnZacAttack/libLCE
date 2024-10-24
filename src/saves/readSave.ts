@@ -13,7 +13,7 @@
  * Licensed under the MIT License. See LICENSE file for details.
 */
 
-import { decompressZlib, SaveIndex, Savegame, SaveVersion } from "../index.js";
+import { decompressZlib, SaveIndex, Savegame, SaveVersion, decompressSave, CompressionTypes } from "../index.js";
 import { bReader } from 'binaryio.js';
 
 interface readOptions {
@@ -30,12 +30,7 @@ export async function readSave(saveFile: File, lEndian = false, ro: readOptions 
     try {
         const decompressTest = new Uint8Array(saveReader.slice(8));
         if (decompressTest[0] === 0x78 && decompressTest[1] === 0x9C) {
-            if (decompressZlib(decompressTest)) {
-                decompressedSize = Number(saveReader.readULong());
-                if ((decompressedSize ?? 0) !== 0) {
-                    saveReader = new bReader(decompressZlib(decompressTest), lEndian);
-                }
-            }
+                saveReader = new bReader(decompressSave(saveReader.arrayBuffer, CompressionTypes.Zlib, lEndian), lEndian);
         } else {
             console.log(`No ZLib header, not gonna attempt decompress.`)
         }

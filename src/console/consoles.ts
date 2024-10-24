@@ -19,60 +19,60 @@ interface consoleCompression {
 
 export function getSaveCompression(console: ConsoleTypes) {
     const compTypesMap = new Map([
-        [ConsoleTypes.Xbox360, CompressionTypes.lzx],
-        [ConsoleTypes.XboxOne, CompressionTypes.zlib],
-        [ConsoleTypes.PS3, CompressionTypes.deflate],
-        [ConsoleTypes.Vita, CompressionTypes.vitarle],
-        [ConsoleTypes.PS4, CompressionTypes.zlib],
-        [ConsoleTypes.WiiU, CompressionTypes.zlib],
-        [ConsoleTypes.Switch, CompressionTypes.none]
+        [ConsoleTypes.Xbox360, CompressionTypes.Lzx],
+        [ConsoleTypes.XboxOne, CompressionTypes.Zlib],
+        [ConsoleTypes.PS3, CompressionTypes.Deflate],
+        [ConsoleTypes.Vita, CompressionTypes.VitaRle],
+        [ConsoleTypes.PS4, CompressionTypes.Zlib],
+        [ConsoleTypes.WiiU, CompressionTypes.Zlib],
+        [ConsoleTypes.Switch, CompressionTypes.None]
     ])
-    return compTypesMap.get(console) || CompressionTypes.none;
+    return compTypesMap.get(console) || CompressionTypes.None;
 }
 
 export function getCompression(console: ConsoleTypes): consoleCompression {
     const compTypesMap = new Map<ConsoleTypes, consoleCompression>([
         [ConsoleTypes.Xbox360, {
-            saveCompression: CompressionTypes.lzx,
-            regionCompression: CompressionTypes.none,
-            chunkCompression: CompressionTypes.lzx
+            saveCompression: CompressionTypes.Lzx,
+            regionCompression: CompressionTypes.None,
+            chunkCompression: CompressionTypes.Lzx
         }],
         [ConsoleTypes.XboxOne, {
-            saveCompression: CompressionTypes.zlib,
-            regionCompression: CompressionTypes.none,
-            chunkCompression: CompressionTypes.zlib
+            saveCompression: CompressionTypes.Zlib,
+            regionCompression: CompressionTypes.SplitSaveRle,
+            chunkCompression: CompressionTypes.Zlib
         }],
         [ConsoleTypes.PS3, {
-            saveCompression: CompressionTypes.deflate,
-            regionCompression: CompressionTypes.none,
-            chunkCompression: CompressionTypes.deflate
+            saveCompression: CompressionTypes.Deflate,
+            regionCompression: CompressionTypes.None,
+            chunkCompression: CompressionTypes.Deflate
         }],
         [ConsoleTypes.Vita, {
-            saveCompression: CompressionTypes.vitarle,
-            regionCompression: CompressionTypes.none,
-            chunkCompression: CompressionTypes.zlib
+            saveCompression: CompressionTypes.VitaRle,
+            regionCompression: CompressionTypes.None,
+            chunkCompression: CompressionTypes.Zlib
         }],
         [ConsoleTypes.PS4, {
-            saveCompression: CompressionTypes.zlib,
-            regionCompression: CompressionTypes.none,
-            chunkCompression: CompressionTypes.zlib
+            saveCompression: CompressionTypes.Zlib,
+            regionCompression: CompressionTypes.SplitSaveRle,
+            chunkCompression: CompressionTypes.Zlib
         }],
         [ConsoleTypes.WiiU, {
-            saveCompression: CompressionTypes.zlib,
-            regionCompression: CompressionTypes.none,
-            chunkCompression: CompressionTypes.zlib
+            saveCompression: CompressionTypes.Zlib,
+            regionCompression: CompressionTypes.None,
+            chunkCompression: CompressionTypes.Zlib
         }],
         [ConsoleTypes.Switch, {
-            saveCompression: CompressionTypes.zlib,
-            regionCompression: CompressionTypes.switchps4rle,
-            chunkCompression: CompressionTypes.zlib
+            saveCompression: CompressionTypes.Zlib,
+            regionCompression: CompressionTypes.SplitSaveRle,
+            chunkCompression: CompressionTypes.Zlib
         }]
     ]);
 
     return compTypesMap.get(console) || {
-        saveCompression: CompressionTypes.none,
-        regionCompression: CompressionTypes.none,
-        chunkCompression: CompressionTypes.none
+        saveCompression: CompressionTypes.None,
+        regionCompression: CompressionTypes.None,
+        chunkCompression: CompressionTypes.None
     };
 }
 
