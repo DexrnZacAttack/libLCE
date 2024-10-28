@@ -11,9 +11,10 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use byteorder::{ByteOrder, ReadBytesExt, WriteBytesExt};
 use crate::file::types::{BasicFile, SaveIndexFile};
 use crate::util;
-use crate::util::string::{write_utf16_padded};
+use crate::util::io::string::{write_utf16_padded};
 use flate2::write::ZlibEncoder;
 use flate2::Compression;
+use crate::util::io::rw::stream_to_basic_file;
 
 #[derive(Default, Debug)]
 pub struct Save {
@@ -62,7 +63,7 @@ pub fn read_save<R: Read + Seek + std::fmt::Debug, B: ByteOrder>(mut reader: R) 
         reader.seek(SeekFrom::Start((index_offset + (144 * i)) as u64)).unwrap();
 
         // why do I have to do so much jank to read a UTF16 string from a byte array
-        let name = util::string::read_utf16::<_, B>(&mut reader, 0x80);
+        let name = util::io::string::read_utf16::<_, B>(&mut reader, 0x80);
         let size: u32 = reader.read_u32::<B>().unwrap();
         let offset = reader.read_u32::<B>().unwrap();
 
@@ -116,13 +117,7 @@ pub(crate) fn write_save<B: ByteOrder>(mut files: Vec<BasicFile>, minimum_versio
         }
     }
 
-    let mut data = Vec::new();
-    // janky, read to the end to get the data
-    writer.seek(SeekFrom::Start(0)).unwrap();
-    writer.read_to_end(&mut data).unwrap();
-
-    let size = writer.get_ref().len();
-    BasicFile {name: "savegame.dat".parse().unwrap(), size, data}
+    stream_to_basic_file(&mut writer, "savegame.dat")
 }
 
 pub(crate) fn compress_save<B: ByteOrder>(save: BasicFile, r#type: SaveCompression) -> BasicFile {
@@ -133,7 +128,7 @@ pub(crate) fn compress_save<B: ByteOrder>(save: BasicFile, r#type: SaveCompressi
         let mut compressor = ZlibEncoder::new(buffer, Compression::default());
         compressor.write_all(&save.data).unwrap();
         let compressed = compressor.finish().unwrap().into_inner();
-        return BasicFile { name: "gamesave.dat".parse().unwrap(), size: compressed.len(), data: compressed }
+        BasicFile { name: "savegame.dat".parse().unwrap(), size: compressed.len(), data: compressed }
     } else {
         panic!("Compression type is not implemented yet.");
     }

@@ -6,6 +6,5 @@
  * Licensed under the MIT License. See LICENSE file for details.
 */
 
-pub mod array;
-pub mod io;
-pub mod image;
+pub mod string;
+pub mod rw;

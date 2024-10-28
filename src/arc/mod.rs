@@ -9,8 +9,8 @@
 use std::io::{Cursor, Read, Seek, SeekFrom, Write};
 use byteorder::{BigEndian, ReadBytesExt, WriteBytesExt};
 use crate::file::types::BasicFile;
-use crate::util;
-use crate::util::string::{read_utf8_prefixed_size, write_utf8};
+use crate::util::io::rw::stream_to_basic_file;
+use crate::util::io::string::{read_utf8_prefixed_size, write_utf8};
 
 #[derive(Default, Debug)]
 pub struct Arc {
@@ -76,11 +76,5 @@ pub(crate) fn write_arc(mut files: Vec<BasicFile>) -> BasicFile {
         writer.set_position(next_entry);
     }
 
-    let mut data = Vec::new();
-    // janky, read to the end to get the data
-    writer.seek(SeekFrom::Start(0)).unwrap();
-    writer.read_to_end(&mut data).unwrap();
-
-    let size = writer.get_ref().len();
-    BasicFile {name: "arc.arc".parse().unwrap(), size, data}
+    stream_to_basic_file(&mut writer, "archive.arc")
 }
