@@ -7,10 +7,10 @@
 */
 
 use std::io::{Read, Seek, SeekFrom};
-use byteorder::{BigEndian, ByteOrder, LittleEndian, ReadBytesExt};
+use std::vec;
+use byteorder::{ByteOrder, LittleEndian, ReadBytesExt};
 use crate::compression::get_console_decompression_function;
-use crate::{world, ConsoleType};
-use crate::world::block;
+use crate::{ConsoleType};
 use crate::world::block::AquaticBlock;
 
 /*
@@ -30,8 +30,8 @@ pub struct ConsoleCompressedChunk {
 
 #[derive(Default, Debug)]
 pub struct AquaticSection {
-    pub size: i16,
-    pub jump_table: Vec<i16>,
+    pub max_section_address: u16,
+    pub jump_table: Vec<u16>,
     pub size_table: Vec<u8>,
     pub blocks: Vec<AquaticBlock>,
 }
@@ -82,11 +82,15 @@ pub fn read_chunk<R: Read + Seek + std::fmt::Debug, B: ByteOrder + 'static>(mut 
 
     if (chunk.version == 12) {
         let mut section = AquaticSection::default();
-        section.size = reader.read_i16::<B>().unwrap() * 256;
+        section.max_section_address = reader.read_u16::<B>().unwrap() * 256;
 
-        let mut jump_table: [i16; 16] = [0; 16];
-        reader.read_exact(bytemuck::cast_slice_mut(&mut jump_table));
+        let mut jump_table: [u16; 16] = [0; 16];
+        for i in 0..16 {
+            jump_table[i] = reader.read_u16::<B>().unwrap();
+        }
         section.jump_table = jump_table.to_vec();
+
+        println!("jump_table: {:?}", section.jump_table);
 
         let mut size_table: [u8; 16] = [0; 16];
         reader.read_exact(&mut size_table);
@@ -96,18 +100,19 @@ pub fn read_chunk<R: Read + Seek + std::fmt::Debug, B: ByteOrder + 'static>(mut 
 
         let mut jump_index = 0;
         for jump in jump_table.iter() {
-            if (*jump == 0) {
+            if (size_table[jump_index] == 0) {
                 jump_index += 1;
                 continue;
             }
 
             reader.seek(SeekFrom::Start(0x4c + *jump as u64)).unwrap();
+            println!("before grid index: {}", reader.stream_position().unwrap());
             let mut grid_index: Vec<GridIndexEntry> = Vec::new();
             for _ in 0..64 {
                 grid_index.push(read_grid_index_entry(reader.read_u16::<B>().unwrap()));
             }
 
-            println!("{:?}", grid_index);
+            println!("Grid index: {:?}", grid_index);
             let mut blocks: Vec<AquaticBlock> = Vec::new();
 
             let reader_pos = reader.stream_position().unwrap();
@@ -131,7 +136,7 @@ pub fn read_chunk<R: Read + Seek + std::fmt::Debug, B: ByteOrder + 'static>(mut 
 
             jump_index += 1;
         }
-        println!("{:?}", section);
+        println!("Section: {:?}", section);
         chunk.section.push(section);
     }
 
