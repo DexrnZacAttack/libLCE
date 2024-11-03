@@ -14,6 +14,7 @@ use crate::util;
 use crate::util::io::string::{write_utf16_padded};
 use flate2::write::ZlibEncoder;
 use flate2::Compression;
+use crate::compression::CompressionTypes;
 use crate::util::io::rw::stream_to_basic_file;
 
 #[derive(Default, Debug)]
@@ -34,12 +35,6 @@ enum SaveVersion {
     TU19 = 9,
     TU36 = 10,
     TU69 = 11
-}
-
-pub enum SaveCompression {
-    ZLIB,
-    LZX,
-    VITARLE,
 }
 
 pub fn read_save<R: Read + Seek + std::fmt::Debug, B: ByteOrder>(mut reader: R) -> Save {
@@ -120,11 +115,11 @@ pub(crate) fn write_save<B: ByteOrder>(mut files: Vec<BasicFile>, minimum_versio
     stream_to_basic_file(&mut writer, "savegame.dat")
 }
 
-pub(crate) fn compress_save<B: ByteOrder>(save: BasicFile, r#type: SaveCompression) -> BasicFile {
+pub(crate) fn compress_save<B: ByteOrder>(save: BasicFile, r#type: CompressionTypes) -> BasicFile {
     let mut buffer = Cursor::new(Vec::new());
     buffer.write_u64::<B>(save.size as u64).unwrap();
 
-    if (matches!(r#type, SaveCompression::ZLIB)) {
+    if (matches!(r#type, CompressionTypes::ZLIB)) {
         let mut compressor = ZlibEncoder::new(buffer, Compression::default());
         compressor.write_all(&save.data).unwrap();
         let compressed = compressor.finish().unwrap().into_inner();
