@@ -1,6 +1,7 @@
 # Experimental Rust Rewrite
 uhh I have no idea what I'm doing (new to rust)
-
+### I am very new to rust dev, if you see things that are wrong please make some issue and explain, if I understand it well enough I will fix it.
+there *WILL* be shitty code, I don't like that very much but idk common rust practices and I'm basically learning from scratch.
 ## Progress
 
 - [ ] Cleanup
