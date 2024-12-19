@@ -5,5 +5,5 @@
  *
  * Licensed under the MIT License. See LICENSE file for details.
 */
-pub(crate) mod types;
+pub mod types;
 pub(crate) mod get;

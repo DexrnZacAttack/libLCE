@@ -6,8 +6,9 @@
  * Licensed under the MIT License. See LICENSE file for details.
 */
 
-use std::io::{Cursor, Read};
 use flate2::read::ZlibDecoder;
+use std::io::{Cursor, Read};
+use wasm_bindgen::prelude::wasm_bindgen;
 
 pub fn decompress_zlib(data: &mut Vec<u8>) -> std::io::Result<Vec<u8>> {
     let mut decoder = ZlibDecoder::new(Cursor::new(data));

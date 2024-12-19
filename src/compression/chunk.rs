@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2024 DexrnZacAttack
  * This file is part of libLCE.
@@ -8,7 +7,7 @@
 */
 
 // Thanks to UtterEvergreen1 for helping with chunk compression.
-pub fn decompress_chunk(data: &mut Vec<u8>) -> std::io::Result<Vec<u8>> {
+pub fn decompress_chunk(data: &mut Vec<u8>) -> Vec<u8> {
     let mut writer = Vec::new();
     let mut i = 0;
 
@@ -22,8 +21,8 @@ pub fn decompress_chunk(data: &mut Vec<u8>) -> std::io::Result<Vec<u8>> {
             let mut write_value = 255;
             let num_of_value = data[i];
             i += 1;
-            
-            if (num_of_value >= 3) {
+
+            if num_of_value >= 3 {
                 write_value = data[i];
                 i += 1;
             }
@@ -32,5 +31,5 @@ pub fn decompress_chunk(data: &mut Vec<u8>) -> std::io::Result<Vec<u8>> {
         }
     }
 
-    Ok(writer)
+    writer
 }

@@ -6,5 +6,5 @@
  * Licensed under the MIT License. See LICENSE file for details.
 */
 
-pub mod string;
+pub mod ex_string;
 pub mod rw;

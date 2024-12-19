@@ -6,8 +6,8 @@
  * Licensed under the MIT License. See LICENSE file for details.
 */
 
-use std::io;
 use byteorder::ByteOrder;
+use std::io;
 
 // cuz you can't read utf16 string from [u8] or whatever it is (there's like 90 different array types help)
 pub(crate) fn u8_to_u16_vec<B: ByteOrder>(array: Vec<u8>) -> io::Result<Vec<u16>> {

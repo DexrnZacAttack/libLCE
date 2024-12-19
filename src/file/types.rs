@@ -8,16 +8,28 @@
 
 #[derive(Default, Clone, Debug)]
 pub struct BasicFile {
-    pub(crate) name: String,
-    pub(crate) size: usize,
-    pub(crate) data: Vec<u8>
+    pub name: String,
+    pub size: usize,
+    pub data: Vec<u8>,
 }
 
-#[derive(Default, Debug)]
+#[derive(Default, Debug, Clone)]
 pub struct SaveIndexFile {
-    pub(crate) name: String,
-    pub(crate) size: u32,
-    pub(crate) offset: u32,
-    pub(crate) timestamp: u64,
-    pub(crate) data: Vec<u8>
+    pub name: String,
+    pub size: u32,
+    pub offset: u32,
+    pub timestamp: u64,
+    pub data: Vec<u8>,
+}
+
+impl From<SaveIndexFile> for BasicFile {
+    fn from(file: SaveIndexFile) -> Self {
+        BasicFile { name: file.name, size: file.size as usize, data: file.data }
+    }
+}
+
+impl From<BasicFile> for SaveIndexFile {
+    fn from(file: BasicFile) -> Self {
+        SaveIndexFile { name: file.name, size: file.size as u32, offset: 0, timestamp: 0, data: file.data }
+    }
 }
