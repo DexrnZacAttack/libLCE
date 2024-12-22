@@ -1,1 +1,0 @@
-Test to see if writing non-ascii characters in UTF8 works properly, I do not know if the game hates this or not so I might have to restrict it later when I test.
