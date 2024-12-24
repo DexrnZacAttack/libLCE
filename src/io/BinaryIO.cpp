@@ -43,7 +43,7 @@ namespace lce::io {
         *this->data++ = static_cast<uint8_t>(v);
     }
 
-    const uint8_t* BinaryIO::getData() const {
+    uint8_t* BinaryIO::getData() {
         return this->dataOrigin;
     }
 
@@ -77,8 +77,15 @@ namespace lce::io {
 
     std::string BinaryIO::readUtf8(size_t size) {
         uint8_t* buf = readOfSize(size);
-        return std::string(reinterpret_cast<char*>(buf), size);
+        return {reinterpret_cast<char*>(buf), size};
     }
+
+    void BinaryIO::writeUtf8(const std::string& input) {
+        for (const char& ch : input) {
+            this->writeB<uint8_t>(static_cast<uint8_t>(ch));
+        }
+    }
+
 
     std::wstring BinaryIO::readWChar2ByteB(const size_t size) {
         std::wstring result;
@@ -126,41 +133,13 @@ namespace lce::io {
 
     void BinaryIO::writeWChar4ByteB(const std::wstring& input) {
         for (const wchar_t& ch : input) {
-            this->writeB<uint32_t>(ch);
+            this->writeB<uint32_t>(static_cast<uint32_t>(ch));
         }
     }
 
     void BinaryIO::writeWChar4ByteL(const std::wstring& input) {
         for (const wchar_t& ch : input) {
-            this->writeL<uint32_t>(ch);
-        }
-    }
-
-    std::wstring BinaryIO::readWCharB(const size_t stringSize, const size_t wcharSize) {
-        std::wstring result;
-        for (size_t i = 0; i < stringSize; i++) {
-            result += static_cast<wchar_t>(this->readLWithSize(wcharSize));
-        }
-        return result;
-    }
-
-    std::wstring BinaryIO::readWCharL(const size_t stringSize, const size_t wcharSize) {
-        std::wstring result;
-        for (size_t i = 0; i < stringSize; i++) {
-            result += static_cast<wchar_t>(this->readLWithSize(wcharSize));
-        }
-        return result;
-    }
-
-    void BinaryIO::writeWCharB(const std::wstring& input, const size_t wcharSize) {
-        for (const wchar_t& ch : input) {
-            this->writeBWithSize(ch, wcharSize);
-        }
-    }
-
-    void BinaryIO::writeWCharL(const std::wstring& input, const size_t wcharSize) {
-        for (const wchar_t& ch : input) {
-            this->writeLWithSize(ch, wcharSize);
+            this->writeL<uint32_t>(static_cast<uint32_t>(ch));
         }
     }
 }

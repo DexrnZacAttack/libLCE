@@ -3,7 +3,7 @@ project(lce)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(lce library.cpp
+add_library(lce SHARED
         src/save/SaveFile.cpp
         src/save/SaveFile.h
         src/io/BinaryIO.cpp
@@ -12,13 +12,18 @@ add_executable(lce library.cpp
         src/save/IndexInnerFile.h
         src/arc/Archive.cpp
         src/arc/Archive.h
-        src/arc/ArchiveFile.cpp
-        src/arc/ArchiveFile.h
+        src/arc/ArchiveInnerFile.cpp
+        src/arc/ArchiveInnerFile.h
         src/save/SaveFileOld.cpp
         src/save/SaveFileOld.h
         src/save/SaveFileCommons.cpp
         src/save/SaveFileCommons.h
 )
+
+add_executable(tests
+tests.cpp)
+
+target_link_libraries(tests PRIVATE lce)
 
 # me: "why don't we use c++20 for std::endian?"
 # them: "c++20 is in my nightmares"

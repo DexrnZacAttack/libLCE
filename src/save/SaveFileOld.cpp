@@ -67,7 +67,7 @@ namespace lce::save {
         }
 
         for (const auto& file: this->index) {
-            io.writeWCharB(file.name, wcharSize);
+            io.writeWChar2ByteB(file.name);
             io.writeB<uint32_t>(file.size);
             io.writeB<uint32_t>(file.offset);
         }

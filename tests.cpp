@@ -1,5 +1,3 @@
-#include "library.h"
-
 #include <chrono>
 #include <fstream>
 #include <iostream>
@@ -41,7 +39,21 @@ namespace tests {
 
         fclose(f);
 
-        lce::arc::Archive::readFromData(ass);
+        lce::arc::Archive file = lce::arc::Archive::readFromData(ass);
+
+        const uint8_t* file2 = file.create();
+
+        std::ofstream outFile("testarc.arc", std::ios::binary);
+        if (!outFile) {
+            throw std::ios_base::failure("Failed to open file");
+        }
+
+        outFile.write(reinterpret_cast<const char*>(file2), file.getSize());
+        if (!outFile) {
+            throw std::ios_base::failure("Failed to write");
+        }
+
+        outFile.close();
     }
 
     void oldSaveTest() {

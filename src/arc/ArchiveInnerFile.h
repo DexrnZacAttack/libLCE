@@ -10,19 +10,21 @@
 // TODO: maybe create a universal type?
 
 namespace lce::arc {
-    class ArchiveFile {
+    class ArchiveInnerFile {
     public:
         std::string name;
         uint32_t size;
         uint32_t offset;
         uint8_t* data;
 
-        ArchiveFile();
-        ~ArchiveFile();
+        ArchiveInnerFile();
+        ~ArchiveInnerFile();
 
-        static ArchiveFile readArchiveFile(uint8_t* data);
+        static ArchiveInnerFile readArchiveFile(uint8_t* data);
 
-        static ArchiveFile readArchiveFileBIO(io::BinaryIO& io);
+        static ArchiveInnerFile readArchiveFileBIO(io::BinaryIO& io);
+
+        uint8_t *create();
     };
 }
 

@@ -85,29 +85,6 @@ namespace lce::io {
             return v;
         }
 
-        size_t readLWithSize(size_t size) {
-            size_t v;
-            memcpy(&v, this->data, size);
-            this->data += size;
-            return little2sys(v);
-        }
-
-        size_t readBWithSize(size_t size) {
-            size_t v;
-            memcpy(&v, this->data, size);
-            this->data += size;
-            return big2sys(v);
-        }
-
-        size_t readWithSize(size_t size, const ByteOrder endian) {
-            size_t v;
-            memcpy(&v, this->data, size);
-            this->data += size;
-
-            if (endian == LittleEndian)
-                return little2sys(v);
-            return big2sys(v);
-        }
         //writing
         void writeByte(uint8_t v);
 
@@ -126,19 +103,7 @@ namespace lce::io {
             this->data+=sizeof(T);
         }
 
-        void writeLWithSize(size_t size, const size_t& v) {
-            size_t ec = little2sys(v);
-            memcpy(this->data, &ec, size);
-            this->data += size;
-        }
-
-        void writeBWithSize(size_t size, const size_t& v) {
-            size_t ec = big2sys(v);
-            memcpy(this->data, &ec, size);
-            this->data += size;
-        }
-
-        const uint8_t* getData() const;
+        uint8_t* getData();
 
         uint8_t *getDataRelative() const;
 
@@ -151,6 +116,8 @@ namespace lce::io {
         void readInto(uint8_t *into, size_t size);
 
         std::string readUtf8(size_t size);
+
+        void writeUtf8(const std::string &input);
 
         std::wstring readWChar2ByteB(size_t size);
 

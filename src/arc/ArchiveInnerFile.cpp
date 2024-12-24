@@ -3,20 +3,21 @@
 //
 
 #include "../io/BinaryIO.h"
-#include "ArchiveFile.h"
+#include "ArchiveInnerFile.h"
 
 namespace lce::arc {
-    ArchiveFile::ArchiveFile() {
+    ArchiveInnerFile::ArchiveInnerFile() {
     }
 
-    ArchiveFile::~ArchiveFile() {
+    ArchiveInnerFile::~ArchiveInnerFile() {
     }
 
-    ArchiveFile ArchiveFile::readArchiveFile(uint8_t *data) {
-        ArchiveFile af;
+    ArchiveInnerFile ArchiveInnerFile::readArchiveFile(uint8_t *data) {
+        ArchiveInnerFile af;
         io::BinaryIO io(data);
 
         uint16_t name_size = io.readB<uint16_t>();
+        std::cout << name_size << std::endl;
 
         af.name = io.readUtf8(name_size);
         af.offset = io.readB<uint32_t>();
@@ -24,8 +25,9 @@ namespace lce::arc {
         return af;
     }
 
-    ArchiveFile ArchiveFile::readArchiveFileBIO(io::BinaryIO& io) {
-        ArchiveFile af;
+    // TODO: better way to do this (maybe not have separate function to pass io reference)
+    ArchiveInnerFile ArchiveInnerFile::readArchiveFileBIO(io::BinaryIO& io) {
+        ArchiveInnerFile af;
 
         uint16_t name_size = io.readB<uint16_t>();
 

@@ -13,6 +13,8 @@
 #include "../io/BinaryIO.h"
 
 namespace lce::save {
+    // TODO: little endian support
+
     SaveFile::SaveFile(uint32_t indexOffset, uint32_t indexFileCount, uint16_t origVersion, uint16_t version,
         const std::vector<IndexInnerFile> &index) {
     }
@@ -76,7 +78,7 @@ namespace lce::save {
         }
 
         for (const auto& file: this->index) {
-            io.writeWCharB(file.name, wcharSize);
+            io.writeWChar2ByteB(file.name);
             io.writeB<uint32_t>(file.size);
             io.writeB<uint32_t>(file.offset);
             io.writeB<uint64_t>(file.timestamp);
