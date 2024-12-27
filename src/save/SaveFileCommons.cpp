@@ -4,6 +4,7 @@
 
 #include "SaveFileCommons.h"
 
+#include <codecvt>
 #include <cstdint>
 #include <variant>
 
@@ -16,7 +17,7 @@ namespace lce::save {
     class SaveFileOld;
     class SaveFile;
 
-    void SaveFileCommons::addFile(const IndexInnerFile file) {
+    void SaveFileCommons::addFile(const IndexInnerFile &file) {
         this->index.push_back(file);
         this->indexFileCount++;
         this->indexOffset += file.size;
@@ -39,6 +40,20 @@ namespace lce::save {
         return size;
     }
 
+    std::optional<IndexInnerFile> SaveFileCommons::getFileByName(std::wstring name) {
+        const auto find = std::find_if(index.begin(), index.end(), [&name](const IndexInnerFile& file) {
+            return file.name == name;
+        });
+
+        if (find != index.end()) return *find;
+
+        return std::nullopt;
+    }
+
+    uint32_t SaveFileCommons::calculateIndexOffset() const {
+        return HEADER_SIZE + this->getFilesSize();
+    }
+
     uint32_t SaveFileCommons::getFilesSize() const {
         uint32_t size = 0;
         for (const auto& file: this->index) {
@@ -57,13 +72,13 @@ namespace lce::save {
         return 0;
     }
 
-    std::variant<SaveFile, SaveFileOld> SaveFileCommons::readFromDataAuto(uint8_t *data) {
-        io::BinaryIO io(data);
+    std::variant<SaveFile, SaveFileOld> SaveFileCommons::readAuto(std::vector<uint8_t> data) {
+        io::BinaryIO io(data.data());
         io.seek(10);
 
         if (const auto version = static_cast<SaveFileVersion>(io.readB<uint16_t>()); version > PR)
-            return SaveFile::readFromData(data);
+            return SaveFile::read(data);
 
-        return SaveFileOld::readFromData(data);
+        return SaveFileOld::read(data);
     }
 }

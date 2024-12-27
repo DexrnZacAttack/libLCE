@@ -26,9 +26,9 @@ namespace lce::save {
      * @param data The data you want to read (a save file)
      * @return The save file.
      */
-    SaveFile SaveFile::readFromData(uint8_t *data) {
+    SaveFile SaveFile::read(std::vector<uint8_t> data) {
         SaveFile sf;
-        io::BinaryIO io(data);
+        io::BinaryIO io((data.data()));
 
         sf.indexOffset = io.readB<uint32_t>();
         sf.indexFileCount = io.readB<uint32_t>();
@@ -40,7 +40,7 @@ namespace lce::save {
         for (int i = 0; i < sf.indexFileCount; ++i) {
             io.seek(sf.indexOffset + (144 * i));
             // read the index entry
-            IndexInnerFile inf = IndexInnerFile::readInnerFile(io.readOfSize(144));
+            IndexInnerFile inf = IndexInnerFile::read(io.readOfSize(144));
             // read the data, maybe should be changed
             io.seek(inf.offset);
             inf.data = new uint8_t[inf.size];

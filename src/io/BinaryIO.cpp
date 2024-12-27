@@ -87,6 +87,15 @@ namespace lce::io {
     }
 
 
+    void BinaryIO::trimWString(std::wstring& inp) {
+        auto pos = inp.find_last_not_of(L'\0');
+        if (pos != std::wstring::npos) {
+            inp.resize(pos + 1);
+        } else {
+            inp.clear();
+        }
+    }
+
     std::wstring BinaryIO::readWChar2ByteB(const size_t size) {
         std::wstring result;
         for (size_t i = 0; i < size; i++) {

@@ -119,6 +119,8 @@ namespace lce::io {
 
         void writeUtf8(const std::string &input);
 
+        static void trimWString(std::wstring &inp);
+
         std::wstring readWChar2ByteB(size_t size);
 
         std::wstring readWChar2ByteL(size_t size);

@@ -15,9 +15,9 @@ namespace lce::save {
      * @param data The data you want to read (a save file)
      * @return The old-format save file.
      */
-    SaveFileOld SaveFileOld::readFromData(uint8_t *data) {
+    SaveFileOld SaveFileOld::read(std::vector<uint8_t> data) {
         SaveFileOld sf;
-        io::BinaryIO io(data);
+        io::BinaryIO io(data.data());
         uint32_t indexSize = sf.getIndexEntrySize();
 
         sf.indexOffset = io.readB<uint32_t>();
@@ -30,7 +30,7 @@ namespace lce::save {
         for (int i = 0; i < sf.indexFileCount; ++i) {
             io.seek(sf.indexOffset + (indexSize * i));
             // read the index entry
-            IndexInnerFile inf = IndexInnerFile::readOldInnerFile(io.readOfSize(indexSize));
+            IndexInnerFile inf = IndexInnerFile::readOld(io.readOfSize(indexSize));
             // read the data, maybe should be changed
             io.seek(inf.offset);
             inf.data = new uint8_t[inf.size];

@@ -4,9 +4,12 @@
 
 #ifndef SAVEFILECOMMONS_H
 #define SAVEFILECOMMONS_H
+#include <optional>
+#include <string>
 #include <variant>
 #include <vector>
 
+// TODO: allow for allocating/freeing space when needed
 
 namespace lce::save {
     class SaveFileOld;
@@ -38,15 +41,19 @@ namespace lce::save {
             size_t wcharSize = sizeof(wchar_t);
             std::vector<IndexInnerFile> index;
 
-            void addFile(IndexInnerFile file);
+            void addFile(const IndexInnerFile &file);
 
             void removeFile(uint32_t index);
 
             uint32_t getSize();
 
+            std::optional<IndexInnerFile> getFileByName(std::wstring name);
+
+            uint32_t calculateIndexOffset() const;
+
             [[nodiscard]] uint32_t getFilesSize() const;
 
-            static std::variant<SaveFile, SaveFileOld> readFromDataAuto(uint8_t *data);
+            static std::variant<SaveFile, SaveFileOld> readAuto(std::vector<uint8_t> data);
         protected:
             virtual uint32_t getIndexEntrySize();
     };

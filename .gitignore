@@ -6,3 +6,5 @@
 /cmake-build-debug-mingw
 /cmake-build-debug-vs
 /CMakeFiles
+/cmake-build-debug-em
+/testFiles

@@ -18,11 +18,10 @@ namespace lce::save {
         IndexInnerFile();
         ~IndexInnerFile();
 
-        static IndexInnerFile readInnerFile(uint8_t* data);
+        static IndexInnerFile read(uint8_t* data);
 
-        static IndexInnerFile readOldInnerFile(uint8_t *data);
+        static IndexInnerFile readOld(uint8_t *data);
     };
 }
-
 
 #endif //INNERFILE_H

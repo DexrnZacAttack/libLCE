@@ -3,7 +3,17 @@ project(lce)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_library(lce SHARED
+if (CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
+    set(ENVIRONMENT_TYPE "Emscripten")
+    # weird?
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s MODULARIZE=1 -sEXPORT_ES6=1 -s EXPORT_ALL=1 -s EXTRA_EXPORTED_RUNTIME_METHODS=['ccall','cwrap','getValue','setValue'] -s EXPORTED_FUNCTIONS=['_malloc'] -s ALLOW_MEMORY_GROWTH=1")
+    set(LIB_TYPE STATIC)
+else ()
+    set(ENVIRONMENT_TYPE "Native")
+    set(LIB_TYPE SHARED)
+endif ()
+
+add_library(lce ${LIB_TYPE}
         src/save/SaveFile.cpp
         src/save/SaveFile.h
         src/io/BinaryIO.cpp

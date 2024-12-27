@@ -10,7 +10,7 @@
 namespace lce::save {
     class SaveFileOld : public lce::save::SaveFileCommons {
     public:
-        static SaveFileOld readFromData(uint8_t *data);
+        static SaveFileOld read(std::vector<uint8_t> data);
 
         const uint8_t *create();
 

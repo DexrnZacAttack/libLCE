@@ -18,7 +18,7 @@ public:
     SaveFile(uint32_t indexOffset, uint32_t indexFileCount, uint16_t origVersion, uint16_t version, const std::vector<IndexInnerFile> &index);
     SaveFile();
 
-    static SaveFile readFromData(uint8_t* data);
+    static SaveFile read(std::vector<uint8_t> data);
 
     const uint8_t *create();
 
