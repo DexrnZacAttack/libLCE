@@ -11,18 +11,17 @@ namespace lce::arc {
 
     Archive::Archive() = default;
 
-    Archive Archive::readFromData(uint8_t *data) {
-        Archive arc;
+    Archive::Archive(uint8_t *data) {
         io::BinaryIO io(data);
 
-        arc.fileCount = io.readB<uint32_t>();
+        this->fileCount = io.readBE<uint32_t>();
 
-        std::vector<ArchiveInnerFile> index(arc.fileCount);
+        std::vector<ArchiveInnerFile> index(this->fileCount);
 
         io::BinaryIO& io2 = io;
 
-        for (uint32_t i = 0; i < arc.fileCount; i++) {
-            ArchiveInnerFile af = ArchiveInnerFile::readArchiveFileBIO(io2);
+        for (uint32_t i = 0; i < this->fileCount; i++) {
+            ArchiveInnerFile af = ArchiveInnerFile::ArchiveInnerFile(io2);
             uint32_t oldPos = io.getPosition();
             io.seek(af.offset);
             af.data = new uint8_t[af.size];
@@ -31,8 +30,7 @@ namespace lce::arc {
             io.seek(oldPos);
         }
 
-        arc.index = index;
-        return arc;
+        this->index = index;
     }
 
     uint8_t *Archive::create() {
@@ -43,14 +41,14 @@ namespace lce::arc {
         uint32_t *offsetPositions = new uint32_t[this->index.size()];
         uint32_t i = 0;
 
-        io.writeB<uint32_t>(this->index.size());
+        io.writeBE<uint32_t>(this->index.size());
         for (auto file: this->index) {
-            io.writeB<uint16_t>(file.name.length());
+            io.writeBE<uint16_t>(file.name.length());
             io.writeUtf8(file.name);
             // this stores the area where the file offset is written.
             offsetPositions[i] = io.getPosition();
-            io.writeB<uint32_t>(0);
-            io.writeB<uint32_t>(file.size);
+            io.writeBE<uint32_t>(0);
+            io.writeBE<uint32_t>(file.size);
 
             i++;
         }
@@ -66,7 +64,7 @@ namespace lce::arc {
             uint32_t pos2 = io.getPosition();
             // go to the offset offset (lol) and write the actual offset.
             io.seek(offsetPositions[j]);
-            io.writeB<uint32_t>(pos);
+            io.writeBE<uint32_t>(pos);
             // seek back over to the next file's position.
             io.seek(pos2);
             // and then we increment this.

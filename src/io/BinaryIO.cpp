@@ -5,10 +5,24 @@
 #include "BinaryIO.h"
 
 #include <vector>
+#include <cstring>
+#include <iostream>
 
 namespace lce::io {
-    BinaryIO::BinaryIO(uint8_t *input) : dataOrigin(input), data(input) {
+    BinaryIO::BinaryIO(uint8_t *input, size_t size) : dataOrigin(input), data(input), size(size) {
     }
+
+    BinaryIO::BinaryIO(size_t size) {
+        auto *data = new uint8_t[size]{};
+        this->dataOrigin = data;
+        this->data = data;
+        this->size = size;
+    }
+
+    // BinaryIO::~BinaryIO() {
+    //     delete[] data;
+    //     delete[] dataOrigin;
+    // }
 
     void BinaryIO::seek(const size_t offset) {
         this->data = this->dataOrigin+offset;
@@ -69,86 +83,20 @@ namespace lce::io {
         return result;
     }
 
+    std::vector<uint8_t> BinaryIO::readOfSizeVec(size_t size) {
+        std::vector<uint8_t> result = std::vector<uint8_t>(size);
+
+        for (size_t i = 0; i < size; i++) {
+            result.push_back(*this->data++);
+        }
+
+        return result;
+    }
+
     void BinaryIO::readInto(uint8_t* into, size_t size) {
         for (size_t i = 0; i < size; i++) {
             into[i] = *this->data++;
         }
     }
 
-    std::string BinaryIO::readUtf8(size_t size) {
-        uint8_t* buf = readOfSize(size);
-        return {reinterpret_cast<char*>(buf), size};
-    }
-
-    void BinaryIO::writeUtf8(const std::string& input) {
-        for (const char& ch : input) {
-            this->writeB<uint8_t>(static_cast<uint8_t>(ch));
-        }
-    }
-
-
-    void BinaryIO::trimWString(std::wstring& inp) {
-        auto pos = inp.find_last_not_of(L'\0');
-        if (pos != std::wstring::npos) {
-            inp.resize(pos + 1);
-        } else {
-            inp.clear();
-        }
-    }
-
-    std::wstring BinaryIO::readWChar2ByteB(const size_t size) {
-        std::wstring result;
-        for (size_t i = 0; i < size; i++) {
-            result += static_cast<wchar_t>(this->readB<uint16_t>());
-        }
-        return result;
-    }
-
-    std::wstring BinaryIO::readWChar2ByteL(const size_t size) {
-        std::wstring result;
-        for (size_t i = 0; i < size; i++) {
-            result += static_cast<wchar_t>(this->readL<uint16_t>());
-        }
-        return result;
-    }
-
-    void BinaryIO::writeWChar2ByteB(const std::wstring& input) {
-        for (const wchar_t& ch : input) {
-            this->writeB<uint16_t>(static_cast<uint16_t>(ch));
-        }
-    }
-
-    void BinaryIO::writeWChar2ByteL(const std::wstring& input) {
-        for (const wchar_t& ch : input) {
-            this->writeL<uint16_t>(static_cast<uint16_t>(ch));
-        }
-    }
-
-    std::wstring BinaryIO::readWChar4ByteB(const size_t size) {
-        std::wstring result;
-        for (size_t i = 0; i < size; i++) {
-            result += static_cast<wchar_t>(this->readB<uint32_t>());
-        }
-        return result;
-    }
-
-    std::wstring BinaryIO::readWChar4ByteL(const size_t size) {
-        std::wstring result;
-        for (size_t i = 0; i < size; i++) {
-            result += static_cast<wchar_t>(this->readL<uint32_t>());
-        }
-        return result;
-    }
-
-    void BinaryIO::writeWChar4ByteB(const std::wstring& input) {
-        for (const wchar_t& ch : input) {
-            this->writeB<uint32_t>(static_cast<uint32_t>(ch));
-        }
-    }
-
-    void BinaryIO::writeWChar4ByteL(const std::wstring& input) {
-        for (const wchar_t& ch : input) {
-            this->writeL<uint32_t>(static_cast<uint32_t>(ch));
-        }
-    }
 }

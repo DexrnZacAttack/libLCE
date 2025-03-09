@@ -8,6 +8,7 @@
 #include <string>
 #include <variant>
 #include <vector>
+#include "../io/ByteOrder.h"
 
 // TODO: allow for allocating/freeing space when needed
 
@@ -29,16 +30,19 @@ namespace lce::save {
     };
 
     class SaveFileCommons {
+        protected:
+        const uint32_t HEADER_SIZE = 12;
+        size_t wcharSize = sizeof(wchar_t);
+        uint32_t indexOffset;
+        uint32_t indexFileCount;
+        uint16_t originalVersion;
+        uint16_t version;
+        ByteOrder endian;
         public:
-            const uint32_t HEADER_SIZE = 12;
+            SaveFileCommons(): endian(ByteOrder::LITTLE), indexOffset(0), indexFileCount(0), originalVersion(11), version(11) {};
 
             virtual ~SaveFileCommons() = default;
 
-            uint32_t indexOffset;
-            uint32_t indexFileCount;
-            uint16_t originalVersion;
-            uint16_t version;
-            size_t wcharSize = sizeof(wchar_t);
             std::vector<IndexInnerFile> index;
 
             void addFile(const IndexInnerFile &file);
@@ -54,6 +58,15 @@ namespace lce::save {
             [[nodiscard]] uint32_t getFilesSize() const;
 
             static std::variant<SaveFile, SaveFileOld> readAuto(std::vector<uint8_t> data);
+
+            uint32_t getFileCount() const;
+            uint16_t getOriginalVersion() const;
+            uint16_t getVersion() const;
+            ByteOrder getEndian() const;
+
+            void setOriginalVersion(uint16_t version);
+            void setVersion(uint16_t version);
+            void setEndian(ByteOrder endian);
         protected:
             virtual uint32_t getIndexEntrySize();
     };

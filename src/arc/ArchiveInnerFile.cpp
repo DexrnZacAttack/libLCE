@@ -12,28 +12,23 @@ namespace lce::arc {
     ArchiveInnerFile::~ArchiveInnerFile() {
     }
 
-    ArchiveInnerFile ArchiveInnerFile::readArchiveFile(uint8_t *data) {
-        ArchiveInnerFile af;
+    ArchiveInnerFile::ArchiveInnerFile(uint8_t *data) {
         io::BinaryIO io(data);
 
-        uint16_t name_size = io.readB<uint16_t>();
+        uint16_t name_size = io.readBE<uint16_t>();
         std::cout << name_size << std::endl;
 
-        af.name = io.readUtf8(name_size);
-        af.offset = io.readB<uint32_t>();
-        af.size = io.readB<uint32_t>();
-        return af;
+        this->name = io.readUtf8(name_size);
+        this->offset = io.readBE<uint32_t>();
+        this->size = io.readBE<uint32_t>();
     }
 
     // TODO: better way to do this (maybe not have separate function to pass io reference)
-    ArchiveInnerFile ArchiveInnerFile::readArchiveFileBIO(io::BinaryIO& io) {
-        ArchiveInnerFile af;
+    ArchiveInnerFile::ArchiveInnerFile (io::BinaryIO& io) {
+        uint16_t name_size = io.readBE<uint16_t>();
 
-        uint16_t name_size = io.readB<uint16_t>();
-
-        af.name = io.readUtf8(name_size);
-        af.offset = io.readB<uint32_t>();
-        af.size = io.readB<uint32_t>();
-        return af;
+        this->name = io.readUtf8(name_size);
+        this->offset = io.readBE<uint32_t>();
+        this->size = io.readBE<uint32_t>();
     }
 }

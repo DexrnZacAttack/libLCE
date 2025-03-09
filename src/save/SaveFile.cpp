@@ -13,34 +13,40 @@
 #include "../io/BinaryIO.h"
 
 namespace lce::save {
-    // TODO: little endian support
-
     SaveFile::SaveFile(uint32_t indexOffset, uint32_t indexFileCount, uint16_t origVersion, uint16_t version,
         const std::vector<IndexInnerFile> &index) {
     }
 
     SaveFile::SaveFile() = default;
 
+    SaveFile::SaveFile(ByteOrder endian) {
+        this->endian = endian;
+    }
+
     /**
      * Reads a save file from a pointer to the data
      * @param data The data you want to read (a save file)
      * @return The save file.
      */
-    SaveFile SaveFile::read(std::vector<uint8_t> data) {
-        SaveFile sf;
+    SaveFile::SaveFile(std::vector<uint8_t> data, ByteOrder endian) {
+        this->endian = endian;
         io::BinaryIO io((data.data()));
 
-        sf.indexOffset = io.readB<uint32_t>();
-        sf.indexFileCount = io.readB<uint32_t>();
-        sf.originalVersion = io.readB<uint16_t>();
-        sf.version = io.readB<uint16_t>();
+        this->indexOffset = io.read<uint32_t>(this->endian);
 
-        std::vector<IndexInnerFile> index(sf.indexFileCount);
+        if (this->indexOffset > data.size())
+            throw std::runtime_error("Index offset points to an area that is out of bounds of the data given.");
 
-        for (int i = 0; i < sf.indexFileCount; ++i) {
-            io.seek(sf.indexOffset + (144 * i));
+        this->indexFileCount = io.read<uint32_t>(this->endian);
+        this->originalVersion = io.read<uint16_t>(this->endian);
+        this->version = io.read<uint16_t>(this->endian);
+
+        std::vector<IndexInnerFile> index(this->indexFileCount);
+
+        for (int i = 0; i < this->indexFileCount; ++i) {
+            io.seek(this->indexOffset + (144 * i));
             // read the index entry
-            IndexInnerFile inf = IndexInnerFile::read(io.readOfSize(144));
+            IndexInnerFile inf = IndexInnerFile(io.readOfSize(144), false, this->endian);
             // read the data, maybe should be changed
             io.seek(inf.offset);
             inf.data = new uint8_t[inf.size];
@@ -49,9 +55,7 @@ namespace lce::save {
             index[i] = inf;
         }
 
-        sf.index = index;
-
-        return sf;
+        this->index = index;
     }
 
     /**
@@ -59,16 +63,14 @@ namespace lce::save {
      * @return Pointer to the save file
      */
     const uint8_t *SaveFile::create() {
-        const uint32_t fileSize = this->getSize();
-        uint8_t *data = new uint8_t[fileSize];
-        io::BinaryIO io(data);
+        io::BinaryIO io(this->getSize());
 
         this->indexOffset = HEADER_SIZE;
 
-        io.writeB<uint32_t>(0);
-        io.writeB<uint32_t>(this->indexFileCount);
-        io.writeB<uint16_t>(this->originalVersion);
-        io.writeB<uint16_t>(this->version);
+        io.write<uint32_t>(0, this->endian);
+        io.write<uint32_t>(this->indexFileCount, this->endian);
+        io.write<uint16_t>(this->originalVersion, this->endian);
+        io.write<uint16_t>(this->version, this->endian);
 
         for (const auto& file: this->index) {
             file.offset = io.getPosition();
@@ -78,14 +80,15 @@ namespace lce::save {
         }
 
         for (const auto& file: this->index) {
-            io.writeWChar2ByteB(file.name);
-            io.writeB<uint32_t>(file.size);
-            io.writeB<uint32_t>(file.offset);
-            io.writeB<uint64_t>(file.timestamp);
+            std::wcout << file.name.length() << std::endl;
+            io.writeWChar2Byte(file.name, this->endian);
+            io.write<uint32_t>(file.size, this->endian);
+            io.write<uint32_t>(file.offset, this->endian);
+            io.write<uint64_t>(file.timestamp, this->endian);
         }
 
         io.seek(0);
-        io.writeB<uint32_t>(this->indexOffset);
+        io.write<uint32_t>(this->indexOffset, this->endian);
 
         return io.getData();
     }

@@ -1,35 +1,20 @@
 //
-// Created by DexrnZacAttack on 12/19/2024.
+// Created by DexrnZacAttack on 2/3/2025.
 //
 
 #include "IndexInnerFile.h"
 #include "../io/BinaryIO.h"
 
 namespace lce::save {
-    IndexInnerFile::IndexInnerFile() {
-    }
+    IndexInnerFile::IndexInnerFile() = default;
 
-    IndexInnerFile::~IndexInnerFile() {
-    }
-
-    IndexInnerFile IndexInnerFile::read(uint8_t *data) {
-        IndexInnerFile inf;
+    IndexInnerFile::IndexInnerFile(uint8_t *data, bool readOld, ByteOrder endian): endian(endian) {
         io::BinaryIO io(data);
-        inf.name = io.readWChar2ByteB(64);
-        io::BinaryIO::trimWString(inf.name);
-        inf.size = io.readB<uint32_t>();
-        inf.offset = io.readB<uint32_t>();
-        inf.timestamp = io.readB<uint64_t>();
-        return inf;
+        this->name = io.readWChar2Byte(64, this->endian);
+        this->size = io.read<uint32_t>(this->endian);
+        this->offset = io.read<uint32_t>(this->endian);
+        if (readOld)
+            this->timestamp = io.read<uint64_t>(this->endian);
     }
 
-    IndexInnerFile IndexInnerFile::readOld(uint8_t *data) {
-        IndexInnerFile inf;
-        io::BinaryIO io(data);
-        inf.name = io.readWChar2ByteB(64);
-        io::BinaryIO::trimWString(inf.name);
-        inf.size = io.readB<uint32_t>();
-        inf.offset = io.readB<uint32_t>();
-        return inf;
-    }
 }
