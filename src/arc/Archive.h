@@ -16,7 +16,7 @@ namespace lce::arc {
         Archive(uint32_t fileCount, const std::vector<ArchiveInnerFile> &index);
         Archive();
 
-        static Archive readFromData(uint8_t* data);
+        Archive::Archive(uint8_t* data);
 
         uint8_t *create();
 

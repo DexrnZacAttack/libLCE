@@ -20,9 +20,9 @@ namespace lce::arc {
         ArchiveInnerFile();
         ~ArchiveInnerFile();
 
-        static ArchiveInnerFile readArchiveFile(uint8_t* data);
+        ArchiveInnerFile(uint8_t* data);
 
-        static ArchiveInnerFile readArchiveFileBIO(io::BinaryIO& io);
+        ArchiveInnerFile(io::BinaryIO& io);
 
         uint8_t *create();
     };

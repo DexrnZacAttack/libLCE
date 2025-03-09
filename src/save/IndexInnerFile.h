@@ -6,21 +6,24 @@
 #define INNERFILE_H
 #include <string>
 
+#include "../io/ByteOrder.h"
+
 namespace lce::save {
+    // wish I could just dump a struct lol
     class IndexInnerFile {
     public:
+        // should use wchar_t name[64] I think?
         std::wstring name;
-        uint32_t size;
-        mutable uint32_t offset;
-        mutable uint64_t timestamp;
-        uint8_t* data;
+        uint32_t size{};
+        mutable uint32_t offset{};
+        mutable uint64_t timestamp{};
+        uint8_t* data{};
+        ByteOrder endian;
 
         IndexInnerFile();
-        ~IndexInnerFile();
 
-        static IndexInnerFile read(uint8_t* data);
+        explicit IndexInnerFile(uint8_t *data, bool readOld = false, ByteOrder endian = LITTLE);
 
-        static IndexInnerFile readOld(uint8_t *data);
     };
 }
 

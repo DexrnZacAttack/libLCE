@@ -10,27 +10,37 @@
 #include "../io/BinaryIO.h"
 
 namespace lce::save {
+    SaveFileOld::SaveFileOld(ByteOrder endian) {
+        this->endian = endian;
+    }
+
     /**
      * Reads an old-format save file from a pointer to the data
      * @param data The data you want to read (a save file)
+     * @param endian The endian/byte order of the save file (default Little)
      * @return The old-format save file.
      */
-    SaveFileOld SaveFileOld::read(std::vector<uint8_t> data) {
-        SaveFileOld sf;
+    SaveFileOld::SaveFileOld(std::vector<uint8_t> data, ByteOrder endian) {
+        this->endian = endian;
+
         io::BinaryIO io(data.data());
-        uint32_t indexSize = sf.getIndexEntrySize();
+        uint32_t indexSize = this->SaveFileOld::getIndexEntrySize();
 
-        sf.indexOffset = io.readB<uint32_t>();
-        sf.indexFileCount = io.readB<uint32_t>() / indexSize;
-        sf.originalVersion = io.readB<uint16_t>();
-        sf.version = io.readB<uint16_t>();
+        this->indexOffset = io.read<uint32_t>(this->endian);
 
-        std::vector<IndexInnerFile> index(sf.indexFileCount);
+        if (this->indexOffset > data.size())
+            throw std::runtime_error("Index offset points to an area out of bounds of the data given.");
 
-        for (int i = 0; i < sf.indexFileCount; ++i) {
-            io.seek(sf.indexOffset + (indexSize * i));
+        this->indexFileCount = io.read<uint32_t>(this->endian) / indexSize;
+        this->originalVersion = io.read<uint16_t>(this->endian);
+        this->version = io.read<uint16_t>(this->endian);
+
+        std::vector<IndexInnerFile> index(this->indexFileCount);
+
+        for (int i = 0; i < this->indexFileCount; ++i) {
+            io.seek(this->indexOffset + (indexSize * i));
             // read the index entry
-            IndexInnerFile inf = IndexInnerFile::readOld(io.readOfSize(indexSize));
+            IndexInnerFile inf = IndexInnerFile::IndexInnerFile(io.readOfSize(indexSize), true, this->endian);
             // read the data, maybe should be changed
             io.seek(inf.offset);
             inf.data = new uint8_t[inf.size];
@@ -39,9 +49,7 @@ namespace lce::save {
             index[i] = inf;
         }
 
-        sf.index = index;
-
-        return sf;
+        this->index = index;
     }
 
     /**
@@ -49,16 +57,14 @@ namespace lce::save {
      * @return Pointer to the save file
      */
     const uint8_t *SaveFileOld::create() {
-        const uint32_t fileSize = this->getSize();
-        uint8_t *data = new uint8_t[fileSize];
-        io::BinaryIO io(data);
+        io::BinaryIO io(this->getSize());
 
         this->indexOffset = HEADER_SIZE;
 
-        io.writeB<uint32_t>(0);
-        io.writeB<uint32_t>(this->indexFileCount * this->getIndexEntrySize());
-        io.writeB<uint16_t>(this->originalVersion);
-        io.writeB<uint16_t>(this->version);
+        io.write<uint32_t>(0, this->endian);
+        io.write<uint32_t>(this->indexFileCount * this->getIndexEntrySize(), this->endian);
+        io.write<uint16_t>(this->originalVersion, this->endian);
+        io.write<uint16_t>(this->version, this->endian);
 
         for (const auto& file: this->index) {
             file.offset = io.getPosition();
@@ -67,13 +73,13 @@ namespace lce::save {
         }
 
         for (const auto& file: this->index) {
-            io.writeWChar2ByteB(file.name);
-            io.writeB<uint32_t>(file.size);
-            io.writeB<uint32_t>(file.offset);
+            io.writeWChar2Byte(file.name, this->endian);
+            io.write<uint32_t>(file.size, this->endian);
+            io.write<uint32_t>(file.offset, this->endian);
         }
 
         io.seek(0);
-        io.writeB<uint32_t>(this->indexOffset);
+        io.write<uint32_t>(this->indexOffset, this->endian);
 
         return io.getData();
     }
@@ -83,22 +89,20 @@ namespace lce::save {
      * @param version The version you want to migrate to (has no effect except for changing the version in the header)
      * @return The new SaveFile
      */
-    SaveFile SaveFileOld::migrate(uint16_t version = 2) {
-        SaveFile sf;
-
+    SaveFile *SaveFileOld::migrate(uint16_t version = 2) {
         if (version <= 1)
             throw std::invalid_argument("Version must be greater than 1. (otherwise it's not really a migration now is it?)");
 
-        sf.indexOffset = this->indexOffset;
-        sf.indexFileCount = this->indexFileCount / 136; // new format
+        const uint32_t indexOffset = this->indexOffset;
+        const uint32_t indexFileCount = this->indexFileCount / 136; // new format
+
+        uint16_t originalVersion;
         if (version > 3)
-            sf.originalVersion = this->version;
+            originalVersion = this->version;
         else
-            sf.originalVersion = 0;
+            originalVersion = 0;
 
-        sf.version = version;
-
-        std::vector<IndexInnerFile> index(sf.indexFileCount);
+        std::vector<IndexInnerFile> index(indexFileCount);
 
         for (const auto& file : this->index) {
             auto updated = file;
@@ -106,8 +110,7 @@ namespace lce::save {
             index.push_back(updated);
         }
 
-        sf.index = index;
-        return sf;
+        return new SaveFile(indexOffset, indexFileCount, originalVersion, version, index);
     }
 
     /**

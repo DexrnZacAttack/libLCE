@@ -10,6 +10,7 @@
 
 #include "IndexInnerFile.h"
 #include "SaveFileCommons.h"
+#include "../io/ByteOrder.h"
 
 namespace lce::save {
 
@@ -17,8 +18,9 @@ class SaveFile : public SaveFileCommons {
 public:
     SaveFile(uint32_t indexOffset, uint32_t indexFileCount, uint16_t origVersion, uint16_t version, const std::vector<IndexInnerFile> &index);
     SaveFile();
+    explicit SaveFile(ByteOrder endian);
 
-    static SaveFile read(std::vector<uint8_t> data);
+    explicit SaveFile(std::vector<uint8_t> data, ByteOrder endian = LITTLE);
 
     const uint8_t *create();
 

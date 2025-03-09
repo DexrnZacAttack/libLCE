@@ -76,9 +76,37 @@ namespace lce::save {
         io::BinaryIO io(data.data());
         io.seek(10);
 
-        if (const auto version = static_cast<SaveFileVersion>(io.readB<uint16_t>()); version > PR)
-            return SaveFile::read(data);
+        if (const auto version = static_cast<SaveFileVersion>(io.readBE<uint16_t>()); version > PR)
+            return SaveFile::SaveFile(data);
 
-        return SaveFileOld::read(data);
+        return SaveFileOld::SaveFileOld(data);
+    }
+
+    uint32_t SaveFileCommons::getFileCount() const {
+        return this->indexFileCount;
+    }
+
+    uint16_t SaveFileCommons::getOriginalVersion() const {
+        return this->originalVersion;
+    }
+
+    uint16_t SaveFileCommons::getVersion() const {
+        return this->version;
+    }
+
+    ByteOrder SaveFileCommons::getEndian() const {
+        return this->endian;
+    }
+
+    void SaveFileCommons::setOriginalVersion(uint16_t version) {
+        this->originalVersion = version;
+    }
+
+    void SaveFileCommons::setVersion(uint16_t version) {
+        this->version = version;
+    }
+
+    void SaveFileCommons::setEndian(ByteOrder endian) {
+        this->endian = endian;
     }
 }
