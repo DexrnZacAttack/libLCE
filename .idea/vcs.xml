@@ -2,6 +2,8 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/external/emsdk" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/external/lodepng" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/external/zlib" vcs="Git" />
   </component>
 </project>

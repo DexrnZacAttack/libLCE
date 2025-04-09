@@ -8,4 +8,5 @@
 /CMakeFiles
 /cmake-build-debug-em
 /testFiles
-/.idea
+/cmake-build-release-em
+

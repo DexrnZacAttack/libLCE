@@ -3,28 +3,43 @@
 
 ## Progress
 
-- [ ] Console compression types
-  - [ ] LZX/XMemCompress
-  - [ ] Vita RLE (needs rewrite)
-  - [ ] PS4/Switch RLE
-  - [ ] Split Save RLE 
 - [x] Savegame
   - [X] Reading
   - [X] Writing
   - [ ] Compression
-  - [ ] Decompression
-- [ ] World info
-  - [ ] Reading
+    - [ ] Zlib
+    - [ ] LZX
+    - [ ] Deflate (non-Zlib)
+    - [ ] Split Save
+    - [ ] Vita
+    - [ ] Chunk
+  - [X] Decompression
+    - [X] Zlib
+    - [ ] LZX
+    - [ ] Deflate (non-Zlib)
+    - [ ] Split Save
+    - [X] Vita
+    - [X] Chunk
+- [ ] World info (THUMB)
+  - [X] Reading
   - [ ] Writing
 - [ ] World folder
   - [ ] Reading
   - [ ] Writing
 - [ ] Region
   - [ ] Reading
+    - [ ] Split Save
+    - [X] Normal regions
   - [ ] Writing
 - [ ] Chunks
   - [ ] Reading
+    - [ ] V12
+    - [ ] V11
+    - [ ] V10
   - [ ] Writing
+    - [ ] V12
+    - [ ] V11
+    - [ ] V10
 - [ ] Other file formats
   - [X] ARC
     - [X] Reading
