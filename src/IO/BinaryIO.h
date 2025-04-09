@@ -7,6 +7,7 @@
 
 #include <cstdint>
 #include <iostream>
+#include <cstring>
 #include <vector>
 
 #include "ByteOrder.h"
@@ -25,7 +26,7 @@ namespace lce::io {
         }
 
         T result;
-        std::memcpy(&result, resultBytes, sizeof(T));
+        memcpy(&result, resultBytes, sizeof(T));
         return result;
     }
 
@@ -156,9 +157,9 @@ class BinaryIO {
 
         void writeWChar4Byte(const std::u32string &input, ByteOrder endian, bool nullTerminate);
 
-        static std::wstring u16stringToWstring(const std::u16string &str);
+        static LIBLCE_API std::wstring u16stringToWstring(const std::u16string &str);
 
-        static std::wstring u32stringToWstring(const std::u32string &str);
+        static LIBLCE_API std::wstring u32stringToWstring(const std::u32string &str);
 };
 }
 

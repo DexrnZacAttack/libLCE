@@ -7,22 +7,36 @@
 #include <iostream>
 #include <string>
 
-#define VERSION "1.0.0"
+#define VERSION "1.0.1"
 
 #ifdef __EMSCRIPTEN__
     #define LIBLCE_API
 #elif defined(LIBLCE_EXPORTS)
-    #define LIBLCE_API __declspec(dllexport)
+    #if defined(__GNUC__) || defined(__clang__)
+        #define LIBLCE_API __attribute__((visibility("default")))
+    #else
+        #define LIBLCE_API __declspec(dllexport)
+    #endif
 #else
-    #define LIBLCE_API __declspec(dllimport)
+    #if defined(__GNUC__) || defined(__clang__)
+        #define LIBLCE_API __attribute__((visibility("default")))
+    #else
+        #define LIBLCE_API __declspec(dllimport)
+    #endif
 #endif
+
 
 LIBLCE_API inline std::string getLibraryVersion() {
     return VERSION;
 }
 
 LIBLCE_API inline void printLibraryInfo() {
-    std::cout << "libLCE v" << VERSION << "\nhttps://github.com/DexrnZacAttack/libLCE" << std::endl;
+    std::cout << "libLCE v" << VERSION
+              << " (" << COMPILER_NAME << " | "
+              << PLATFORM_NAME << " "
+              << PLATFORM_ARCH
+              << ") | https://github.com/DexrnZacAttack/libLCE"
+              << std::endl;
 }
 
 /// FAKE 24 BIT TYPE

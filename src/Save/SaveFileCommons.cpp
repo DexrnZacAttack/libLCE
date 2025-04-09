@@ -7,6 +7,7 @@
 #include <codecvt>
 #include <cstdint>
 #include <variant>
+#include <algorithm>
 
 #include "IndexInnerFile.h"
 #include "SaveFileOld.h"

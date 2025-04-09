@@ -17,6 +17,7 @@
 #include "Save/SaveFileOld.h"
 #include "Save/SaveFileCommons.h"
 #include "Save/IndexInnerFile.h"
+#include "lce.h"
 
 std::vector<uint8_t> VectorFromUInt8Array(emscripten::val arr) {
     return emscripten::convertJSArrayToNumberVector<uint8_t>(arr);
@@ -35,6 +36,9 @@ EMSCRIPTEN_BINDINGS(libLCE) {
     emscripten::register_vector<uint8_t>("vector<uint8_t>");
     emscripten::internal::_embind_register_std_wstring(emscripten::internal::TYPEID(12780), 2, "std::wstring");
     emscripten::register_optional<lce::save::IndexInnerFile>();
+
+    emscripten::function("getLibraryVersion", &getLibraryVersion);
+    emscripten::function("printLibraryInfo", &printLibraryInfo);
 
     emscripten::function("VectorFromUInt8Array", &VectorFromUInt8Array);
     emscripten::function("VectorToUInt8Array", &VectorToUInt8Array);

@@ -1,12 +1,3 @@
-
-/cmake-build-release-visual-studio
-/cmake-build-debug-visual-studio
-/cmake-build-debug
-/cmake-build-release-vs
-/cmake-build-debug-mingw
-/cmake-build-debug-vs
+/cmake-*
 /CMakeFiles
-/cmake-build-debug-em
 /testFiles
-/cmake-build-release-em
-

@@ -1,7 +1,11 @@
-cmake_minimum_required(VERSION 3.30)
+cmake_minimum_required(VERSION 3.26)
 project(libLCE)
 
 set(CMAKE_CXX_STANDARD 17)
+
+add_definitions(-DCOMPILER_NAME="${CMAKE_CXX_COMPILER_ID}")
+add_definitions(-DPLATFORM_NAME="${CMAKE_SYSTEM_NAME}")
+add_definitions(-DPLATFORM_ARCH="${CMAKE_SYSTEM_PROCESSOR}")
 
 include_directories(external/emsdk/upstream/emscripten/system/include)
 link_directories(external/emsdk/upstream/emscripten/system/lib)

@@ -3,6 +3,7 @@
 //
 
 #include "ColorFileCommons.h"
+#include <algorithm>
 
 namespace lce::color {
     std::optional<Color> ColorFileCommons::getColorByName(std::string name) {

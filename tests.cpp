@@ -73,8 +73,8 @@ namespace lce::tests {
         std::cout << "oldSaveTest: " << "File version is " << static_cast<lce::save::SaveFileVersion>(file.getVersion()) << std::endl;
 
         for (save::IndexInnerFile f : file.getFiles()) {
-            // this will break on unix
-            std::wcout << reinterpret_cast<const wchar_t*>(f.getName().c_str()) << std::endl;
+            
+            std::wcout << lce::io::BinaryIO::u16stringToWstring(f.getName().c_str()) << std::endl;
 
         }
 
@@ -131,8 +131,8 @@ namespace lce::tests {
         std::cout << "saveTestEndian: " << "File version is " << static_cast<lce::save::SaveFileVersion>(file.getVersion()) << std::endl;
 
         for (save::IndexInnerFile f : file.getFiles()) {
-            // this will break on unix
-            std::wcout << reinterpret_cast<const wchar_t*>(f.getName().c_str()) << std::endl;
+            
+            std::wcout << lce::io::BinaryIO::u16stringToWstring(f.getName()) << std::endl;
 
         }
 
@@ -192,8 +192,8 @@ namespace lce::tests {
         std::cout << "saveTestEndian: " << "File version is " << static_cast<lce::save::SaveFileVersion>(file.getVersion()) << std::endl;
 
         for (save::IndexInnerFile f : file.getFiles()) {
-            // this will break on unix
-            std::wcout << reinterpret_cast<const wchar_t*>(f.getName().c_str()) << std::endl;
+            
+            std::wcout << lce::io::BinaryIO::u16stringToWstring(f.getName()) << std::endl;
         }
 
         const uint8_t* file2 = file.create();
@@ -253,8 +253,8 @@ namespace lce::tests {
         std::cout << "saveTestSwitch: " << "File version is " << static_cast<lce::save::SaveFileVersion>(file.getVersion()) << std::endl;
 
         for (save::IndexInnerFile f : file.getFiles()) {
-            // this will break on unix
-            std::wcout << reinterpret_cast<const wchar_t*>(f.getName().c_str()) << std::endl;
+            
+            std::wcout << lce::io::BinaryIO::u16stringToWstring(f.getName()) << std::endl;
         }
 
 
@@ -370,7 +370,7 @@ namespace lce::tests {
 }
 
 int main(int argc, char** argv) {
-    std::cout << "Init" << std::endl;
+    printLibraryInfo();
 
     lce::tests::runTest(lce::tests::saveTestEndian, "Read Big Endian savegame.dat", ByteOrder::BIG);
     lce::tests::runTest(lce::tests::saveTestEndian, "Read Little Endian savegame.dat", ByteOrder::LITTLE);
