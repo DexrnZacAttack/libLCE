@@ -30,7 +30,7 @@ namespace lce::save {
      */
     SaveFile::SaveFile(std::vector<uint8_t> data, ByteOrder endian) {
         this->endian = endian;
-        io::BinaryIO io((data.data()));
+        io::BinaryIO io(data.data());
 
         this->indexOffset = io.read<uint32_t>(this->endian);
 
@@ -45,12 +45,20 @@ namespace lce::save {
         this->originalVersion = io.read<uint16_t>(this->endian);
         this->version = io.read<uint16_t>(this->endian);
 
+        DebugLog("Index offset: " << this->indexOffset);
+        DebugLog("Index file count: " << this->indexFileCount);
+        DebugLog("Version: " << this->version);
+        DebugLog("Orig version: " << this->originalVersion);
+
         std::vector<IndexInnerFile> index(this->indexFileCount);
 
         for (int i = 0; i < this->indexFileCount; ++i) {
             io.seek(this->indexOffset + (144 * i));
             // read the index entry
             IndexInnerFile inf = IndexInnerFile(io.readOfSize(144), false, this->endian);
+
+            DebugLogW(io::BinaryIO::u16stringToWstring(inf.getName()));
+
             // read the data, maybe should be changed
             io.seek(inf.getOffset());
             inf.setData(new uint8_t[inf.getSize()]);

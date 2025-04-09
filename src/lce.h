@@ -7,7 +7,7 @@
 #include <iostream>
 #include <string>
 
-#define VERSION "1.0.1"
+#define VERSION "1.0.2"
 
 #ifdef __EMSCRIPTEN__
     #define LIBLCE_API
@@ -44,7 +44,7 @@ typedef uint32_t uint24_t;
 /// SIGNED FAKE 24 BIT TYPE
 typedef int32_t int24_t;
 
-#ifdef _DEBUG
+#ifdef CMAKE_BUILD_DEBUG
 /* Only gets the filename instead of full file path */
 #define __FILE_NAME__ (__FILE__ + std::string(__FILE__).find_last_of("\\/") + 1)
 /* Logs only when built in Debug, includes filename, function, and line number. IDEs such as CLion will let you click on the filename:line to jump to that line in the file. */

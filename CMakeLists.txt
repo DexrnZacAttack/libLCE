@@ -7,6 +7,11 @@ add_definitions(-DCOMPILER_NAME="${CMAKE_CXX_COMPILER_ID}")
 add_definitions(-DPLATFORM_NAME="${CMAKE_SYSTEM_NAME}")
 add_definitions(-DPLATFORM_ARCH="${CMAKE_SYSTEM_PROCESSOR}")
 
+# because _DEBUG is not universal
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_definitions(-DCMAKE_BUILD_DEBUG)
+endif()
+
 include_directories(external/emsdk/upstream/emscripten/system/include)
 link_directories(external/emsdk/upstream/emscripten/system/lib)
 

@@ -34,7 +34,7 @@ emscripten::val VectorToUInt8Array(const std::vector<uint8_t>& vec) {
 EMSCRIPTEN_BINDINGS(libLCE) {
     emscripten::register_vector<lce::save::IndexInnerFile>("vector<lce::save::IndexInnerFile>");
     emscripten::register_vector<uint8_t>("vector<uint8_t>");
-    emscripten::internal::_embind_register_std_wstring(emscripten::internal::TYPEID(12780), 2, "std::wstring");
+
     emscripten::register_optional<lce::save::IndexInnerFile>();
 
     emscripten::function("getLibraryVersion", &getLibraryVersion);
@@ -115,12 +115,12 @@ EMSCRIPTEN_BINDINGS(libLCE) {
     .property("x", &lce::world::Region::getX, &lce::world::Region::setX)
     .property("z", &lce::world::Region::getZ, &lce::world::Region::setZ)
     .property("dim", &lce::world::Region::getDim, &lce::world::Region::setDim)
-    .class_function("getXZFromSplitSaveFilename", &lce::world::Region::getXZFromFilename)
-    .class_function("getDimFromSplitSaveFilename", &lce::world::Region::getDimFromFilename);
+    .class_function("getXZFromFilename", &lce::world::Region::getXZFromFilename)
+    .class_function("getDimFromFilename", &lce::world::Region::getDimFromFilename);
 
     emscripten::class_<lce::world::SplitSave, emscripten::base<lce::world::Region>>("SplitSave")
-    .class_function("getXZFromSplitSaveFilename", &lce::world::Region::getXZFromFilename)
-    .class_function("getDimFromSplitSaveFilename", &lce::world::Region::getDimFromFilename);
+    .class_function("getXZFromFilename", &lce::world::SplitSave::getXZFromFilename)
+    .class_function("getDimFromFilename", &lce::world::SplitSave::getDimFromFilename);
 
     emscripten::class_<lce::world::Chunk>("Chunk")
     .property("x", &lce::world::Chunk::getX)

@@ -9,6 +9,7 @@
 namespace lce::world {
 
 class SplitSave : public Region {
+public:
     //split save region constructors
     SplitSave() = default;
     SplitSave(int16_t x, int16_t z, int16_t dim);

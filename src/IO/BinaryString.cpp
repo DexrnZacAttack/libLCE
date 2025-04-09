@@ -91,6 +91,8 @@ namespace lce::io {
         return std::wstring(str.begin(), str.end());
 #else
         std::wstring result;
+        result.reserve(str.size());
+
         for (char16_t c : str) {
             result.push_back(static_cast<wchar_t>(c));
         }
@@ -100,11 +102,13 @@ namespace lce::io {
     }
 
     std::wstring BinaryIO::u32stringToWstring(const std::u32string& str) {
-#if WCHAR_MAX == 0xffffffff
+#if WCHAR_MAX == 0x7fffffff
             return std::wstring(str.begin(), str.end());
 #else
         // LOSSY LOSSY LOSSY LOSSY LOSSY AAAAAAAAAAAAA
         std::wstring result;
+        result.reserve(str.size());
+
         for (char32_t c : str) {
             result.push_back(static_cast<wchar_t>(c));
         }
