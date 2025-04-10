@@ -6,7 +6,7 @@
 #define COLORFILEOLD_H
 #include <optional>
 
-#include "Color.h"
+#include "Colors/Color.h"
 #include "ColorFileCommons.h"
 
 namespace lce::color {

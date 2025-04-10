@@ -38,40 +38,40 @@ set(ZLIB_FILES
 set(FILES
         src/lce.h
         src/EmscriptenBindings.cpp
-        src/world/region.cpp
-        src/world/region.h
-        src/world/Chunk.cpp
-        src/world/Chunk.h
-        src/save/SaveFile.cpp
-        src/save/SaveFile.h
-        src/io/BinaryIO.cpp
-        src/io/BinaryIO.h
-        src/save/IndexInnerFile.cpp
-        src/save/IndexInnerFile.h
+        src/World/Region.cpp
+        src/World/Region.h
+        src/World/Chunk.cpp
+        src/World/Chunk.h
+        src/Save/SaveFile.cpp
+        src/Save/SaveFile.h
+        src/IO/BinaryIO.cpp
+        src/IO/BinaryIO.h
+        src/Save/IndexInnerFile.cpp
+        src/Save/IndexInnerFile.h
         src/Archive/Archive.cpp
         src/Archive/Archive.h
         src/Archive/ArchiveInnerFile.cpp
         src/Archive/ArchiveInnerFile.h
-        src/save/SaveFileOld.cpp
-        src/save/SaveFileOld.h
-        src/save/SaveFileCommons.cpp
-        src/save/SaveFileCommons.h
-        src/io/BinaryString.cpp
-        src/compression/Compression.cpp
-        src/compression/Compression.h
-        src/Color/Color.cpp
-        src/Color/Color.h
+        src/Save/SaveFileOld.cpp
+        src/Save/SaveFileOld.h
+        src/Save/SaveFileCommons.cpp
+        src/Save/SaveFileCommons.h
+        src/IO/BinaryString.cpp
+        src/Compression/Compression.cpp
+        src/Compression/Compression.h
+        src/Color/Colors/Color.cpp
+        src/Color/Colors/Color.h
         src/Color/ColorFileOld.cpp
         src/Color/ColorFileOld.h
         src/Color/ColorFileCommons.cpp
         src/Color/ColorFileCommons.h
         src/Color/ColorFile.cpp
         src/Color/ColorFile.h
-        src/Color/ColorCommons.cpp
-        src/Color/ColorCommons.h
-        src/Color/WorldColor.cpp
-        src/Color/WorldColor.h
-        src/io/ByteOrder.h
+        src/Color/Colors/ColorCommons.cpp
+        src/Color/Colors/ColorCommons.h
+        src/Color/Colors/WorldColor.cpp
+        src/Color/Colors/WorldColor.h
+        src/IO/ByteOrder.h
         src/Save/Thumb.cpp
         src/Save/Thumb.h
         src/World/SplitSave.cpp

@@ -190,6 +190,7 @@ bool Compression::decompressZlib(std::vector<uint8_t>& in, std::vector<uint8_t>&
         switch (type) {
             case compression::CompressionType::ZLIB: return decompressZlib(in, out); break;
             case compression::CompressionType::VITA: return decompressVita(in, out, 0); break;
+            default: throw std::runtime_error("Invalid compression type");
         }
     }
 

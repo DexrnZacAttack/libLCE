@@ -6,8 +6,6 @@
 
 #include <fstream>
 
-#include "../IO/BinaryIO.h"
-
 namespace lce::color {
     Color::Color(std::string name, ARGB color): ColorCommons(name), color(color) {}
 

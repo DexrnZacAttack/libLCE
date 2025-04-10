@@ -5,7 +5,7 @@
 #ifndef COLORFILE_H
 #define COLORFILE_H
 #include "ColorFileCommons.h"
-#include "WorldColor.h"
+#include "Colors/WorldColor.h"
 
 namespace lce::color {
 
