@@ -12,7 +12,7 @@
 #include "src/Save/SaveFileOld.h"
 #include "src/Save/Thumb.h"
 #include "src/World/Chunk.h"
-#include "src/World/region.h"
+#include "src/World/Region.h"
 
 // #include "src/Archive/Archive.h"
 // #include "src/save/SaveFileOld.h"
