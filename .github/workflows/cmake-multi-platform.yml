@@ -48,7 +48,6 @@ jobs:
             c_compiler: cl
           - os: ubuntu-latest
             c_compiler: emcc
-            cpp_compiler: em++
 
     steps:
     - uses: actions/checkout@v4
