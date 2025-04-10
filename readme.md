@@ -1,6 +1,8 @@
 # LibLCE
 'Another port?', you may ask... Yup.
 
+Downloads for Linux, Windows, and Emscripten are available at https://nightly.link/DexrnZacAttack/libLCE/workflows/cmake-multi-platform/main?preview
+
 ## Progress
 
 - [x] Savegame
