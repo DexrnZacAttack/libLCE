@@ -28,9 +28,13 @@ jobs:
         c_compiler: [gcc, clang, cl, emcc]
         include:
           - os: windows-latest
+            platform_name: Windows
+            compiler_name: MSVC
             c_compiler: cl
             cpp_compiler: cl
           - os: ubuntu-latest
+            platform_name: WASM
+            compiler_name: Emscripten
             c_compiler: emcc
             cpp_compiler: em++
             build_settings: >
@@ -40,9 +44,13 @@ jobs:
               -DEMSCRIPTEN_DIR="$/home/runner/work/libLCE/libLCE/external/emsdk/upstream/emscripten"
               -DCMAKE_TOOLCHAIN_FILE=/home/runner/work/libLCE/libLCE/external/emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake
           - os: ubuntu-latest
+            platform_name: Linux
+            compiler_name: GCC
             c_compiler: gcc
             cpp_compiler: g++
           - os: ubuntu-latest
+            platform_name: Linux
+            compiler_name: Clang
             c_compiler: clang
             cpp_compiler: clang++
         exclude:
@@ -105,6 +113,6 @@ jobs:
       uses: actions/upload-artifact@v4
       if: matrix.os != 'ubuntu-latest'
       with:
-        name: ${{ matrix.c_compiler }}-${{ matrix.build_type }}
+        name: ${{ matrix.platform_name }}-${{ matrix.compiler_name }}_${{ matrix.build_type }}
         path: ${{ github.workspace }}/cmake-build-${{ matrix.build_type }}-${{ matrix.c_compiler }}/${{ matrix.build_type }}
 
