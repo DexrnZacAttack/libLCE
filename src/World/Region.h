@@ -8,6 +8,7 @@
 #include <map>
 #include <vector>
 #include <string>
+#include <array>
 
 #include "../libLCE.h"
 #include "../Compression/Compression.h"
@@ -36,7 +37,7 @@ namespace lce::world {
         /// Dimension
         int16_t dim;
     public:
-        std::vector<RegionChunk> chunks{1024};
+        std::array<RegionChunk, 1024> chunks;
 
         //region constructors
         Region() = default;

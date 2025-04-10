@@ -385,6 +385,6 @@ int main(int argc, char** argv) {
     // lce::tests::runTest(lce::tests::thumbTest, "Read Little Endian THUMB", ByteOrder::LITTLE, 0x100, false);
     // lce::tests::runTest(lce::tests::thumbTest, "Read Switch THUMB", ByteOrder::LITTLE, 0x208, true);
     // lce::tests::runTest(lce::tests::compressedChunkTest, "Read compressed chunk");
-    // lce::tests::runTest(lce::tests::regionTest, "Read region");
+    lce::tests::runTest(lce::tests::regionTest, "Read region");
     return 0;
 }

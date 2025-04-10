@@ -4,6 +4,7 @@
 
 #ifndef CHUNK_H
 #define CHUNK_H
+#include <array>
 #include <cstdint>
 #include <vector>
 
@@ -25,7 +26,7 @@ namespace lce::world {
     public:
         class LIBLCE_API Section {
         public:
-            std::vector<uint16_t> blocks; // blocks
+            std::array<uint16_t, 16*256*16> blocks; // blocks
 
             Section();
         };

@@ -12,7 +12,7 @@
 #include "../IO/BinaryIO.h"
 
 namespace lce::world {
-    Chunk::Section::Section(): blocks(16 * 16 * 16) {}
+    Chunk::Section::Section() {}
 
     Chunk::Chunk(std::vector<uint8_t> data, compression::CompressionType outerCompression, ByteOrder endian) {
         io::BinaryIO io(data.data(), data.size());
