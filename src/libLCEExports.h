@@ -8,10 +8,10 @@
 
 // prevents duplicating these defines over and over
 
-#define VERSION "1.0.4"
+#define VERSION "1.0.5"
 #define LIBRARY_STRING "libLCE v" VERSION " (" COMPILER_NAME " | " PLATFORM_NAME " " PLATFORM_ARCH ") | https://github.com/DexrnZacAttack/libLCE"
 
-LIBLCE_API const char* NO_DISCARD getLibraryVersion();
-LIBLCE_API void NO_DISCARD printLibraryInfo();
+LIBLCE_API NO_DISCARD const char* getLibraryVersion();
+LIBLCE_API NO_DISCARD void printLibraryInfo();
 
 #endif //LIBLCEEXPORTS_H

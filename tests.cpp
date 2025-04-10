@@ -13,6 +13,7 @@
 #include "src/Save/Thumb.h"
 #include "src/World/Chunk.h"
 #include "src/World/Region.h"
+#include "src/libLCEExports.h"
 
 // #include "src/Archive/Archive.h"
 // #include "src/save/SaveFileOld.h"
