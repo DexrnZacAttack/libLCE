@@ -9,7 +9,7 @@
 #include <vector>
 #include "../IO/ByteOrder.h"
 #include "../IO/BinaryIO.h"
-#include "../lce.h"
+#include "../libLCE.h"
 
 namespace lce::save {
 

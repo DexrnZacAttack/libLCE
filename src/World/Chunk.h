@@ -9,7 +9,7 @@
 
 #include "Region.h"
 #include "../IO/BinaryIO.h"
-#include "../lce.h"
+#include "../libLCE.h"
 
 #include "../Compression/Compression.h"
 

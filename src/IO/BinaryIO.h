@@ -11,7 +11,7 @@
 #include <vector>
 
 #include "ByteOrder.h"
-#include "../lce.h"
+#include "../libLCE.h"
 
 
 namespace lce::io {

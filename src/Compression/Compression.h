@@ -7,7 +7,7 @@
 
 #include <vector>
 
-#include "../lce.h"
+#include "../libLCE.h"
 #include "../IO/ByteOrder.h"
 
 namespace lce::compression {

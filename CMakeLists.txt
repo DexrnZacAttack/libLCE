@@ -19,10 +19,10 @@ link_directories(external/emsdk/upstream/emscripten/system/lib)
 #set(ZLIB_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external/zlib)
 
 set(LODEPNG_FILES
-external/lodepng/lodepng.h
-external/lodepng/lodepng.cpp
-        external/lodepng/lodepng_util.h
-        external/lodepng/lodepng_util.cpp)
+    external/lodepng/lodepng.h
+    external/lodepng/lodepng.cpp
+    external/lodepng/lodepng_util.h
+    external/lodepng/lodepng_util.cpp)
 
 set(ZLIB_FILES
         external/zlib/zlib.h
@@ -36,7 +36,9 @@ set(ZLIB_FILES
 )
 
 set(FILES
-        src/lce.h
+        src/libLCE.h
+        src/libLCEExports.h
+        src/libLCEExports.cpp
         src/EmscriptenBindings.cpp
         src/World/Region.cpp
         src/World/Region.h
@@ -78,7 +80,8 @@ set(FILES
         src/World/SplitSave.h
         src/World/Block.cpp
         src/World/Block.h
-        src/World/Chunk/V12.cpp)
+        src/World/Chunk/V12.cpp
+)
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
     set(ENVIRONMENT_TYPE "Emscripten")

@@ -6,7 +6,7 @@
 #define ARCHIVE_H
 #include <vector>
 #include "ArchiveInnerFile.h"
-#include "../lce.h"
+#include "../libLCE.h"
 
 
 namespace lce::arc {

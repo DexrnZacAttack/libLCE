@@ -4,6 +4,7 @@
 // "JavascriptHellUtility.cpp"
 
 
+#include "libLCEExports.h"
 #ifdef __EMSCRIPTEN__
 
 #include <emscripten/bind.h>
@@ -17,7 +18,7 @@
 #include "Save/SaveFileOld.h"
 #include "Save/SaveFileCommons.h"
 #include "Save/IndexInnerFile.h"
-#include "lce.h"
+#include "libLCE.h"
 
 std::vector<uint8_t> VectorFromUInt8Array(emscripten::val arr) {
     return emscripten::convertJSArrayToNumberVector<uint8_t>(arr);
@@ -37,7 +38,7 @@ EMSCRIPTEN_BINDINGS(libLCE) {
 
     emscripten::register_optional<lce::save::IndexInnerFile>();
 
-    emscripten::function("getLibraryVersion", &getLibraryVersion);
+    emscripten::function("getLibraryVersion", &getLibraryVersion, emscripten::allow_raw_pointer<const char*>());
     emscripten::function("printLibraryInfo", &printLibraryInfo);
 
     emscripten::function("VectorFromUInt8Array", &VectorFromUInt8Array);

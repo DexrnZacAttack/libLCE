@@ -7,37 +7,26 @@
 #include <iostream>
 #include <string>
 
-#define VERSION "1.0.3"
-
 #ifdef __EMSCRIPTEN__
     #define LIBLCE_API
+    #define NO_DISCARD __attribute__((used))
 #elif defined(LIBLCE_EXPORTS)
     #if defined(__GNUC__) || defined(__clang__)
+        #define NO_DISCARD __attribute__((used))
         #define LIBLCE_API __attribute__((visibility("default")))
     #else
+        #define NO_DISCARD __declspec(noinline)
         #define LIBLCE_API __declspec(dllexport)
     #endif
 #else
     #if defined(__GNUC__) || defined(__clang__)
+        #define NO_DISCARD __attribute__((used))
         #define LIBLCE_API __attribute__((visibility("default")))
     #else
+        #define NO_DISCARD __declspec(noinline)
         #define LIBLCE_API __declspec(dllimport)
     #endif
 #endif
-
-
-LIBLCE_API inline std::string getLibraryVersion() {
-    return VERSION;
-}
-
-LIBLCE_API inline void printLibraryInfo() {
-    std::cout << "libLCE v" << VERSION
-              << " (" << COMPILER_NAME << " | "
-              << PLATFORM_NAME << " "
-              << PLATFORM_ARCH
-              << ") | https://github.com/DexrnZacAttack/libLCE"
-              << std::endl;
-}
 
 /// FAKE 24 BIT TYPE
 typedef uint32_t uint24_t;

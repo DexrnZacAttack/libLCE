@@ -9,7 +9,7 @@
 #include <vector>
 #include <string>
 
-#include "../lce.h"
+#include "../libLCE.h"
 #include "../Compression/Compression.h"
 #include "../IO/BinaryIO.h"
 

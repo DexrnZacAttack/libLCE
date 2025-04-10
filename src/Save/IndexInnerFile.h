@@ -8,7 +8,7 @@
 #include <vector>
 
 #include "../IO/ByteOrder.h"
-#include "../lce.h"
+#include "../libLCE.h"
 
 namespace lce::save {
     // wish I could just dump a struct lol

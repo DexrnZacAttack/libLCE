@@ -7,7 +7,7 @@
 #include <cstdint>
 
 #include "../IO/ByteOrder.h"
-#include "../lce.h"
+#include "../libLCE.h"
 
 namespace lce::world {
 
