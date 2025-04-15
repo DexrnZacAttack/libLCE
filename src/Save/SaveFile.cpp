@@ -56,7 +56,7 @@ namespace lce::save {
             io.seek(this->indexOffset + (144 * i));
             // read the index entry
             IndexInnerFile inf = IndexInnerFile(io.readOfSize(144), false, this->endian);
-
+            
             DebugLogW(io::BinaryIO::u16stringToWstring(inf.getName()));
 
             // read the data, maybe should be changed

@@ -104,51 +104,57 @@ bool Compression::decompressZlib(std::vector<uint8_t>& in, std::vector<uint8_t>&
         return false;
     }
 
-    bool Compression::decompressChunk(std::vector<uint8_t>& in, std::vector<uint8_t>& out) {
+    // Modified version of fully decompiled & matching Compression::internalDecompressRle from Nintendo Switch Edition
+    bool Compression::decompressChunk(std::vector<uint8_t> &in, std::vector<uint8_t> &out) {
+        // todo: could make it auto allocate out to 0x40000 like LCE does
         io::BinaryIO io(in.data());
 
         int i = 0;
 
-        // to sum it up: if read byte is not 255, push to out vec, otherwise read count and the value (if the count is 3+) and push it
+        // to sum it up: read byte, if byte is not 255, push to out vec, otherwise read count and the value (if the count is 3+, otherwise value is 0xFF) and push it
         while (i < in.size()) {
             uint8_t byte = io.readByte();
             // if the byte isn't 0xFF (255)
-            if (byte != 0xFF) {
-                // push the byte that we just read to the output vector
-                out[i++] = byte;
-            } else {
+            if (byte == 0xFF) {
                 // otherwise read the count
-                uint8_t val = 0;
                 uint8_t count = io.readByte();
+                uint8_t val;
 
                 // if the count is 3+ then we will read the value
-                if (count >= 3) {
+                // otherwise it is 0xFF
+                if (count < 3) {
+                    val = 0xFF;
+                } else {
                     val = io.readByte();
                 }
 
                 // push to output vector count amount of times
-                // literally spent forever debugging this, apparently the count needs to start at -1... ????
-                for (int c = -1; c < count; c++)
+                for (int c = 0; c <= count; ++c)
                     out[i++] = val;
+            } else {
+                // push the byte that we just read to the output vector
+                out[i++] = byte;
             }
         }
 
         return false;
     }
+
     /** Decompresses "Vita RLE"
      *
-     * reversed from Compression::VitaVirtualDecompress from Wii U Edition
+     * Modified version of fully decompiled & matching Compression::VitaVirtualDecompress from Nintendo Switch Edition
      *
      * The RLE works like so:
      * First, read a byte... if that byte is NOT 0, push to the output vector.
      *
-     * Otherwise, read the next byte and do some weird ass bit shifting.
-     *
-     * The result of the bit shifting will be how many blocks of 8 zeros and normal zeros to add.
+     * Otherwise, read the next byte, that's the count of how many zeros to push.
      *
      * Push those zeros to the output vector, and repeat.
+     *
+     * It's much simpler than the pseudocode made it look.
      */
     bool Compression::decompressVita(std::vector<uint8_t> &in, std::vector<uint8_t> &out, uint32_t outBuf, uint32_t offset) {
+        // todo: could make it auto allocate out to 0x40000 like LCE does
         io::BinaryIO io(in.data());
         io.seek(offset);
 
@@ -157,23 +163,11 @@ bool Compression::decompressZlib(std::vector<uint8_t>& in, std::vector<uint8_t>&
         while (io.getPosition() < in.size()) {
             // read a byte, if it's 0x00, then it needs to be decoded... otherwise copy it directly to the output vec.
             if (uint8_t byte = io.readByte(); byte == 0x00) {
-                // determines how many zeros should be added, for some reason it looks like some weird ass math is involved...
+                // determines how many zeros should be added
                 const uint8_t count = io.readByte();
 
-                // how many blocks of 8 zeros to add
-                uint8_t blks = count >> 3;
-                // how many zeros to add
-                uint8_t zeros = count & 7;
-
-                // write blocks
-                for (int i = 0; i < blks; ++i) {
-                    for (int j = 0; j < 8; ++j) {
-                        out.push_back(0);
-                    }
-                }
-
                 // write zeros
-                for (int i = 0; i < zeros; ++i) {
+                for (int z = 0; z < count; ++z) {
                     out.push_back(0);
                 }
             } else {
