@@ -33,7 +33,6 @@ namespace lce::loc {
         
         for (const auto& string : this->strings) {
 			size += sizeof(uint16_t) + string.size();
-			
         }
 
         return size;
