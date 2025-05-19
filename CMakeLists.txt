@@ -54,7 +54,11 @@ set(FILES
         src/Archive/Archive.h
         src/Archive/ArchiveInnerFile.cpp
         src/Archive/ArchiveInnerFile.h
-        src/Save/SaveFileOld.cpp
+		src/Localization/LocalizationFile.cpp
+        src/Localization/LocalizationFile.h
+        src/Localization/Language.cpp
+		src/Localization/Language.h
+		src/Save/SaveFileOld.cpp
         src/Save/SaveFileOld.h
         src/Save/SaveFileCommons.cpp
         src/Save/SaveFileCommons.h
