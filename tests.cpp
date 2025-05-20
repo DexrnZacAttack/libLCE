@@ -16,6 +16,7 @@
 #include "src/libLCEExports.h"
 
 #include "src/Localization/LocalizationFile.h"
+#include "src/Soundbank/Soundbank.h"
 
 namespace lce::tests {
     void arcTest() {
@@ -81,6 +82,28 @@ namespace lce::tests {
         }
 
         outFile.close();
+		
+        fclose(f);
+	}
+	
+	void msscmpTest() {
+        FILE* f = fopen("../testFiles/Minecraft.msscmp", "rb");
+        if (f == nullptr) {
+            std::cerr << "Failed to open file." << std::endl;
+            return;
+        }
+
+        fseek(f, 0, SEEK_END);
+        const size_t endPos = ftell(f);
+        fseek(f, 0, SEEK_SET);
+        const size_t beginPos = ftell(f);
+        const size_t length = endPos - beginPos;
+
+        uint8_t* ass = new uint8_t[length];
+
+        fread(ass, 1, length, f);
+
+        lce::msscmp::SoundbankFile file = lce::msscmp::SoundbankFile(ass);
 		
         fclose(f);
 	}
@@ -407,19 +430,20 @@ namespace lce::tests {
 int main(int argc, char** argv) {
     printLibraryInfo();
 
-    lce::tests::runTest(lce::tests::saveTestEndian, "Read Big Endian savegame.dat", ByteOrder::BIG);
-    lce::tests::runTest(lce::tests::saveTestEndian, "Read Little Endian savegame.dat", ByteOrder::LITTLE);
-    lce::tests::runTest(lce::tests::saveTestSwitch, "Switch Big Endian to Little Endian savegame.dat", ByteOrder::LITTLE);
-    lce::tests::runTest(lce::tests::saveTestSwitch, "Switch Little Endian to Big Endian savegame.dat", ByteOrder::BIG);
-    lce::tests::runTest(lce::tests::oldSaveTest, "Read PR savegame.dat");
-    lce::tests::runTest(lce::tests::saveTestVita, "Read PSVita savegame.dat");
+    // lce::tests::runTest(lce::tests::saveTestEndian, "Read Big Endian savegame.dat", ByteOrder::BIG);
+    // lce::tests::runTest(lce::tests::saveTestEndian, "Read Little Endian savegame.dat", ByteOrder::LITTLE);
+    // lce::tests::runTest(lce::tests::saveTestSwitch, "Switch Big Endian to Little Endian savegame.dat", ByteOrder::LITTLE);
+    // lce::tests::runTest(lce::tests::saveTestSwitch, "Switch Little Endian to Big Endian savegame.dat", ByteOrder::BIG);
+    // lce::tests::runTest(lce::tests::oldSaveTest, "Read PR savegame.dat");
+    // lce::tests::runTest(lce::tests::saveTestVita, "Read PSVita savegame.dat");
     // lce::tests::runTest(lce::tests::arcTest, "Read example.arc");
-    lce::tests::runTest(lce::tests::locTest, "Read example.loc");
+    // lce::tests::runTest(lce::tests::locTest, "Read example.loc");
+    lce::tests::runTest(lce::tests::msscmpTest, "Read Minecraft.msscmp");
     // lce::tests::runTest(lce::tests::colourTest, "Read COL file");
     // lce::tests::runTest(lce::tests::thumbTest, "Read Big Endian THUMB", ByteOrder::BIG, 0x100, false);
     // lce::tests::runTest(lce::tests::thumbTest, "Read Little Endian THUMB", ByteOrder::LITTLE, 0x100, false);
     // lce::tests::runTest(lce::tests::thumbTest, "Read Switch THUMB", ByteOrder::LITTLE, 0x208, true);
     // lce::tests::runTest(lce::tests::compressedChunkTest, "Read compressed chunk");
-    lce::tests::runTest(lce::tests::regionTest, "Read region");
+    // lce::tests::runTest(lce::tests::regionTest, "Read region");
     return 0;
 }

@@ -10,7 +10,7 @@
 #include <cstring>
 #include <vector>
 
-#include "ByteOrder.h"
+#include "ByteEnums.h"
 #include "../libLCE.h"
 
 
@@ -71,6 +71,9 @@ class BinaryIO {
         uint32_t readUint24(ByteOrder endian);
 
         int32_t readInt24(ByteOrder endian);
+        
+        uint64_t readUintByGeneration(ByteOrder endian, Generation gen);
+        
         template <typename T>
         T readLE() {
             const T v = little2sys(*reinterpret_cast<const T*>(this->data));

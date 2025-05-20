@@ -10,7 +10,7 @@
 
 #include "IndexInnerFile.h"
 #include "SaveFileCommons.h"
-#include "../IO/ByteOrder.h"
+#include "../IO/ByteEnums.h"
 
 namespace lce::save {
 

@@ -8,7 +8,7 @@
 #include <string>
 #include <variant>
 #include <vector>
-#include "../IO/ByteOrder.h"
+#include "../IO/ByteEnums.h"
 #include "../libLCE.h"
 
 namespace lce::save {

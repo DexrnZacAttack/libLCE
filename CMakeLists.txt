@@ -72,6 +72,8 @@ set(FILES
         src/Localization/LocalizationFile.h
         src/Localization/Language.cpp
 		src/Localization/Language.h
+		src/Soundbank/Soundbank.cpp
+		src/Soundbank/Soundbank.h
 		src/Save/SaveFileOld.cpp
         src/Save/SaveFileOld.h
         src/Save/SaveFileCommons.cpp
