@@ -17,7 +17,13 @@ namespace lce::loc {
 	
 	class LIBLCE_API LocalizationFile {
 	public:		
+		
 		LocalizationFile(uint8_t* data);
+		LocalizationFile();
+		LocalizationFile(uint32_t version, uint32_t languageCount, 
+			std::unordered_map<uint32_t, std::string> langIds, std::vector<Language> languages);
+		LocalizationFile(uint32_t version, uint32_t languageCount, std::vector<uint32_t> keys,
+			std::unordered_map<uint32_t, std::string> langIds, std::vector<Language> languages);
 		
 		uint32_t getSize() const;
 		uint8_t* create() const;
