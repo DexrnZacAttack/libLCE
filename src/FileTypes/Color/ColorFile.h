@@ -17,9 +17,9 @@ class LIBLCE_API ColorFile : public ColorFileCommons {
     ColorFile(std::vector<Color> colors, std::vector<WorldColor> worldColors);
 
     static ColorFile read(std::vector<uint8_t> data);
-    uint32_t getSize() override;
+    uint32_t getSize() const override;
 
-    uint8_t *create();
+    uint8_t *create() const override;
 };
 
 } // lce::color

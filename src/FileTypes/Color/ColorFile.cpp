@@ -33,7 +33,7 @@ namespace lce::color {
         return cfo;
     }
 
-    uint32_t ColorFile::getSize() {
+    uint32_t ColorFile::getSize() const {
         uint32_t size = 12; // 4 for version 4 for count 4 for biome count
         for (auto color : colors) {
             size += 2;
@@ -50,7 +50,7 @@ namespace lce::color {
         return size;
     }
 
-    uint8_t *ColorFile::create() {
+    uint8_t *ColorFile::create() const {
         io::BinaryIO io(this->getSize());
 
         io.writeBE<uint32_t>(this->version);

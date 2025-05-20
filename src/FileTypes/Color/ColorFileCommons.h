@@ -9,10 +9,11 @@
 #include <vector>
 
 #include "Colors/Color.h"
+#include "../File.h"
 
 namespace lce::color {
 
-class LIBLCE_API ColorFileCommons {
+class LIBLCE_API ColorFileCommons : File {
 public:
     uint32_t version;
     std::vector<Color> colors;
@@ -23,7 +24,8 @@ public:
     ColorFileCommons(const std::vector<Color> & colors, uint32_t version);
 
     void addColor(Color color);
-    virtual uint32_t getSize();
+    
+    uint32_t getSize() const override;
 };
 
 } // lce::color

@@ -32,7 +32,7 @@ namespace lce::color {
         return cfo;
     }
 
-    uint8_t *ColorFileOld::create() {
+    uint8_t *ColorFileOld::create() const {
         io::BinaryIO io(this->getSize());
 
         io.writeBE<uint32_t>(this->version);
@@ -45,7 +45,7 @@ namespace lce::color {
         return io.getData();
     }
 
-    uint32_t ColorFileOld::getSize() {
+    uint32_t ColorFileOld::getSize() const {
         uint32_t size = 8; // 4 for version 4 for count
         for (const auto& color : colors) {
             size += 2;
