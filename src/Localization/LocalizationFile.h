@@ -16,8 +16,7 @@
 namespace lce::loc {
 	
 	class LIBLCE_API LocalizationFile {
-	public:		
-		
+	public:
 		LocalizationFile(uint8_t* data);
 		LocalizationFile();
 		LocalizationFile(uint32_t version, uint32_t languageCount, 
