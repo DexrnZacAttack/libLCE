@@ -1,4 +1,5 @@
 /cmake-*
 /CMakeFiles
 /testFiles
-build
+/build
+*.geany
