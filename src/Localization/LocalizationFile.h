@@ -4,19 +4,19 @@
 
 #ifndef LOCALIZATIONFILE_H
 #define LOCALIZATIONFILE_H
-#include "../../libLCE.h"
 
 #include <utility>
 #include <string>
 #include <vector>
 #include <unordered_map>
 
-#include "../File.h"
+#include "../libLCE.h"
+#include "../File/File.h"
 #include "Language.h"
 
 namespace lce::loc {
 	
-	class LIBLCE_API LocalizationFile : File {
+	class LIBLCE_API LocalizationFile : file::File {
 	public:		
 		LocalizationFile(uint8_t* data);
 		

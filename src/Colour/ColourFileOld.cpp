@@ -8,7 +8,7 @@
 
 #include <optional>
 
-#include "../../IO/BinaryIO.h"
+#include "../IO/BinaryIO.h"
 
 namespace lce::colour {
     ColourFileOld::ColourFileOld() {}

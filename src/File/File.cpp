@@ -4,7 +4,7 @@
 
 #include "File.h"
 
-namespace lce {
+namespace lce::file {
 	
 	File::~File() {}
 	

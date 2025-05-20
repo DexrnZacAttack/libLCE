@@ -8,7 +8,7 @@
 #include <vector>
 
 #include "ColourCommons.h"
-#include "../../../IO/BinaryIO.h"
+#include "../../IO/BinaryIO.h"
 
 namespace lce::colour {
 

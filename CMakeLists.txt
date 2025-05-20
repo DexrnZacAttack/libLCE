@@ -50,28 +50,28 @@ set(FILES
         src/IO/BinaryIO.h
         src/Save/IndexInnerFile.cpp
         src/Save/IndexInnerFile.h
-        src/FileTypes/File.cpp
-        src/FileTypes/File.h
-        src/FileTypes/Archive/Archive.cpp
-        src/FileTypes/Archive/Archive.h
-        src/FileTypes/Archive/ArchiveInnerFile.cpp
-        src/FileTypes/Archive/ArchiveInnerFile.h
-        src/FileTypes/Colour/Colours/Colour.cpp
-        src/FileTypes/Colour/Colours/Colour.h
-        src/FileTypes/Colour/ColourFileOld.cpp
-        src/FileTypes/Colour/ColourFileOld.h
-        src/FileTypes/Colour/ColourFileCommons.cpp
-        src/FileTypes/Colour/ColourFileCommons.h
-        src/FileTypes/Colour/ColourFile.cpp
-        src/FileTypes/Colour/ColourFile.h
-        src/FileTypes/Colour/Colours/ColourCommons.cpp
-        src/FileTypes/Colour/Colours/ColourCommons.h
-        src/FileTypes/Colour/Colours/WorldColour.cpp
-        src/FileTypes/Colour/Colours/WorldColour.h
-		src/FileTypes/Localization/LocalizationFile.cpp
-        src/FileTypes/Localization/LocalizationFile.h
-        src/FileTypes/Localization/Language.cpp
-		src/FileTypes/Localization/Language.h
+        src/File/File.cpp
+        src/File/File.h
+        src/File/InnerFile.cpp
+        src/File/InnerFile.h
+        src/Archive/Archive.cpp
+        src/Archive/Archive.h
+        src/Colour/Colours/Colour.cpp
+        src/Colour/Colours/Colour.h
+        src/Colour/ColourFileOld.cpp
+        src/Colour/ColourFileOld.h
+        src/Colour/ColourFileCommons.cpp
+        src/Colour/ColourFileCommons.h
+        src/Colour/ColourFile.cpp
+        src/Colour/ColourFile.h
+        src/Colour/Colours/ColourCommons.cpp
+        src/Colour/Colours/ColourCommons.h
+        src/Colour/Colours/WorldColour.cpp
+        src/Colour/Colours/WorldColour.h
+		src/Localization/LocalizationFile.cpp
+        src/Localization/LocalizationFile.h
+        src/Localization/Language.cpp
+		src/Localization/Language.h
 		src/Save/SaveFileOld.cpp
         src/Save/SaveFileOld.h
         src/Save/SaveFileCommons.cpp

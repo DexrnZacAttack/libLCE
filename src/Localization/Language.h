@@ -1,11 +1,12 @@
 //
 // Created by Boreal on 05/15/2025.
 //
+
 #ifndef LANGUAGE_H
 #define LANGUAGE_H
 
-#include "../../libLCE.h"
-#include "../../IO/BinaryIO.h"
+#include "../libLCE.h"
+#include "../IO/BinaryIO.h"
 
 #include <string>
 #include <vector>

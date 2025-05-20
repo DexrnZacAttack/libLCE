@@ -2,8 +2,11 @@
 // Created by Boreal on 05/15/2025.
 //
 
+// Documentation for this format is available at:
+// https://team-lodestone.github.io/Documentation/LCE/File%20Types/LOC.html
+
 #include "LocalizationFile.h"
-#include "../../IO/BinaryIO.h"
+#include "../IO/BinaryIO.h"
 
 namespace lce::loc {
 	

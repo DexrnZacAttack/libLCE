@@ -5,7 +5,7 @@
 #ifndef COLOURCOMMONS_H
 #define COLOURCOMMONS_H
 #include <string>
-#include "../../../libLCE.h"
+#include "../../libLCE.h"
 
 namespace lce::colour {
 

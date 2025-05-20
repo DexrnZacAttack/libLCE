@@ -2,17 +2,17 @@
 // Created by DexrnZacAttack on 12/19/2024.
 //
 
-#include "../../IO/BinaryIO.h"
-#include "ArchiveInnerFile.h"
+#include "../IO/BinaryIO.h"
+#include "InnerFile.h"
 
-namespace lce::arc {
-    ArchiveInnerFile::ArchiveInnerFile() {
+namespace lce::file {
+    InnerFile::InnerFile() {
     }
 
-    ArchiveInnerFile::~ArchiveInnerFile() {
+    InnerFile::~InnerFile() {
     }
 
-    ArchiveInnerFile::ArchiveInnerFile(uint8_t *data) {
+    InnerFile::InnerFile(uint8_t *data) {
         io::BinaryIO io(data);
 
         uint16_t name_size = io.readBE<uint16_t>();
@@ -24,7 +24,7 @@ namespace lce::arc {
     }
 
     // TODO: better way to do this (maybe not have separate function to pass io reference)
-    ArchiveInnerFile::ArchiveInnerFile (io::BinaryIO& io) {
+	InnerFile::InnerFile (io::BinaryIO& io) {
         uint16_t name_size = io.readBE<uint16_t>();
 
         this->name = io.readUtf8(name_size);
@@ -32,7 +32,7 @@ namespace lce::arc {
         this->size = io.readBE<uint32_t>();
     }
     
-    uint8_t* ArchiveInnerFile::create() const {
+    uint8_t* InnerFile::create() const {
 		return data;
 	}
 }
