@@ -10,7 +10,7 @@
 
 
 namespace lce::arc {
-    class LIBLCE_API Archive {
+    class LIBLCE_API Archive : public File {
     public:
         uint32_t fileCount;
         std::vector<ArchiveInnerFile> index;
@@ -20,9 +20,9 @@ namespace lce::arc {
 
         Archive(uint8_t* data);
 
-        uint8_t *create();
+        uint8_t* create() const override;
 
-        uint32_t getSize() const;
+        uint32_t getSize() const override;
 
         void addFile(ArchiveInnerFile file);
 

@@ -11,16 +11,17 @@
 #include <vector>
 #include <unordered_map>
 
+#include "../File.h"
 #include "Language.h"
 
 namespace lce::loc {
 	
-	class LIBLCE_API LocalizationFile {
+	class LIBLCE_API LocalizationFile : File {
 	public:		
 		LocalizationFile(uint8_t* data);
 		
-		uint32_t getSize() const;
-		uint8_t* create() const;
+		uint32_t getSize() const override;
+		uint8_t* create() const override;
 	
 		uint32_t version;
 		uint32_t languageCount;

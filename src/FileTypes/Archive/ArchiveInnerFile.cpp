@@ -31,4 +31,8 @@ namespace lce::arc {
         this->offset = io.readBE<uint32_t>();
         this->size = io.readBE<uint32_t>();
     }
+    
+    uint8_t* ArchiveInnerFile::create() const {
+		return data;
+	}
 }

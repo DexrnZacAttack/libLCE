@@ -7,11 +7,12 @@
 #include <string>
 #include "../../IO/BinaryIO.h"
 #include "../../libLCE.h"
+#include "../File.h"
 
 // TODO: maybe create a universal type?
 
 namespace lce::arc {
-    class LIBLCE_API ArchiveInnerFile {
+    class LIBLCE_API ArchiveInnerFile : File {
     public:
         std::string name;
         uint32_t size;
@@ -19,13 +20,15 @@ namespace lce::arc {
         uint8_t* data;
 
         ArchiveInnerFile();
-        ~ArchiveInnerFile();
+        virtual ~ArchiveInnerFile();
 
         ArchiveInnerFile(uint8_t* data);
 
         ArchiveInnerFile(io::BinaryIO& io);
+        
+		uint32_t getSize() const override { return size; }
 
-        uint8_t *create();
+        uint8_t* create() const override;
     };
 }
 

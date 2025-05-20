@@ -33,7 +33,7 @@ namespace lce::arc {
         this->index = index;
     }
 
-    uint8_t *Archive::create() {
+    uint8_t* Archive::create() const {
         const uint32_t fileSize = this->getSize();
         uint8_t *data = new uint8_t[fileSize];
         io::BinaryIO io(data);
