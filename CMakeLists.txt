@@ -50,27 +50,27 @@ set(FILES
         src/IO/BinaryIO.h
         src/Save/IndexInnerFile.cpp
         src/Save/IndexInnerFile.h
-        src/Formats/Archive/Archive.cpp
-        src/Formats/Archive/Archive.h
-        src/Formats/Archive/ArchiveInnerFile.cpp
-        src/Formats/Archive/ArchiveInnerFile.h
-        src/Formats/Color/Colors/Color.cpp
-        src/Formats/Color/Colors/Color.h
-        src/Formats/Color/ColorFileOld.cpp
-        src/Formats/Color/ColorFileOld.h
-        src/Formats/Color/ColorFileCommons.cpp
-        src/Formats/Color/ColorFileCommons.h
-        src/Formats/Color/ColorFile.cpp
-        src/Formats/Color/ColorFile.h
-        src/Formats/Color/Colors/ColorCommons.cpp
-        src/Formats/Color/Colors/ColorCommons.h
-        src/Formats/Color/Colors/WorldColor.cpp
-        src/Formats/Color/Colors/WorldColor.h
-        src/Formats/Localization/LocalizationFile.cpp
-        src/Formats/Localization/LocalizationFile.h
-        src/Formats/Localization/Language.cpp
-        src/Formats/Localization/Language.h
-        src/Save/SaveFileOld.cpp
+        src/FileTypes/Archive/Archive.cpp
+        src/FileTypes/Archive/Archive.h
+        src/FileTypes/Archive/ArchiveInnerFile.cpp
+        src/FileTypes/Archive/ArchiveInnerFile.h
+        src/FileTypes/Color/Colors/Color.cpp
+        src/FileTypes/Color/Colors/Color.h
+        src/FileTypes/Color/ColorFileOld.cpp
+        src/FileTypes/Color/ColorFileOld.h
+        src/FileTypes/Color/ColorFileCommons.cpp
+        src/FileTypes/Color/ColorFileCommons.h
+        src/FileTypes/Color/ColorFile.cpp
+        src/FileTypes/Color/ColorFile.h
+        src/FileTypes/Color/Colors/ColorCommons.cpp
+        src/FileTypes/Color/Colors/ColorCommons.h
+        src/FileTypes/Color/Colors/WorldColor.cpp
+        src/FileTypes/Color/Colors/WorldColor.h
+		src/FileTypes/Localization/LocalizationFile.cpp
+        src/FileTypes/Localization/LocalizationFile.h
+        src/FileTypes/Localization/Language.cpp
+		src/FileTypes/Localization/Language.h
+		src/Save/SaveFileOld.cpp
         src/Save/SaveFileOld.h
         src/Save/SaveFileCommons.cpp
         src/Save/SaveFileCommons.h
