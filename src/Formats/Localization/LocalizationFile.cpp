@@ -3,7 +3,7 @@
 //
 
 #include "LocalizationFile.h"
-#include "../IO/BinaryIO.h"
+#include "../../IO/BinaryIO.h"
 
 namespace lce::loc {
 	

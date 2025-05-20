@@ -50,33 +50,33 @@ set(FILES
         src/IO/BinaryIO.h
         src/Save/IndexInnerFile.cpp
         src/Save/IndexInnerFile.h
-        src/Archive/Archive.cpp
-        src/Archive/Archive.h
-        src/Archive/ArchiveInnerFile.cpp
-        src/Archive/ArchiveInnerFile.h
-	src/Localization/LocalizationFile.cpp
-        src/Localization/LocalizationFile.h
-        src/Localization/Language.cpp
-	src/Localization/Language.h
-	src/Save/SaveFileOld.cpp
+        src/Formats/Archive/Archive.cpp
+        src/Formats/Archive/Archive.h
+        src/Formats/Archive/ArchiveInnerFile.cpp
+        src/Formats/Archive/ArchiveInnerFile.h
+        src/Formats/Color/Colors/Color.cpp
+        src/Formats/Color/Colors/Color.h
+        src/Formats/Color/ColorFileOld.cpp
+        src/Formats/Color/ColorFileOld.h
+        src/Formats/Color/ColorFileCommons.cpp
+        src/Formats/Color/ColorFileCommons.h
+        src/Formats/Color/ColorFile.cpp
+        src/Formats/Color/ColorFile.h
+        src/Formats/Color/Colors/ColorCommons.cpp
+        src/Formats/Color/Colors/ColorCommons.h
+        src/Formats/Color/Colors/WorldColor.cpp
+        src/Formats/Color/Colors/WorldColor.h
+        src/Formats/Localization/LocalizationFile.cpp
+        src/Formats/Localization/LocalizationFile.h
+        src/Formats/Localization/Language.cpp
+        src/Formats/Localization/Language.h
+        src/Save/SaveFileOld.cpp
         src/Save/SaveFileOld.h
         src/Save/SaveFileCommons.cpp
         src/Save/SaveFileCommons.h
         src/IO/BinaryString.cpp
         src/Compression/Compression.cpp
         src/Compression/Compression.h
-        src/Color/Colors/Color.cpp
-        src/Color/Colors/Color.h
-        src/Color/ColorFileOld.cpp
-        src/Color/ColorFileOld.h
-        src/Color/ColorFileCommons.cpp
-        src/Color/ColorFileCommons.h
-        src/Color/ColorFile.cpp
-        src/Color/ColorFile.h
-        src/Color/Colors/ColorCommons.cpp
-        src/Color/Colors/ColorCommons.h
-        src/Color/Colors/WorldColor.cpp
-        src/Color/Colors/WorldColor.h
         src/IO/ByteOrder.h
         src/Save/Thumb.cpp
         src/Save/Thumb.h

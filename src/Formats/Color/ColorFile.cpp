@@ -6,7 +6,7 @@
 
 #include <fstream>
 
-#include "../IO/BinaryIO.h"
+#include "../../IO/BinaryIO.h"
 
 namespace lce::color {
     ColorFile::ColorFile() {}

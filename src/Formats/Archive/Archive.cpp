@@ -3,7 +3,7 @@
 //
 
 #include "Archive.h"
-#include "../IO/BinaryIO.h"
+#include "../../IO/BinaryIO.h"
 
 namespace lce::arc {
     Archive::Archive(uint32_t fileCount, const std::vector<ArchiveInnerFile> &index): fileCount(fileCount), index(index) {

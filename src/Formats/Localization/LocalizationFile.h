@@ -4,7 +4,7 @@
 
 #ifndef LOCALIZATIONFILE_H
 #define LOCALIZATIONFILE_H
-#include "../libLCE.h"
+#include "../../libLCE.h"
 
 #include <utility>
 #include <string>

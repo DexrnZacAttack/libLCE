@@ -7,15 +7,15 @@
 #include <vector>
 #include <cstdarg>
 
-#include "src/Archive/Archive.h"
-#include "src/Color/ColorFile.h"
+#include "src/Formats/Archive/Archive.h"
+#include "src/Formats/Color/ColorFile.h"
 #include "src/Save/SaveFileOld.h"
 #include "src/Save/Thumb.h"
 #include "src/World/Chunk.h"
 #include "src/World/Region.h"
 #include "src/libLCEExports.h"
 
-#include "src/Localization/LocalizationFile.h"
+#include "src/Formats/Localization/LocalizationFile.h"
 
 namespace lce::tests {
     void arcTest() {

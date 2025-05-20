@@ -5,8 +5,8 @@
 #ifndef ARCHIVEFILE_H
 #define ARCHIVEFILE_H
 #include <string>
-#include "../IO/BinaryIO.h"
-#include "../libLCE.h"
+#include "../../IO/BinaryIO.h"
+#include "../../libLCE.h"
 
 // TODO: maybe create a universal type?
 

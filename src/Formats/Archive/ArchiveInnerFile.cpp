@@ -2,7 +2,7 @@
 // Created by DexrnZacAttack on 12/19/2024.
 //
 
-#include "../IO/BinaryIO.h"
+#include "../../IO/BinaryIO.h"
 #include "ArchiveInnerFile.h"
 
 namespace lce::arc {
