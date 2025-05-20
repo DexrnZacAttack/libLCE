@@ -25,7 +25,7 @@ namespace lce::loc {
 			std::string code = io.readUtf8(io.readBE<uint16_t>());
 			uint32_t id = io.readBE<uint32_t>();
 			
-			langIds.push_back( LangId(code, id) );
+			langIds[id] = code;
 		}
 
 		for (int i = 0; i < languageCount; i++) {
@@ -45,7 +45,7 @@ namespace lce::loc {
 		}
 		
 		for(const auto& langId : langIds) {
-			size += langId.first.size() + ( sizeof(uint16_t) + sizeof(langId.second) );
+			size += langId.second.size() + ( sizeof(uint16_t) + sizeof(langId.first) );
 		}
 		
 		for(const auto& language : languages) {
@@ -69,9 +69,9 @@ namespace lce::loc {
 		}
 		
 		for(const auto& langId : langIds) {
-			io.writeBE<uint16_t>(langId.first.size());
-			io.writeUtf8(langId.first);
-			io.writeBE<uint32_t>(langId.second);
+			io.writeBE<uint16_t>(langId.second.size());
+			io.writeUtf8(langId.second);
+			io.writeBE<uint32_t>(langId.first);
 		}
 		
 		for(const auto& language : languages) {

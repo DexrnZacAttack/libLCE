@@ -9,14 +9,11 @@
 #include <utility>
 #include <string>
 #include <vector>
-#include <map>
+#include <unordered_map>
 
 #include "Language.h"
 
 namespace lce::loc {
-	using LangId = std::pair<std::string, uint32_t>;
-	
-	// TODO: Make these structs into classes
 	
 	class LIBLCE_API LocalizationFile {
 	public:		
@@ -32,7 +29,7 @@ namespace lce::loc {
 		uint32_t keyCount;
 		
 		std::vector<uint32_t> keys;
-		std::vector<LangId> langIds;
+		std::unordered_map<uint32_t, std::string> langIds;
 		std::vector<Language> languages;
 	};
 }
