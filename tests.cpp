@@ -8,7 +8,7 @@
 #include <cstdarg>
 
 #include "src/FileTypes/Archive/Archive.h"
-#include "src/FileTypes/Color/ColorFile.h"
+#include "src/FileTypes/Colour/ColourFile.h"
 #include "src/Save/SaveFileOld.h"
 #include "src/Save/Thumb.h"
 #include "src/World/Chunk.h"
@@ -309,18 +309,18 @@ namespace lce::tests {
         outFile.close();
     }
 
-    void colorWriteTest(color::ColorFile colors) {
+    void colourWriteTest(colour::ColourFile colours) {
         std::ofstream outFile("../testFiles/out.col", std::ios::binary);
         if (!outFile) {
             std::cerr << "Failed to create the file." << std::endl;
         }
 
-        outFile.write(reinterpret_cast<const char *>(colors.create()), colors.getSize());
+        outFile.write(reinterpret_cast<const char *>(colours.create()), colours.getSize());
 
         outFile.close();
     }
 
-    void colorTest() {
+    void colourTest() {
         std::ifstream fin("../testFiles/colours.col", std::ios::binary);
         std::vector<uint8_t> v(std::istreambuf_iterator<char>(fin), {});
 
@@ -328,9 +328,9 @@ namespace lce::tests {
 
         std::cout << "Read" << std::endl;
 
-        lce::color::ColorFile file = lce::color::ColorFile::read(v);
+        lce::colour::ColourFile file = lce::colour::ColourFile::read(v);
 
-        colorWriteTest(file);
+        colourWriteTest(file);
     }
 
     void thumbTest(ByteOrder endian, int headerSize, bool use4Byte = false) {
@@ -415,7 +415,7 @@ int main(int argc, char** argv) {
     lce::tests::runTest(lce::tests::saveTestVita, "Read PSVita savegame.dat");
     // lce::tests::runTest(lce::tests::arcTest, "Read example.arc");
     lce::tests::runTest(lce::tests::locTest, "Read example.loc");
-    // lce::tests::runTest(lce::tests::colorTest, "Read COL file");
+    // lce::tests::runTest(lce::tests::colourTest, "Read COL file");
     // lce::tests::runTest(lce::tests::thumbTest, "Read Big Endian THUMB", ByteOrder::BIG, 0x100, false);
     // lce::tests::runTest(lce::tests::thumbTest, "Read Little Endian THUMB", ByteOrder::LITTLE, 0x100, false);
     // lce::tests::runTest(lce::tests::thumbTest, "Read Switch THUMB", ByteOrder::LITTLE, 0x208, true);

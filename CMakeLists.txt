@@ -56,18 +56,18 @@ set(FILES
         src/FileTypes/Archive/Archive.h
         src/FileTypes/Archive/ArchiveInnerFile.cpp
         src/FileTypes/Archive/ArchiveInnerFile.h
-        src/FileTypes/Color/Colors/Color.cpp
-        src/FileTypes/Color/Colors/Color.h
-        src/FileTypes/Color/ColorFileOld.cpp
-        src/FileTypes/Color/ColorFileOld.h
-        src/FileTypes/Color/ColorFileCommons.cpp
-        src/FileTypes/Color/ColorFileCommons.h
-        src/FileTypes/Color/ColorFile.cpp
-        src/FileTypes/Color/ColorFile.h
-        src/FileTypes/Color/Colors/ColorCommons.cpp
-        src/FileTypes/Color/Colors/ColorCommons.h
-        src/FileTypes/Color/Colors/WorldColor.cpp
-        src/FileTypes/Color/Colors/WorldColor.h
+        src/FileTypes/Colour/Colours/Colour.cpp
+        src/FileTypes/Colour/Colours/Colour.h
+        src/FileTypes/Colour/ColourFileOld.cpp
+        src/FileTypes/Colour/ColourFileOld.h
+        src/FileTypes/Colour/ColourFileCommons.cpp
+        src/FileTypes/Colour/ColourFileCommons.h
+        src/FileTypes/Colour/ColourFile.cpp
+        src/FileTypes/Colour/ColourFile.h
+        src/FileTypes/Colour/Colours/ColourCommons.cpp
+        src/FileTypes/Colour/Colours/ColourCommons.h
+        src/FileTypes/Colour/Colours/WorldColour.cpp
+        src/FileTypes/Colour/Colours/WorldColour.h
 		src/FileTypes/Localization/LocalizationFile.cpp
         src/FileTypes/Localization/LocalizationFile.h
         src/FileTypes/Localization/Language.cpp

@@ -2,34 +2,34 @@
 // Created by DexrnZacAttack on 1/2/2025.
 //
 
-#include "Color.h"
+#include "Colour.h"
 
 #include <fstream>
 
-namespace lce::color {
-    Color::Color(std::string name, ARGB color): ColorCommons(name), color(color) {}
+namespace lce::colour {
+    Colour::Colour(std::string name, ARGB colour): ColourCommons(name), colour(colour) {}
 
-    Color Color::read(std::vector<uint8_t> data) {
+    Colour Colour::read(std::vector<uint8_t> data) {
         io::BinaryIO io((data.data()));
         const auto strLength = io.readBE<uint16_t>();
         std::string name = io.readUtf8(strLength);
 
-        auto color = io.readBE<ARGB>();
+        auto colour = io.readBE<ARGB>();
 
-        return {name, color};
+        return {name, colour};
     }
 
     // ugh doing this again
-    Color Color::read(io::BinaryIO& io) {
+    Colour Colour::read(io::BinaryIO& io) {
         const auto strLength = io.readBE<uint16_t>();
         std::string name = io.readUtf8(strLength);
 
-        auto color = io.readLE<ARGB>();
+        auto colour = io.readLE<ARGB>();
 
-        return {name, color};
+        return {name, colour};
     }
 
-    uint32_t Color::getSize() {
+    uint32_t Colour::getSize() {
         uint32_t size = 0;
         size += sizeof(uint16_t);
         size += name.size();
@@ -37,13 +37,13 @@ namespace lce::color {
         return size;
     }
 
-    uint8_t *Color::create() {
+    uint8_t *Colour::create() {
         io::BinaryIO io(getSize());
 
         io.writeBE<uint16_t>(name.size());
         io.writeUtf8(name);
-        io.writeLE<ARGB>(color);
+        io.writeLE<ARGB>(colour);
 
         return io.getData();
     }
-} // lce::color
+} // lce::colour
