@@ -33,7 +33,9 @@ namespace lce::fs {
 		size_t getIndexSize() const { return index.size(); }
 		const std::vector<std::shared_ptr<File>> getIndex() const { return index; }
 		std::vector<std::shared_ptr<File>> getIndex() { return index; }
-	protected:
+		
+		void setIndex(std::vector<std::shared_ptr<File>>& index) { this->index = index; }
+	private:
 		std::vector<std::shared_ptr<File>> index; // shared_ptr for the polymorphism ig
 	};
 }
