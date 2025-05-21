@@ -68,20 +68,20 @@ set(FILES
         src/Colour/Colours/ColourCommons.h
         src/Colour/Colours/WorldColour.cpp
         src/Colour/Colours/WorldColour.h
-		src/Localization/LocalizationFile.cpp
+	src/Localization/LocalizationFile.cpp
         src/Localization/LocalizationFile.h
         src/Localization/Language.cpp
-		src/Localization/Language.h
-		src/Soundbank/Soundbank.cpp
-		src/Soundbank/Soundbank.h
-		src/Save/SaveFileOld.cpp
+	src/Localization/Language.h
+	src/Soundbank/Soundbank.cpp
+	src/Soundbank/Soundbank.h
+	src/Save/SaveFileOld.cpp
         src/Save/SaveFileOld.h
         src/Save/SaveFileCommons.cpp
         src/Save/SaveFileCommons.h
         src/IO/BinaryString.cpp
         src/Compression/Compression.cpp
         src/Compression/Compression.h
-        src/IO/ByteOrder.h
+        src/IO/ByteEnums.h
         src/Save/Thumb.cpp
         src/Save/Thumb.h
         src/World/SplitSave.cpp
