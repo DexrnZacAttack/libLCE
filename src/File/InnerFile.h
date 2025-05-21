@@ -19,13 +19,17 @@ namespace lce::file {
 
         InnerFile(uint8_t* data);
         
+        // JAAJ in C++?
+        
         std::string getName() const { return name; }
         uint64_t getOffset() const { return offset; }
         uint64_t getSize() const override { return size; }
         uint8_t* create() const override;
         
         void setName(std::string _name) { name = _name; }
-		void setData(uint64_t _size, uint64_t _offset, uint8_t* _data);
+        void setSize(uint64_t _size) { size = _size; } 
+        void setOffset(uint64_t _offset) {offset = _offset; }
+        void setData(uint8_t* _data) { data = _data; }
 	private:
         std::string name;
         uint64_t size;
