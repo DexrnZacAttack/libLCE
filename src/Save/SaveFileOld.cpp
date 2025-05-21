@@ -47,12 +47,12 @@ namespace lce::save {
             inf.setData(new uint8_t[inf.getSize()]);
             io.readInto(inf.getData(), inf.getSize());
             // set the entry
-            addFile(inf);
+            addFile(std::make_shared<IndexInnerFile>(inf));
         }
         
         for (auto& file: getIndex()) {
-            file.setOffset(io.getPosition());
-            io.writeBytes(file.getData(), file.getSize());
+            file->setOffset(io.getPosition());
+            io.writeBytes(file->getData(), file->getSize());
         }
     }
 
@@ -75,9 +75,9 @@ namespace lce::save {
 
         io.seek(this->indexOffset);
         for (auto& file: getIndex()) {
-            io.writeWChar2Byte(file.getNameU16(), this->endian, false);
-            io.write<uint32_t>(file.getSize(), this->endian);
-            io.write<uint32_t>(file.getOffset(), this->endian);
+            io.writeWChar2Byte(file->getNameU16(), this->endian, false);
+            io.write<uint32_t>(file->getSize(), this->endian);
+            io.write<uint32_t>(file->getOffset(), this->endian);
         }
 
         io.seek(0);
@@ -89,7 +89,7 @@ namespace lce::save {
     /**
      * Migrates from SaveFileOld to SaveFile
      * @param version The version you want to migrate to (has no effect except for changing the version in the header)
-     * @return The new SaveFile
+     * @return A shared_ptr to the SaveFile
      */
     SaveFile *SaveFileOld::migrate(uint16_t version = 2) {
         if (version <= 1)
@@ -103,18 +103,17 @@ namespace lce::save {
             originalVersion = this->version;
         else
             originalVersion = 0;
+            
+        std::vector<std::shared_ptr<IndexInnerFile>> innerFiles;
 
-        std::vector<IndexInnerFile> index(getIndexSize());
-
-        for (const auto& file : getIndex() ) {
-			const IndexInnerFile& innerFile = dynamic_cast<const IndexInnerFile&>(file);
-			
-            auto updated = innerFile;
-            updated.setTimestamp(0); // LCE does this
-            addFile(updated);
-        }
-
-        return new SaveFile(indexOffset, indexFileCount, originalVersion, version, index);
+		for (auto& file : getIndex()) {
+			if (auto innerFile = std::dynamic_pointer_cast<IndexInnerFile>(file)) {
+				innerFile->setTimestamp(0);
+				innerFiles.push_back(innerFile);
+			}
+		}
+		
+        return new SaveFile(indexOffset, indexFileCount, originalVersion, version, innerFiles);
     }
 
     /**

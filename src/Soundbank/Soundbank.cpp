@@ -88,7 +88,7 @@ namespace lce::msscmp {
 			io.readInto(data, fileSize);
 			io.seek(oldPos);
 			
-			addFile(SoundbankInnerFile(fileName, fileSize, dataOffset, std::move(data), sampleRate));
+			addFile( std::make_shared<SoundbankInnerFile>(SoundbankInnerFile(fileName, fileSize, dataOffset, std::move(data), sampleRate)) );
 		}
 	}
 }

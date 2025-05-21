@@ -16,7 +16,7 @@ namespace lce::save {
 
 class LIBLCE_API SaveFile : public SaveFileCommons {
 public:
-    SaveFile(uint32_t indexOffset, uint32_t indexFileCount, uint16_t origVersion, uint16_t version, const std::vector<IndexInnerFile> &index);
+    SaveFile(uint32_t indexOffset, uint32_t indexFileCount, uint16_t origVersion, uint16_t version, const std::vector<std::shared_ptr<IndexInnerFile>> &index);
     SaveFile();
     explicit SaveFile(ByteOrder endian);
 

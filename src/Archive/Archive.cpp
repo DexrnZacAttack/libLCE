@@ -6,7 +6,7 @@
 #include "../IO/BinaryIO.h"
 
 namespace lce::arc {
-    Archive::Archive(uint32_t fileCount, std::vector<fs::File>& index): fileCount(fileCount), Filesystem(index) {
+    Archive::Archive(uint32_t fileCount, std::vector<std::shared_ptr<fs::File>>& index): fileCount(fileCount), Filesystem(index) {
     }
 
     Archive::Archive() = default;
@@ -15,8 +15,6 @@ namespace lce::arc {
         io::BinaryIO io(data);
 
         this->fileCount = io.readBE<uint32_t>();
-
-        std::vector<fs::File> index(this->fileCount);
 
         for (uint32_t i = 0; i < this->fileCount; i++) {
             uint16_t name_size = io.readBE<uint16_t>();
@@ -32,7 +30,7 @@ namespace lce::arc {
             io.seek(oldPos);
             
             fs::File af(name, size, offset, std::move(data));
-            addFile(af);
+            addFile( std::make_shared<fs::File>(af) );
         }
     }
 
@@ -46,12 +44,12 @@ namespace lce::arc {
 
         io.writeBE<uint32_t>(getIndexSize());
         for (auto& file: getIndex()) {
-            io.writeBE<uint16_t>(file.getName().length());
-            io.writeUtf8(file.getName());
+            io.writeBE<uint16_t>(file->getName().length());
+            io.writeUtf8(file->getName());
             // this stores the area where the file offset is written.
             offsetPositions[i] = io.getPosition();
             io.writeBE<uint32_t>(0);
-            io.writeBE<uint32_t>(file.getSize());
+            io.writeBE<uint32_t>(file->getSize());
 
             i++;
         }
@@ -62,7 +60,7 @@ namespace lce::arc {
             // get current position (this is the position of the file)
             uint32_t pos = io.getPosition();
             // write the file
-            io.writeBytes(file.create(), file.getSize());
+            io.writeBytes(file->create(), file->getSize());
             // get the position after the file was written (we return here to write the next one)
             uint32_t pos2 = io.getPosition();
             // go to the offset offset (lol) and write the actual offset.
@@ -81,9 +79,9 @@ namespace lce::arc {
         uint32_t size = 0;
         for (const auto& file: getIndex()) {
             size += 2; // string length prefix
-            size += file.getName().length(); // name length
+            size += file->getName().length(); // name length
             size += 8; // offset, size
-            size += file.getSize(); // file size
+            size += file->getSize(); // file size
         }
 
         return size;

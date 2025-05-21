@@ -15,7 +15,7 @@ namespace lce::arc {
     public:
         uint32_t fileCount;
 
-        Archive(uint32_t fileCount, std::vector<fs::File> &index);
+        Archive(uint32_t fileCount, std::vector<std::shared_ptr<fs::File>> &index);
         Archive();
 
         Archive(uint8_t* data);

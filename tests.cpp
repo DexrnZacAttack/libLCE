@@ -107,7 +107,7 @@ namespace lce::tests {
         lce::msscmp::SoundbankFile file = lce::msscmp::SoundbankFile(ass);
         
         for(const auto& innerFile : file.getIndex()) {
-			std::filesystem::path innerFilePath = "../testFiles/" + innerFile.getName() + ".binka";
+			std::filesystem::path innerFilePath = "../testFiles/" + innerFile->getName() + ".binka";
 			std::filesystem::create_directories(innerFilePath.parent_path());
 			
 			std::ofstream outFile(innerFilePath, std::ios::binary | std::ios::trunc);
@@ -115,7 +115,7 @@ namespace lce::tests {
 				throw std::ios_base::failure("Failed to open file");
 			}
 			
-			outFile.write(reinterpret_cast<const char*>(innerFile.create()), innerFile.getSize());
+			outFile.write(reinterpret_cast<const char*>(innerFile->create()), innerFile->getSize());
 		}
         
         fclose(f);
@@ -144,7 +144,7 @@ namespace lce::tests {
         std::cout << "oldSaveTest: " << "File version is " << static_cast<lce::save::SaveFileVersion>(file.getVersion()) << std::endl;
 
         for (auto& f : file.getIndex()) {
-            std::cout << f.getName() << std::endl;
+            std::cout << f->getName() << std::endl;
         }
 
         // write the file
@@ -199,7 +199,7 @@ namespace lce::tests {
         std::cout << "saveTestEndian: " << "File version is " << static_cast<lce::save::SaveFileVersion>(file.getVersion()) << std::endl;
 
         for (auto& f : file.getIndex()) {
-            std::cout << f.getName() << std::endl;
+            std::cout << f->getName() << std::endl;
         }
 
         const uint8_t* file2 = file.create();
@@ -258,7 +258,7 @@ namespace lce::tests {
         std::cout << "saveTestEndian: " << "File version is " << static_cast<lce::save::SaveFileVersion>(file.getVersion()) << std::endl;
 
         for (auto& f : file.getIndex()) {
-            std::cout << f.getName() << std::endl;
+            std::cout << f->getName() << std::endl;
         }
         
         const uint8_t* file2 = file.create();
@@ -318,7 +318,7 @@ namespace lce::tests {
         std::cout << "saveTestSwitch: " << "File version is " << static_cast<lce::save::SaveFileVersion>(file.getVersion()) << std::endl;
 
         for (auto& f : file.getIndex()) {
-            std::cout << f.getName() << std::endl;
+            std::cout << f->getName() << std::endl;
         }
 
         file.setEndian(endian);

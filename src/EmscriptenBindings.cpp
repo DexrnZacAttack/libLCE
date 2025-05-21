@@ -90,7 +90,7 @@ EMSCRIPTEN_BINDINGS(libLCE) {
         .property("version", &lce::save::SaveFileCommons::getVersion, &lce::save::SaveFileCommons::setVersion)
         .property("indexOffset", &lce::save::SaveFileCommons::getIndexOffset)
         .property("endian", &lce::save::SaveFileCommons::getEndian, &lce::save::SaveFileCommons::setEndian)
-        .property("index", &lce::save::SaveFileCommons::getIndex);
+        .property("index", &lce::save::SaveFileCommons::getIndex, emscripten::readonly()); // temp fix
 
     emscripten::class_<lce::save::SaveFile, emscripten::base<lce::save::SaveFileCommons>>("SaveFile")
     .constructor<uint32_t, uint32_t, uint16_t, uint16_t, const std::vector<lce::save::IndexInnerFile> &>()

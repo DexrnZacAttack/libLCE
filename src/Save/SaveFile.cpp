@@ -14,7 +14,7 @@
 
 namespace lce::save {
     SaveFile::SaveFile(uint32_t indexOffset, uint32_t indexFileCount, uint16_t origVersion, uint16_t version,
-        const std::vector<IndexInnerFile> &index) {
+        const std::vector<std::shared_ptr<IndexInnerFile>> &index) {
     }
 
     SaveFile::SaveFile() = default;
@@ -61,16 +61,17 @@ namespace lce::save {
             io.seek(inf.getOffset());
             inf.setData(new uint8_t[inf.getSize()]);
             io.readInto(inf.getData(), inf.getSize());
+            
             // set the entry
-            addFile(inf);
+            addFile(std::make_shared<IndexInnerFile>(inf));
         }
         
         for (auto& file : getIndex() ) {
-			auto& innerFile = static_cast<lce::save::IndexInnerFile&>(file);
+			std::shared_ptr<IndexInnerFile> innerFile = std::dynamic_pointer_cast<IndexInnerFile>(file);
 			
-            innerFile.setOffset(io.getPosition());
-            innerFile.setTimestamp(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count());
-            io.writeBytes(innerFile.getData(), innerFile.getSize());
+			innerFile->setOffset(io.getPosition());
+            innerFile->setTimestamp(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count());
+            io.writeBytes(innerFile->getData(), innerFile->getSize());
         }
     }
 
@@ -94,14 +95,14 @@ namespace lce::save {
         io.seek(this->indexOffset);
         
         for (auto& file: getIndex() ) {
-			const IndexInnerFile& innerFile = dynamic_cast<const IndexInnerFile&>(file);
+			const std::shared_ptr<const IndexInnerFile> innerFile = std::dynamic_pointer_cast<const IndexInnerFile>(file);
 			
-            DebugLog(innerFile.getName().length());
+            DebugLog(innerFile->getName().length());
             
-            io.writeWChar2Byte(innerFile.getNameU16(), this->endian, false);
-            io.write<uint32_t>(innerFile.getSize(), this->endian);
-            io.write<uint32_t>(innerFile.getOffset(), this->endian);
-            io.write<uint64_t>(innerFile.getTimestamp(), this->endian);
+            io.writeWChar2Byte(innerFile->getNameU16(), this->endian, false);
+            io.write<uint32_t>(innerFile->getSize(), this->endian);
+            io.write<uint32_t>(innerFile->getOffset(), this->endian);
+            io.write<uint64_t>(innerFile->getTimestamp(), this->endian);
         }
 
         io.seek(0);

@@ -8,8 +8,8 @@
 #include "../libLCE.h"
 #include "File.h"
 #include <vector>
-#include <optional>
 #include <algorithm>
+#include <memory>
 
 namespace lce::fs {
 	
@@ -18,23 +18,23 @@ namespace lce::fs {
 		Filesystem() = default;
 		virtual ~Filesystem();
 		
-		Filesystem(std::vector<File>& index) : index(index) {}
+		Filesystem(std::vector<std::shared_ptr<File>>& index) : index(index) {}
 		
 		virtual uint64_t getSize() const = 0;
 		virtual uint8_t* create() const = 0;
 		
-		void addFile(const File& file);
+		void addFile(const std::shared_ptr<File> file);
 		void removeFile(uint32_t index);
 		void resizeTo(size_t size);
 		
-		std::optional<File> getFileByName(std::string name);
-		File& getFileByIndex(size_t i) { return index[i]; }
+		std::shared_ptr<File> getFileByName(std::string name) const;
+		std::shared_ptr<File> getFileByIndex(size_t i) const { return index[i]; }
 		
 		size_t getIndexSize() const { return index.size(); }
-		const std::vector<File>& getIndex() const { return index; }
-		std::vector<File>& getIndex() { return index; } 
-	private:
-		std::vector<File> index;
+		const std::vector<std::shared_ptr<File>> getIndex() const { return index; }
+		std::vector<std::shared_ptr<File>> getIndex() { return index; }
+	protected:
+		std::vector<std::shared_ptr<File>> index; // shared_ptr for the polymorphism ig
 	};
 }
 
