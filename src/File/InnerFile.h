@@ -30,6 +30,7 @@ namespace lce::file {
         void setSize(uint64_t _size) { size = _size; } 
         void setOffset(uint64_t _offset) {offset = _offset; }
         void setData(uint8_t* _data) { data = _data; }
+	
 	private:
         std::string name;
         uint64_t size;
