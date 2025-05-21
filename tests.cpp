@@ -15,9 +15,7 @@
 #include "src/World/Region.h"
 #include "src/libLCEExports.h"
 
-// #include "src/Archive/Archive.h"
-// #include "src/save/SaveFileOld.h"
-// #include "src/save/SaveFile.h"
+#include "src/Localization/LocalizationFile.h"
 
 namespace lce::tests {
     void arcTest() {
@@ -50,6 +48,42 @@ namespace lce::tests {
 
         outFile.close();
     }
+    
+    void locTest() {
+        FILE* f = fopen("../testFiles/example.loc", "rb");
+        if (f == nullptr) {
+            std::cerr << "Failed to open file." << std::endl;
+            return;
+        }
+
+        fseek(f, 0, SEEK_END);
+        const size_t endPos = ftell(f);
+        fseek(f, 0, SEEK_SET);
+        const size_t beginPos = ftell(f);
+        const size_t length = endPos - beginPos;
+
+        uint8_t* ass = new uint8_t[length];
+
+        fread(ass, 1, length, f);
+
+        lce::loc::LocalizationFile file = lce::loc::LocalizationFile(ass);
+		
+		const uint8_t* file2 = file.create();
+
+        std::ofstream outFile("../testFiles/example_copy.loc", std::ios::binary);
+        if (!outFile) {
+            throw std::ios_base::failure("Failed to open file");
+        }
+
+        outFile.write(reinterpret_cast<const char*>(file2), file.getSize());
+        if (!outFile) {
+            throw std::ios_base::failure("Failed to write");
+        }
+
+        outFile.close();
+		
+        fclose(f);
+	}
 
     void oldSaveTest() {
         FILE* f = fopen("../testFiles/savegame_pr.dat", "rb");
@@ -380,6 +414,7 @@ int main(int argc, char** argv) {
     lce::tests::runTest(lce::tests::oldSaveTest, "Read PR savegame.dat");
     lce::tests::runTest(lce::tests::saveTestVita, "Read PSVita savegame.dat");
     // lce::tests::runTest(lce::tests::arcTest, "Read example.arc");
+    lce::tests::runTest(lce::tests::locTest, "Read example.loc");
     // lce::tests::runTest(lce::tests::colorTest, "Read COL file");
     // lce::tests::runTest(lce::tests::thumbTest, "Read Big Endian THUMB", ByteOrder::BIG, 0x100, false);
     // lce::tests::runTest(lce::tests::thumbTest, "Read Little Endian THUMB", ByteOrder::LITTLE, 0x100, false);

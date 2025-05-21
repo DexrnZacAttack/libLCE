@@ -46,9 +46,9 @@ Downloads for Linux, Windows, and Emscripten are available at https://nightly.li
   - [X] ARC
     - [X] Reading
     - [X] Writing
-  - [ ] LOC
-    - [ ] Reading
-    - [ ] Writing
+  - [X] LOC
+    - [X] Reading
+    - [X] Writing
   - [ ] PCK
     - [ ] Reading
     - [ ] Writing
