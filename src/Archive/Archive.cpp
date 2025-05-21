@@ -18,13 +18,17 @@ namespace lce::arc {
 
         std::vector<file::InnerFile> index(this->fileCount);
 
-        io::BinaryIO& io2 = io;
-
         for (uint32_t i = 0; i < this->fileCount; i++) {
-            file::InnerFile af(io2);
+            file::InnerFile af;
+            
+            uint16_t name_size = io.readBE<uint16_t>();
+            af.name = io.readUtf8(name_size);
+			af.offset = io.readBE<uint32_t>();
+			af.size = io.readBE<uint32_t>();
+			
             uint32_t oldPos = io.getPosition();
             io.seek(af.offset);
-            af.data = new uint8_t[af.size];
+
             io.readInto(af.data, af.size);
             index[i] = af;
             io.seek(oldPos);

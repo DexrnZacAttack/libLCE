@@ -22,8 +22,6 @@ namespace lce::file {
 
         InnerFile(uint8_t* data);
 
-		InnerFile(io::BinaryIO& io);
-        
 		uint32_t getSize() const override { return size; }
 
         uint8_t* create() const override;
