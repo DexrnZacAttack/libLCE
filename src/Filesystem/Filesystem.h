@@ -31,8 +31,8 @@ namespace lce::fs {
 		std::shared_ptr<File> getFileByIndex(size_t i) const { return index[i]; }
 		
 		size_t getIndexSize() const { return index.size(); }
-		const std::vector<std::shared_ptr<File>> getIndex() const { return index; }
-		std::vector<std::shared_ptr<File>> getIndex() { return index; }
+		const std::vector<std::shared_ptr<File>>& getIndex() const { return index; }
+		std::vector<std::shared_ptr<File>>& getIndex() { return index; }
 		
 		void setIndex(std::vector<std::shared_ptr<File>>& index) { this->index = index; }
 	private:
