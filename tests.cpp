@@ -22,6 +22,11 @@
 namespace lce::tests {
     void arcTest() {
         FILE* f = fopen("../testFiles/example.arc", "rb");
+        if (f == nullptr) {
+            std::cerr << "Failed to open file." << std::endl;
+            return;
+        }
+        
         fseek(f, 0, SEEK_END);
         const size_t endPos = ftell(f);
         fseek(f, 0, SEEK_SET);
@@ -435,7 +440,7 @@ namespace lce::tests {
 int main(int argc, char** argv) {
     printLibraryInfo();
 
-    // lce::tests::runTest(lce::tests::saveTestEndian, "Read Big Endian savegame.dat", ByteOrder::BIG);
+    lce::tests::runTest(lce::tests::saveTestEndian, "Read Big Endian savegame.dat", ByteOrder::BIG);
     // lce::tests::runTest(lce::tests::saveTestEndian, "Read Little Endian savegame.dat", ByteOrder::LITTLE);
     // lce::tests::runTest(lce::tests::saveTestSwitch, "Switch Big Endian to Little Endian savegame.dat", ByteOrder::LITTLE);
     // lce::tests::runTest(lce::tests::saveTestSwitch, "Switch Little Endian to Big Endian savegame.dat", ByteOrder::BIG);
@@ -443,7 +448,7 @@ int main(int argc, char** argv) {
     // lce::tests::runTest(lce::tests::saveTestVita, "Read PSVita savegame.dat");
     // lce::tests::runTest(lce::tests::arcTest, "Read example.arc");
     // lce::tests::runTest(lce::tests::locTest, "Read example.loc");
-    lce::tests::runTest(lce::tests::msscmpTest, "Read Minecraft.msscmp");
+    // lce::tests::runTest(lce::tests::msscmpTest, "Read Minecraft.msscmp");
     // lce::tests::runTest(lce::tests::colourTest, "Read COL file");
     // lce::tests::runTest(lce::tests::thumbTest, "Read Big Endian THUMB", ByteOrder::BIG, 0x100, false);
     // lce::tests::runTest(lce::tests::thumbTest, "Read Little Endian THUMB", ByteOrder::LITTLE, 0x100, false);

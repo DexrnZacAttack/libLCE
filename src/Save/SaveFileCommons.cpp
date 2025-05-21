@@ -21,7 +21,7 @@ namespace lce::save {
     class SaveFile;
 
     uint64_t SaveFileCommons::getSize() const {
-        uint64_t size = HEADER_SIZE + (getIndexSize() * getIndexEntrySize()); // for each index entry there is 144 bytes (136 bytes with old save file format)
+        uint64_t size = HEADER_SIZE + (getIndexCount() * getIndexEntrySize()); // for each index entry there is 144 bytes (136 bytes with old save file format)
         for (const auto& file: getIndex()) {
             size += file->getSize();
         }
@@ -37,8 +37,12 @@ namespace lce::save {
         uint32_t size = 0;
         for (const auto& file: getIndex()) {
             size += file->getSize();
+            DebugLog("Name: " + file->getName());
         }
-
+        
+        DebugLog("FileSize: " + std::to_string(size));
+        DebugLog("FileCount: " + std::to_string(getIndexCount()));
+		
         return size;
     }
 

@@ -4,6 +4,7 @@
 
 #include "Archive.h"
 #include "../IO/BinaryIO.h"
+#include <iostream>
 
 namespace lce::arc {
     Archive::Archive(uint32_t fileCount, std::vector<std::shared_ptr<fs::File>>& index): fileCount(fileCount), Filesystem(index) {
@@ -13,7 +14,7 @@ namespace lce::arc {
 
     Archive::Archive(uint8_t *data) {
         io::BinaryIO io(data);
-
+		std::cout << "Archive\n";
         this->fileCount = io.readBE<uint32_t>();
 
         for (uint32_t i = 0; i < this->fileCount; i++) {
@@ -30,6 +31,7 @@ namespace lce::arc {
             io.seek(oldPos);
             
             fs::File af(name, size, offset, std::move(data));
+           
             addFile( std::make_shared<fs::File>(af) );
         }
     }
@@ -39,10 +41,10 @@ namespace lce::arc {
         uint8_t *data = new uint8_t[fileSize];
         io::BinaryIO io(data);
 
-        uint32_t *offsetPositions = new uint32_t[getIndexSize()];
+        uint32_t *offsetPositions = new uint32_t[getIndexCount()];
         uint32_t i = 0;
 
-        io.writeBE<uint32_t>(getIndexSize());
+        io.writeBE<uint32_t>(getIndexCount());
         for (auto& file: getIndex()) {
             io.writeBE<uint16_t>(file->getName().length());
             io.writeUtf8(file->getName());

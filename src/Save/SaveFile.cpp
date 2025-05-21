@@ -36,21 +36,22 @@ namespace lce::save {
 
         if (this->indexOffset > data.size())
             throw std::runtime_error("Index offset points to an area that is out of bounds of the data given.");
+		
+		DebugLog(""<<io.getPosition());
+        this->setIndexCount(io.read<uint32_t>(this->endian));
 
-        this->resizeTo(io.read<uint32_t>(this->endian));
-
-        if (this->getIndexSize() > (0xFFFFFFFF - HEADER_SIZE) / this->SaveFile::getIndexEntrySize() )
-            throw std::runtime_error("File count (" + std::to_string(this->getIndexSize() ) + ") makes the file too big for it's index offset to stored in a 32-bit integer.");
+        if (this->getIndexCount() > (0xFFFFFFFF - HEADER_SIZE) / this->SaveFile::getIndexEntrySize() )
+            throw std::runtime_error("File count (" + std::to_string(this->getIndexCount() ) + ") makes the file too big for it's index offset to stored in a 32-bit integer.");
 
         this->originalVersion = io.read<uint16_t>(this->endian);
         this->version = io.read<uint16_t>(this->endian);
 
         DebugLog("Index offset: " << this->indexOffset);
-        DebugLog("Index file count: " << getIndexSize());
+        DebugLog("Index file count: " << getIndexCount());
         DebugLog("Version: " << this->version);
         DebugLog("Orig version: " << this->originalVersion);
 
-        for (int i = 0; i < this->getIndexSize(); ++i) {
+        for (int i = 0; i < this->getIndexCount(); ++i) {
             io.seek(this->indexOffset + (144 * i));
             // read the index entry
             IndexInnerFile inf = IndexInnerFile(io.readOfSize(144), false, this->endian);
@@ -88,7 +89,7 @@ namespace lce::save {
             throw std::runtime_error("Index offset is too big to be stored in a 32-bit integer.");
 
         io.write<uint32_t>(0, this->endian);
-        io.write<uint32_t>(getIndexSize(), this->endian);
+        io.write<uint32_t>(getIndexCount(), this->endian);
         io.write<uint16_t>(this->originalVersion, this->endian);
         io.write<uint16_t>(this->version, this->endian);
 

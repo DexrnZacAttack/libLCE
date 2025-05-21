@@ -31,14 +31,14 @@ namespace lce::save {
         if (this->indexOffset > data.size())
             throw std::runtime_error("Index offset points to an area out of bounds of the data given.");
 
-        if (getIndexSize() > (0xFFFFFFFF - HEADER_SIZE) / indexSize)
-            throw std::runtime_error("File count (" + std::to_string(getIndexSize()) + ") makes the file too big for it's index offset to stored in a 32-bit integer.");
+        if (getIndexCount() > (0xFFFFFFFF - HEADER_SIZE) / indexSize)
+            throw std::runtime_error("File count (" + std::to_string(getIndexCount()) + ") makes the file too big for it's index offset to stored in a 32-bit integer.");
 
-        resizeTo(io.read<uint32_t>(this->endian) / indexSize);
+        this->setIndexCount(io.read<uint32_t>(this->endian) / indexSize);
         this->originalVersion = io.read<uint16_t>(this->endian);
         this->version = io.read<uint16_t>(this->endian);
 
-        for (int i = 0; i < getIndexSize(); ++i) {
+        for (int i = 0; i < getIndexCount(); ++i) {
             io.seek(this->indexOffset + (indexSize * i));
             // read the index entry
             IndexInnerFile inf(io.readOfSize(indexSize), true, this->endian);
@@ -69,7 +69,7 @@ namespace lce::save {
             throw std::runtime_error("Index offset is too big to be stored in a 32-bit integer.");
 
         io.write<uint32_t>(0, this->endian);
-        io.write<uint32_t>(getIndexSize() * this->getIndexEntrySize(), this->endian);
+        io.write<uint32_t>(getIndexCount() * this->getIndexEntrySize(), this->endian);
         io.write<uint16_t>(this->originalVersion, this->endian);
         io.write<uint16_t>(this->version, this->endian);
 
@@ -96,7 +96,7 @@ namespace lce::save {
             throw std::invalid_argument("Version must be greater than 1. (otherwise it's not really a migration now is it?)");
 
         const uint32_t indexOffset = this->indexOffset;
-        const uint32_t indexFileCount = getIndexSize() / 136; // new format
+        const uint32_t indexFileCount = getIndexCount() / 136; // new format
 
         uint16_t originalVersion;
         if (version > 3)

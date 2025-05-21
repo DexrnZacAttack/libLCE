@@ -10,6 +10,10 @@ namespace lce::fs {
 	
 	void Filesystem::addFile(const std::shared_ptr<File> file) {
         this->index.push_back(file);
+        
+        if(index.size() > indexCount) {
+			setIndexCount(getIndexCount() + 1); // JAAJ???
+		}
     }
 
     void Filesystem::removeFile(const uint32_t index) {
@@ -18,8 +22,9 @@ namespace lce::fs {
         this->index.erase(this->index.begin() + index);
     }
     
-    void Filesystem::resizeTo(size_t count) {
-		index.resize(count);
+    void Filesystem::setIndexCount(uint32_t count) {
+		index.reserve(count);
+		indexCount = count;
     }
     
 	std::shared_ptr<File> Filesystem::getFileByName(const std::string name) const {
