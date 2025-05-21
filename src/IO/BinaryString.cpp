@@ -12,6 +12,18 @@ namespace lce::io {
         uint8_t* buf = readOfSize(size);
         return {reinterpret_cast<char*>(buf), size};
     }
+    
+    std::string BinaryIO::readUtf8NullTerminated() {
+		std::string result;
+		
+		while (true) {
+			char ch = *this->data++;
+			if(ch == '\0') break;
+			result += ch;
+		}
+		
+		return result;
+    }
 
     void BinaryIO::writeUtf8(const std::string& input) {
         for (const char& ch : input) {

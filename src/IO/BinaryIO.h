@@ -143,6 +143,8 @@ class BinaryIO {
         [[nodiscard]] size_t getPosition() const;
 
         std::string readUtf8(size_t size);
+        
+        std::string readUtf8NullTerminated();
 
         void writeUtf8(const std::string &input);
 

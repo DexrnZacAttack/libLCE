@@ -5,12 +5,19 @@
 #ifndef SOUNDBANK_H
 #define SOUNDBANK_H
 
-#include "../File/File.h"
 #include "../libLCE.h"
 #include "../IO/ByteEnums.h"
+#include "../File/File.h"
+#include "../File/InnerFile.h"
+#include <vector>
 #include <stdexcept> //Remove when implemented
 
 namespace lce::msscmp {
+	
+	class LIBLCE_API SoundbankInnerFile : public file::InnerFile {
+	public:
+		uint32_t sampleRate;
+	};
 	
 	class LIBLCE_API SoundbankFile : public file::File {
 	public:
@@ -21,6 +28,9 @@ namespace lce::msscmp {
 	private:
 		ByteOrder byteOrder;
 		Generation gen;
+		
+		uint32_t index2Size;
+		std::vector<SoundbankInnerFile> index2;
 	};
 }
 

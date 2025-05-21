@@ -13,7 +13,6 @@ namespace lce::msscmp {
 		io::BinaryIO io(data);
 		
 		std::string magic = io.readUtf8(4);
-		std::cout << "Magic: " << magic << std::endl;
 		
 		if (magic == "BANK") byteOrder = BIG;
 		else if (magic == "KNAB") byteOrder = LITTLE;
@@ -25,32 +24,80 @@ namespace lce::msscmp {
 
 		io.seek(0x04); // go back
 		
-		uint32_t unknown1 = io.read<uint32_t>(byteOrder); // Unknown "I forgot what this is"
+		io.read<uint32_t>(byteOrder); // Unknown "I forgot what this is"
 		
 		uint64_t dataStartOffset = io.readUintByGeneration(byteOrder, gen);
 		
-		uint64_t unknown2 = io.read<uint64_t>(byteOrder); // Unknown
+		io.read<uint64_t>(byteOrder); // Unknown
 
-		uint64_t firstIndexOffset = io.readUintByGeneration(byteOrder, gen);
+		uint64_t firstEntryOffset = io.readUintByGeneration(byteOrder, gen);
 
-		uint64_t lastItemOffset = io.readUintByGeneration(byteOrder, gen);
+		uint64_t lastEntryOffset = io.readUintByGeneration(byteOrder, gen);
 		
-		uint64_t unknown3 = io.read<uint64_t>(byteOrder); // Unknown
+		io.read<uint64_t>(byteOrder); // Unknown
 
 		if(gen == NEW_GEN) {
 			uint64_t unknownNewGen = io.read<uint64_t>(byteOrder);
 		}
 		
-		uint64_t unknownOffset = io.readUintByGeneration(byteOrder, gen);
+		io.readUintByGeneration(byteOrder, gen);
 		
 		uint64_t index1Size = io.readUintByGeneration(byteOrder, gen);
 		
-		uint32_t unknown4 = io.read<uint32_t>(byteOrder); // Unknown
+		io.read<uint32_t>(byteOrder); // Unknown
 		
-		uint32_t index2Size = io.read<uint32_t>(byteOrder);
+		Generation opposite = (gen == NEW_GEN) ? OLD_GEN : NEW_GEN;
+		index2Size = io.readUintByGeneration(byteOrder, opposite);
 		
-		std::cout << std::hex << io.getPosition() << std::dec << std::endl;
 		std::string name =  io.readUtf8(12);
-		std::cout << "Name: " << name << std::endl;
+		
+		io.seek(lastEntryOffset + 4);
+		
+		index2 = std::vector<SoundbankInnerFile>(index2Size);
+		
+		for (uint64_t i = 0; i < index2Size; i++) {
+			io.seek((lastEntryOffset + 4) + (i * 8));
+			
+			uint32_t entryOffset = io.read<uint32_t>(byteOrder);
+			
+			uint32_t fStructureOffset = 0;
+            if(i != index2Size) {
+                fStructureOffset = io.read<uint32_t>(byteOrder);
+            }
+            
+            io.seek(entryOffset);
+            
+            uint32_t nameOffset = io.read<uint32_t>(byteOrder);
+            uint32_t currentOffset = io.getPosition();
+            
+            io.seek(nameOffset);
+            std::string fileName = io.readUtf8NullTerminated();
+			io.seek(currentOffset);
+			
+			io.read<uint32_t>(byteOrder);
+			
+			uint32_t dataOffset = io.read<uint32_t>(LITTLE);
+			io.read<uint32_t>(byteOrder);
+			io.read<uint32_t>(byteOrder);
+			uint32_t sampleRate = io.read<uint32_t>(byteOrder);
+			uint32_t fileSize = io.read<uint32_t>(byteOrder);
+			
+			SoundbankInnerFile sf;
+			int32_t oldPos = io.getPosition();
+			
+			std::cout << fileName << std::endl;
+			
+			sf.name = fileName;
+			sf.size = fileSize;
+			sf.offset = dataOffset;
+			
+			sf.data = new uint8_t[sf.size];
+			io.seek(sf.offset);
+			io.readInto(sf.data, sf.size);
+			io.seek(oldPos);
+			sf.sampleRate = sampleRate;
+			
+			index2[i] = sf;
+		}
 	}
 }
