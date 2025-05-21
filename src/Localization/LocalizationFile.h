@@ -20,7 +20,7 @@ namespace lce::loc {
 	public:		
 		LocalizationFile(uint8_t* data);
 		
-		uint32_t getSize() const override;
+		uint64_t getSize() const override;
 		uint8_t* create() const override;
 	
 		uint32_t version;

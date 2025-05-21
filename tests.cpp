@@ -6,6 +6,7 @@
 #include <sstream>
 #include <vector>
 #include <cstdarg>
+#include <filesystem>
 
 #include "src/Archive/Archive.h"
 #include "src/Colour/ColourFile.h"
@@ -104,7 +105,19 @@ namespace lce::tests {
         fread(ass, 1, length, f);
 
         lce::msscmp::SoundbankFile file = lce::msscmp::SoundbankFile(ass);
-		
+        
+        for(const auto& innerFile : file.getIndex2()) {
+			std::filesystem::path innerFilePath = "../testFiles/" + innerFile.getName();
+			std::filesystem::create_directories(innerFilePath.parent_path());
+			
+			std::ofstream outFile(innerFilePath, std::ios::binary | std::ios::trunc);
+			if (!outFile) {
+				throw std::ios_base::failure("Failed to open file");
+			}
+			
+			outFile.write(reinterpret_cast<const char*>(innerFile.create()), innerFile.getSize());
+		}
+        
         fclose(f);
 	}
 

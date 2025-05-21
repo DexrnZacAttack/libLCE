@@ -6,24 +6,14 @@
 #include "InnerFile.h"
 
 namespace lce::file {
-    InnerFile::InnerFile() {
-    }
-
-    InnerFile::~InnerFile() {
-    }
-
-    InnerFile::InnerFile(uint8_t *data) {
-        io::BinaryIO io(data);
-
-        uint16_t name_size = io.readBE<uint16_t>();
-        std::cout << name_size << std::endl;
-
-        this->name = io.readUtf8(name_size);
-        this->offset = io.readBE<uint32_t>();
-        this->size = io.readBE<uint32_t>();
-    }
     
     uint8_t* InnerFile::create() const {
 		return data;
+	}
+	
+	void InnerFile::setData(uint64_t _size, uint64_t _offset, uint8_t* _data) {
+		size = _size;
+		offset = _offset;
+		data = _data;
 	}
 }

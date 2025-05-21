@@ -6,6 +6,7 @@
 #include "../IO/BinaryIO.h"
 
 #include <iostream>
+#include <utility>
 
 namespace lce::msscmp {
 	
@@ -82,22 +83,14 @@ namespace lce::msscmp {
 			uint32_t sampleRate = io.read<uint32_t>(byteOrder);
 			uint32_t fileSize = io.read<uint32_t>(byteOrder);
 			
-			SoundbankInnerFile sf;
 			int32_t oldPos = io.getPosition();
-			
-			std::cout << fileName << std::endl;
-			
-			sf.name = fileName;
-			sf.size = fileSize;
-			sf.offset = dataOffset;
-			
-			sf.data = new uint8_t[sf.size];
-			io.seek(sf.offset);
-			io.readInto(sf.data, sf.size);
+
+			uint8_t* data = new uint8_t[fileSize];
+			io.seek(dataOffset);
+			io.readInto(data, fileSize);
 			io.seek(oldPos);
-			sf.sampleRate = sampleRate;
 			
-			index2[i] = sf;
+			index2[i] = SoundbankInnerFile(fileName, fileSize, dataOffset, std::move(data), sampleRate);
 		}
 	}
 }

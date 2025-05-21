@@ -22,7 +22,7 @@ namespace lce::arc {
 
         uint8_t* create() const override;
 
-        uint32_t getSize() const override;
+        uint64_t getSize() const override;
 
         void addFile(file::InnerFile file);
 

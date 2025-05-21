@@ -19,7 +19,7 @@ namespace lce::colour {
 
     ColourFileCommons::ColourFileCommons(const std::vector<Colour> &colours, uint32_t version): colours(colours), version(version) {}
 
-    uint32_t ColourFileCommons::getSize() const {
+    uint64_t ColourFileCommons::getSize() const {
         return 4; // atleast 4
     }
 } // lce::colour

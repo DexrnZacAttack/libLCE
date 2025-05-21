@@ -25,7 +25,7 @@ public:
 
     void addColour(Colour colour);
     
-    uint32_t getSize() const override;
+    uint64_t getSize() const override;
 };
 
 } // lce::colour

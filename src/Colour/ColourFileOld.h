@@ -20,7 +20,7 @@ class LIBLCE_API ColourFileOld : public ColourFileCommons {
     static ColourFileOld read(std::vector<uint8_t> data);
 
     uint8_t *create() const override;
-    uint32_t getSize() const override;
+    uint64_t getSize() const override;
 };
 
 } // lce::colour

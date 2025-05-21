@@ -14,12 +14,8 @@ namespace lce::file {
 		File() = default;
 		virtual ~File();
 		
-		virtual uint32_t getSize() const = 0;
+		virtual uint64_t getSize() const = 0;
 		virtual uint8_t* create() const = 0;
-		
-		uint32_t size;
-        uint32_t offset; // if this isn't 0, its an inner file
-        uint8_t* data;
 	};
 }
 

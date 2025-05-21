@@ -45,7 +45,7 @@ namespace lce::colour {
         return io.getData();
     }
 
-    uint32_t ColourFileOld::getSize() const {
+    uint64_t ColourFileOld::getSize() const {
         uint32_t size = 8; // 4 for version 4 for count
         for (const auto& colour : colours) {
             size += 2;
