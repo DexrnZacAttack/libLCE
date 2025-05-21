@@ -17,5 +17,19 @@ namespace lce::fs {
 
         this->index.erase(this->index.begin() + index);
     }
-	
+    
+    void Filesystem::resizeTo(size_t count) {
+		index.resize(count);
+    }
+    
+    std::optional<File> Filesystem::getFileByName(std::string name) {
+        const auto find = std::find_if(index.begin(), index.end(), [&name](const File& file) {
+            return file.getName() == name;
+        });
+
+        if (find != index.end()) return *find;
+
+        return std::nullopt;
+    }
+
 }

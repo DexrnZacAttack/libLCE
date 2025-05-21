@@ -29,29 +29,19 @@ namespace lce::save {
         TU69
     };
 
-    class LIBLCE_API SaveFileCommons : fs::Filesystem {
+    class LIBLCE_API SaveFileCommons : public fs::Filesystem {
         protected:
         static constexpr uint32_t HEADER_SIZE = 12;
         uint32_t indexOffset;
-        uint32_t indexFileCount;
         uint16_t originalVersion;
         uint16_t version;
         ByteOrder endian;
-        std::vector<IndexInnerFile> index;
         public:
-            SaveFileCommons(): endian(ByteOrder::LITTLE), indexOffset(0), indexFileCount(0), originalVersion(11), version(11) {};
+            SaveFileCommons(): endian(ByteOrder::LITTLE), indexOffset(0), originalVersion(11), version(11) {};
 
             virtual ~SaveFileCommons() = default;
 
-            std::vector<IndexInnerFile> getFiles() const;
-
-            void addFile(const IndexInnerFile &file);
-
-            void removeFile(uint32_t index);
-
             uint64_t getSize() const override;
-
-            std::optional<IndexInnerFile> getFileByName(std::u16string name);
 
             uint32_t calculateIndexOffset() const;
 
@@ -60,9 +50,7 @@ namespace lce::save {
 #ifndef __EMSCRIPTEN__
             static std::variant<SaveFile, SaveFileOld> readAuto(std::vector<uint8_t> data, ByteOrder endian = LITTLE);
 #endif
-
             static uint16_t getVersionFromData(std::vector<uint8_t> data, ByteOrder endian = LITTLE);
-            uint32_t getFileCount() const;
             uint32_t getIndexOffset() const;
             uint16_t getOriginalVersion() const;
             uint16_t getVersion() const;

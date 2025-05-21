@@ -8,6 +8,8 @@
 #include "../libLCE.h"
 #include "File.h"
 #include <vector>
+#include <optional>
+#include <algorithm>
 
 namespace lce::fs {
 	
@@ -23,9 +25,14 @@ namespace lce::fs {
 		
 		void addFile(const File& file);
 		void removeFile(uint32_t index);
+		void resizeTo(size_t size);
+		
+		std::optional<File> getFileByName(std::string name);
+		File& getFileByIndex(size_t i) { return index[i]; }
 		
 		size_t getIndexSize() const { return index.size(); }
-		const std::vector<File>& getIndex() const { return index; } 
+		const std::vector<File>& getIndex() const { return index; }
+		std::vector<File>& getIndex() { return index; } 
 	private:
 		std::vector<File> index;
 	};

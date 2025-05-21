@@ -16,9 +16,9 @@ namespace lce::save {
         uint8_t* create() const override;
 
         SaveFile *migrate(uint16_t version);
-
+    
     protected:
-        uint32_t getIndexEntrySize() const;
+		uint32_t getIndexEntrySize() const;
     };
 }
 

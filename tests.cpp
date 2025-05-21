@@ -143,7 +143,7 @@ namespace lce::tests {
         lce::save::SaveFileOld file = lce::save::SaveFileOld(ass, BIG);
         std::cout << "oldSaveTest: " << "File version is " << static_cast<lce::save::SaveFileVersion>(file.getVersion()) << std::endl;
 
-        for (save::IndexInnerFile f : file.getFiles()) {
+        for (auto& f : file.getIndex()) {
             std::cout << f.getName() << std::endl;
         }
 
@@ -198,8 +198,8 @@ namespace lce::tests {
         lce::save::SaveFile file = lce::save::SaveFile(ass, endian);
         std::cout << "saveTestEndian: " << "File version is " << static_cast<lce::save::SaveFileVersion>(file.getVersion()) << std::endl;
 
-        for (save::IndexInnerFile f : file.getFiles()) {
-			std::cout << f.getName() << std::endl;
+        for (auto& f : file.getIndex()) {
+            std::cout << f.getName() << std::endl;
         }
 
         const uint8_t* file2 = file.create();
@@ -257,10 +257,10 @@ namespace lce::tests {
         lce::save::SaveFile file = lce::save::SaveFile(assd, LITTLE);
         std::cout << "saveTestEndian: " << "File version is " << static_cast<lce::save::SaveFileVersion>(file.getVersion()) << std::endl;
 
-        for (save::IndexInnerFile f : file.getFiles()) {
+        for (auto& f : file.getIndex()) {
             std::cout << f.getName() << std::endl;
         }
-
+        
         const uint8_t* file2 = file.create();
 
         std::ofstream outFile("../testFiles/savegame-vita_out.dat", std::ios::binary);
@@ -317,11 +317,9 @@ namespace lce::tests {
         lce::save::SaveFile file = lce::save::SaveFile(ass, endian == LITTLE ? BIG : LITTLE);
         std::cout << "saveTestSwitch: " << "File version is " << static_cast<lce::save::SaveFileVersion>(file.getVersion()) << std::endl;
 
-        for (save::IndexInnerFile f : file.getFiles()) {
-            
+        for (auto& f : file.getIndex()) {
             std::cout << f.getName() << std::endl;
         }
-
 
         file.setEndian(endian);
         const uint8_t* file2 = file.create();

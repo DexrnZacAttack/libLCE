@@ -37,10 +37,10 @@ namespace lce::save {
         if (this->indexOffset > data.size())
             throw std::runtime_error("Index offset points to an area that is out of bounds of the data given.");
 
-        this->indexFileCount = io.read<uint32_t>(this->endian);
+        this->resizeTo(io.read<uint32_t>(this->endian));
 
-        if (this->indexFileCount > (0xFFFFFFFF - HEADER_SIZE) / this->SaveFile::getIndexEntrySize())
-            throw std::runtime_error("File count (" + std::to_string(this->indexFileCount) + ") makes the file too big for it's index offset to stored in a 32-bit integer.");
+        if (this->getIndexSize() > (0xFFFFFFFF - HEADER_SIZE) / this->SaveFile::getIndexEntrySize() )
+            throw std::runtime_error("File count (" + std::to_string(this->getIndexSize() ) + ") makes the file too big for it's index offset to stored in a 32-bit integer.");
 
         this->originalVersion = io.read<uint16_t>(this->endian);
         this->version = io.read<uint16_t>(this->endian);
@@ -50,9 +50,7 @@ namespace lce::save {
         DebugLog("Version: " << this->version);
         DebugLog("Orig version: " << this->originalVersion);
 
-        std::vector<IndexInnerFile> index(this->indexFileCount);
-
-        for (int i = 0; i < this->indexFileCount; ++i) {
+        for (int i = 0; i < this->getIndexSize(); ++i) {
             io.seek(this->indexOffset + (144 * i));
             // read the index entry
             IndexInnerFile inf = IndexInnerFile(io.readOfSize(144), false, this->endian);
@@ -64,16 +62,16 @@ namespace lce::save {
             inf.setData(new uint8_t[inf.getSize()]);
             io.readInto(inf.getData(), inf.getSize());
             // set the entry
-            index[i] = inf;
+            addFile(inf);
         }
         
-        for (auto& file: index) {
-            file.setOffset(io.getPosition());
-            file.setTimestamp(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count());
-            io.writeBytes(file.getData(), file.getSize());
+        for (auto& file : getIndex() ) {
+			auto& innerFile = static_cast<lce::save::IndexInnerFile&>(file);
+			
+            innerFile.setOffset(io.getPosition());
+            innerFile.setTimestamp(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count());
+            io.writeBytes(innerFile.getData(), innerFile.getSize());
         }
-        
-        this->index = index;
     }
 
     /**
@@ -89,17 +87,21 @@ namespace lce::save {
             throw std::runtime_error("Index offset is too big to be stored in a 32-bit integer.");
 
         io.write<uint32_t>(0, this->endian);
-        io.write<uint32_t>(this->indexFileCount, this->endian);
+        io.write<uint32_t>(getIndexSize(), this->endian);
         io.write<uint16_t>(this->originalVersion, this->endian);
         io.write<uint16_t>(this->version, this->endian);
 
         io.seek(this->indexOffset);
-        for (const auto& file: this->index) {
-            DebugLog(file.getName().length());
-            io.writeWChar2Byte(file.getNameU16(), this->endian, false);
-            io.write<uint32_t>(file.getSize(), this->endian);
-            io.write<uint32_t>(file.getOffset(), this->endian);
-            io.write<uint64_t>(file.getTimestamp(), this->endian);
+        
+        for (auto& file: getIndex() ) {
+			const IndexInnerFile& innerFile = dynamic_cast<const IndexInnerFile&>(file);
+			
+            DebugLog(innerFile.getName().length());
+            
+            io.writeWChar2Byte(innerFile.getNameU16(), this->endian, false);
+            io.write<uint32_t>(innerFile.getSize(), this->endian);
+            io.write<uint32_t>(innerFile.getOffset(), this->endian);
+            io.write<uint64_t>(innerFile.getTimestamp(), this->endian);
         }
 
         io.seek(0);

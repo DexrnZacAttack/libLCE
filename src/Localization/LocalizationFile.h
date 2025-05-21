@@ -11,12 +11,11 @@
 #include <unordered_map>
 
 #include "../libLCE.h"
-#include "../Filesystem/Filesystem.h"
 #include "Language.h"
 
 namespace lce::loc {
 
-	class LIBLCE_API LocalizationFile : fs::Filesystem {
+	class LIBLCE_API LocalizationFile {
 	public:		
 		LocalizationFile(uint8_t* data);
 		LocalizationFile();
@@ -25,8 +24,8 @@ namespace lce::loc {
 		LocalizationFile(uint32_t version, uint32_t languageCount, std::vector<uint32_t> keys,
 			std::unordered_map<uint32_t, std::string> langIds, std::vector<Language> languages);
 		
-		uint64_t getSize() const override;
-		uint8_t* create() const override;
+		uint64_t getSize() const;
+		uint8_t* create() const;
 	
 		uint32_t version;
 		uint32_t languageCount;
