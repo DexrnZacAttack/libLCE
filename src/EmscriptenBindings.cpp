@@ -83,7 +83,7 @@ EMSCRIPTEN_BINDINGS(libLCE) {
         .function("getFileByName", &lce::save::SaveFileCommons::getFileByName)
         .function("calculateIndexOffset", &lce::save::SaveFileCommons::calculateIndexOffset)
         .function("getFilesSize", &lce::save::SaveFileCommons::getFilesSize)
-        .function("index", emscripten::select_overload<std::vector<std::shared_ptr<lce::fs::File>>()>
+        .function("index", emscripten::select_overload<std::vector<std::shared_ptr<lce::fs::File>>&()>
         (&lce::save::SaveFileCommons::getIndex)) // Select the non const function
         // .class_function("readAuto", &lce::save::SaveFileCommons::readAuto)
         .class_function("getVersionFromData", &lce::save::SaveFileCommons::getVersionFromData)
