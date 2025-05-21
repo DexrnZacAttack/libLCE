@@ -107,7 +107,7 @@ namespace lce::tests {
         lce::msscmp::SoundbankFile file = lce::msscmp::SoundbankFile(ass);
         
         for(const auto& innerFile : file.getIndex2()) {
-			std::filesystem::path innerFilePath = "../testFiles/" + innerFile.getName();
+			std::filesystem::path innerFilePath = "../testFiles/" + innerFile.getName() + ".binka";
 			std::filesystem::create_directories(innerFilePath.parent_path());
 			
 			std::ofstream outFile(innerFilePath, std::ios::binary | std::ios::trunc);
@@ -144,9 +144,7 @@ namespace lce::tests {
         std::cout << "oldSaveTest: " << "File version is " << static_cast<lce::save::SaveFileVersion>(file.getVersion()) << std::endl;
 
         for (save::IndexInnerFile f : file.getFiles()) {
-            
-            std::wcout << lce::io::BinaryIO::u16stringToWstring(f.getName().c_str()) << std::endl;
-
+            std::cout << f.getName() << std::endl;
         }
 
 
@@ -202,9 +200,7 @@ namespace lce::tests {
         std::cout << "saveTestEndian: " << "File version is " << static_cast<lce::save::SaveFileVersion>(file.getVersion()) << std::endl;
 
         for (save::IndexInnerFile f : file.getFiles()) {
-            
-            std::wcout << lce::io::BinaryIO::u16stringToWstring(f.getName()) << std::endl;
-
+			std::cout << f.getName() << std::endl;
         }
 
         const uint8_t* file2 = file.create();
@@ -263,8 +259,7 @@ namespace lce::tests {
         std::cout << "saveTestEndian: " << "File version is " << static_cast<lce::save::SaveFileVersion>(file.getVersion()) << std::endl;
 
         for (save::IndexInnerFile f : file.getFiles()) {
-            
-            std::wcout << lce::io::BinaryIO::u16stringToWstring(f.getName()) << std::endl;
+            std::cout << f.getName() << std::endl;
         }
 
         const uint8_t* file2 = file.create();
@@ -325,7 +320,7 @@ namespace lce::tests {
 
         for (save::IndexInnerFile f : file.getFiles()) {
             
-            std::wcout << lce::io::BinaryIO::u16stringToWstring(f.getName()) << std::endl;
+            std::cout << f.getName() << std::endl;
         }
 
 

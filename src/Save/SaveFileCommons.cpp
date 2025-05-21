@@ -47,7 +47,7 @@ namespace lce::save {
 
     std::optional<IndexInnerFile> SaveFileCommons::getFileByName(std::u16string name) {
         const auto find = std::find_if(index.begin(), index.end(), [&name](const IndexInnerFile& file) {
-            return file.getName() == name;
+            return file.getNameU16() == name;
         });
 
         if (find != index.end()) return *find;

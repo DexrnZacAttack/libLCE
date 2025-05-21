@@ -96,7 +96,7 @@ namespace lce::save {
         io.seek(this->indexOffset);
         for (const auto& file: this->index) {
             DebugLog(file.getName().length());
-            io.writeWChar2Byte(file.getName(), this->endian, false);
+            io.writeWChar2Byte(file.getNameU16(), this->endian, false);
             io.write<uint32_t>(file.getSize(), this->endian);
             io.write<uint32_t>(file.getOffset(), this->endian);
             io.write<uint64_t>(file.getTimestamp(), this->endian);

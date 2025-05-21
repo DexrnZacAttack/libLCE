@@ -79,7 +79,7 @@ namespace lce::save {
 
         io.seek(this->indexOffset);
         for (auto& file: this->index) {
-            io.writeWChar2Byte(file.getName(), this->endian, false);
+            io.writeWChar2Byte(file.getNameU16(), this->endian, false);
             io.write<uint32_t>(file.getSize(), this->endian);
             io.write<uint32_t>(file.getOffset(), this->endian);
         }
