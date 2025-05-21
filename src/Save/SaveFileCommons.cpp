@@ -70,7 +70,6 @@ namespace lce::save {
         return size;
     }
 
-
     /**
      * Gets the size of an index entry based on the save file class type.
      * @return The size of an index entry
@@ -116,6 +115,10 @@ namespace lce::save {
     ByteOrder SaveFileCommons::getEndian() const {
         return this->endian;
     }
+    
+    uint8_t* SaveFileCommons::create() const {
+		return nullptr; // Fix emscripten
+	}
 
     void SaveFileCommons::setOriginalVersion(uint16_t version) {
         this->originalVersion = version;

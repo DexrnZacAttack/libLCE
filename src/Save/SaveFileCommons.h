@@ -66,11 +66,12 @@ namespace lce::save {
             uint32_t getIndexOffset() const;
             uint16_t getOriginalVersion() const;
             uint16_t getVersion() const;
-            ByteOrder getEndian() const;
-
+            ByteOrder getEndian() const;   
             void setOriginalVersion(uint16_t version);
             void setVersion(uint16_t version);
             void setEndian(ByteOrder endian);
+            
+            uint8_t* create() const override;
         protected:
             virtual uint32_t getIndexEntrySize() const;
     };
