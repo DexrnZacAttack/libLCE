@@ -29,6 +29,25 @@ namespace lce::loc {
 
 	LocalizationFile::LocalizationFile() = default;
 	
+	LocalizationFile::LocalizationFile(uint32_t version, uint32_t languageCount, 
+		std::unordered_map<uint32_t, std::string> langIds, std::vector<Language> languages)
+		: version(version), 
+		languageCount(languageCount), 
+		langIds(langIds), 
+		languages(languages) {}
+	
+	LocalizationFile::LocalizationFile(uint32_t version, uint32_t languageCount, std::vector<uint32_t> keys, 
+		std::unordered_map<uint32_t, std::string> langIds, std::vector<Language> languages)
+		: version(version), 
+		useUniqueIds(true),
+		keyCount(keys.size()),
+		keys(keys),
+		languageCount(languageCount), 
+		langIds(langIds), 
+		languages(languages) {}
+	
+	LocalizationFile::LocalizationFile() = default;
+	
 	LocalizationFile::LocalizationFile(uint8_t *data) {
 		io::BinaryIO io(data);
 		
