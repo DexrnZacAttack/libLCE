@@ -46,7 +46,7 @@ Downloads for Linux, Windows, and Emscripten are available at https://nightly.li
   - [X] ARC
     - [X] Reading
     - [X] Writing
-  - [X] LOC
+  - [X] LOCg
     - [X] Reading
     - [X] Writing
   - [ ] PCK
@@ -56,5 +56,5 @@ Downloads for Linux, Windows, and Emscripten are available at https://nightly.li
     - [X] Reading
     - [X] Writing
   - [ ] MSSCMP
-    - [ ] Reading
+    - [X] Reading
     - [ ] Writing
