@@ -9,11 +9,11 @@
 
 #include "../IO/ByteEnums.h"
 #include "../libLCE.h"
-#include "../File/InnerFile.h"
+#include "../Filesystem/File.h"
 
 namespace lce::save {
     // wish I could just dump a struct lol
-    class LIBLCE_API IndexInnerFile : public file::InnerFile {
+    class LIBLCE_API IndexInnerFile : public fs::File {
     protected:
         mutable uint64_t timestamp{};
         ByteOrder endian;

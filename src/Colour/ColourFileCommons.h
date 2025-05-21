@@ -9,11 +9,11 @@
 #include <vector>
 
 #include "Colours/Colour.h"
-#include "../File/File.h"
+#include "../Filesystem/Filesystem.h"
 
 namespace lce::colour {
 
-class LIBLCE_API ColourFileCommons : file::File {
+class LIBLCE_API ColourFileCommons : public fs::Filesystem {
 public:
     uint32_t version;
     std::vector<Colour> colours;

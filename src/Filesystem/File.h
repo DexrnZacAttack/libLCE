@@ -1,25 +1,26 @@
 //
-// Created by DexrnZacAttack on 12/19/2024.
+// Created by Boreal on 5/20/2025.
 //
 
-#ifndef ARCHIVEFILE_H
-#define ARCHIVEFILE_H
+#ifndef FILE_H
+#define FILE_H
 #include <string>
 #include "../IO/BinaryIO.h"
 #include "../libLCE.h"
-#include "File.h"
+#include "Filesystem.h"
 
 #include <vector>
 
-namespace lce::file {
-    class LIBLCE_API InnerFile : File {
+namespace lce::fs {
+	
+    class LIBLCE_API File : public Filesystem {
 	public:
-        InnerFile() = default;
-        InnerFile(std::u16string name, uint64_t size, uint64_t offset, uint8_t* data) 
+        File() = default;
+        File(std::u16string name, uint64_t size, uint64_t offset, uint8_t* data) 
 			: name(name), size(size), offset(offset), data(data) {}
-		InnerFile(std::string name, uint64_t size, uint64_t offset, uint8_t* data) 
+		File(std::string name, uint64_t size, uint64_t offset, uint8_t* data) 
 			: size(size), offset(offset), data(data) { setName(name); }
-        virtual ~InnerFile() {}
+        virtual ~File() {}
         // JAAJ in C++?
         
         std::string getName() const;

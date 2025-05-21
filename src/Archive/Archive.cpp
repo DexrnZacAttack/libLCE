@@ -6,7 +6,7 @@
 #include "../IO/BinaryIO.h"
 
 namespace lce::arc {
-    Archive::Archive(uint32_t fileCount, const std::vector<file::InnerFile> &index): fileCount(fileCount), index(index) {
+    Archive::Archive(uint32_t fileCount, const std::vector<fs::File> &index): fileCount(fileCount), index(index) {
     }
 
     Archive::Archive() = default;
@@ -16,7 +16,7 @@ namespace lce::arc {
 
         this->fileCount = io.readBE<uint32_t>();
 
-        std::vector<file::InnerFile> index(this->fileCount);
+        std::vector<fs::File> index(this->fileCount);
 
         for (uint32_t i = 0; i < this->fileCount; i++) {
             uint16_t name_size = io.readBE<uint16_t>();
@@ -31,7 +31,7 @@ namespace lce::arc {
             io.readInto(data, size);
             io.seek(oldPos);
             
-            file::InnerFile af(name, size, offset, std::move(data));
+            fs::File af(name, size, offset, std::move(data));
             index[i] = af;
         }
 
@@ -91,12 +91,12 @@ namespace lce::arc {
         return size;
     }
 
-    void Archive::addFile(const file::InnerFile file) {
+    void Archive::addFile(const fs::File file) {
         this->index.push_back(file);
     }
 
     void Archive::removeFile(const uint32_t index) {
-        const file::InnerFile file = this->index[index];
+        const fs::File file = this->index[index];
 
         this->index.erase(this->index.begin() + index);
     }

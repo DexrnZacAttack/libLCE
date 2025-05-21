@@ -10,7 +10,7 @@
 #include <vector>
 #include "../IO/ByteEnums.h"
 #include "../libLCE.h"
-#include "../File/File.h"
+#include "../Filesystem/Filesystem.h"
 
 namespace lce::save {
     class SaveFileOld;
@@ -29,7 +29,7 @@ namespace lce::save {
         TU69
     };
 
-    class LIBLCE_API SaveFileCommons : file::File {
+    class LIBLCE_API SaveFileCommons : fs::Filesystem {
         protected:
         static constexpr uint32_t HEADER_SIZE = 12;
         uint32_t indexOffset;

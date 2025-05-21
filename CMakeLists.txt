@@ -50,10 +50,10 @@ set(FILES
 	src/IO/BinaryIO.h
 	src/Save/IndexInnerFile.cpp
 	src/Save/IndexInnerFile.h
-	src/File/File.cpp
-	src/File/File.h
-	src/File/InnerFile.cpp
-	src/File/InnerFile.h
+	src/Filesystem/Filesystem.cpp
+	src/Filesystem/Filesystem.h
+	src/Filesystem/File.cpp
+	src/Filesystem/File.h
 	src/Archive/Archive.cpp
 	src/Archive/Archive.h
 	src/Colour/Colours/Colour.cpp

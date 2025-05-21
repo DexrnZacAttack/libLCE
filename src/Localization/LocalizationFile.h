@@ -11,12 +11,12 @@
 #include <unordered_map>
 
 #include "../libLCE.h"
-#include "../File/File.h"
+#include "../Filesystem/Filesystem.h"
 #include "Language.h"
 
 namespace lce::loc {
 
-	class LIBLCE_API LocalizationFile : file::File {
+	class LIBLCE_API LocalizationFile : fs::Filesystem {
 	public:		
 		LocalizationFile(uint8_t* data);
 		LocalizationFile();
