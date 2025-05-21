@@ -54,8 +54,6 @@ namespace lce::msscmp {
 		
 		io.seek(lastEntryOffset + 4);
 		
-		index2 = std::vector<SoundbankInnerFile>(index2Size);
-		
 		for (uint64_t i = 0; i < index2Size; i++) {
 			io.seek((lastEntryOffset + 4) + (i * 8));
 			
@@ -90,7 +88,7 @@ namespace lce::msscmp {
 			io.readInto(data, fileSize);
 			io.seek(oldPos);
 			
-			index2[i] = SoundbankInnerFile(fileName, fileSize, dataOffset, std::move(data), sampleRate);
+			addFile(SoundbankInnerFile(fileName, fileSize, dataOffset, std::move(data), sampleRate));
 		}
 	}
 }

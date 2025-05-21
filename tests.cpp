@@ -106,7 +106,7 @@ namespace lce::tests {
 
         lce::msscmp::SoundbankFile file = lce::msscmp::SoundbankFile(ass);
         
-        for(const auto& innerFile : file.getIndex2()) {
+        for(const auto& innerFile : file.getIndex()) {
 			std::filesystem::path innerFilePath = "../testFiles/" + innerFile.getName() + ".binka";
 			std::filesystem::create_directories(innerFilePath.parent_path());
 			

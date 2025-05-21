@@ -6,7 +6,7 @@
 #include "../IO/BinaryIO.h"
 
 namespace lce::arc {
-    Archive::Archive(uint32_t fileCount, const std::vector<fs::File> &index): fileCount(fileCount), index(index) {
+    Archive::Archive(uint32_t fileCount, std::vector<fs::File>& index): fileCount(fileCount), Filesystem(index) {
     }
 
     Archive::Archive() = default;
@@ -32,10 +32,8 @@ namespace lce::arc {
             io.seek(oldPos);
             
             fs::File af(name, size, offset, std::move(data));
-            index[i] = af;
+            addFile(af);
         }
-
-        this->index = index;
     }
 
     uint8_t* Archive::create() const {
@@ -43,11 +41,11 @@ namespace lce::arc {
         uint8_t *data = new uint8_t[fileSize];
         io::BinaryIO io(data);
 
-        uint32_t *offsetPositions = new uint32_t[this->index.size()];
+        uint32_t *offsetPositions = new uint32_t[getIndexSize()];
         uint32_t i = 0;
 
-        io.writeBE<uint32_t>(this->index.size());
-        for (auto file: this->index) {
+        io.writeBE<uint32_t>(getIndexSize());
+        for (auto& file: getIndex()) {
             io.writeBE<uint16_t>(file.getName().length());
             io.writeUtf8(file.getName());
             // this stores the area where the file offset is written.
@@ -60,7 +58,7 @@ namespace lce::arc {
 
         uint32_t j = 0;
 
-        for (auto file: this->index) {
+        for (auto& file: getIndex()) {
             // get current position (this is the position of the file)
             uint32_t pos = io.getPosition();
             // write the file
@@ -81,7 +79,7 @@ namespace lce::arc {
 
     uint64_t Archive::getSize() const {
         uint32_t size = 0;
-        for (const auto& file: this->index) {
+        for (const auto& file: getIndex()) {
             size += 2; // string length prefix
             size += file.getName().length(); // name length
             size += 8; // offset, size
@@ -89,16 +87,6 @@ namespace lce::arc {
         }
 
         return size;
-    }
-
-    void Archive::addFile(const fs::File file) {
-        this->index.push_back(file);
-    }
-
-    void Archive::removeFile(const uint32_t index) {
-        const fs::File file = this->index[index];
-
-        this->index.erase(this->index.begin() + index);
     }
 
 }

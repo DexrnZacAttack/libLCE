@@ -7,13 +7,12 @@
 #include <string>
 #include "../IO/BinaryIO.h"
 #include "../libLCE.h"
-#include "Filesystem.h"
 
 #include <vector>
 
 namespace lce::fs {
 	
-    class LIBLCE_API File : public Filesystem {
+    class LIBLCE_API File {
 	public:
         File() = default;
         File(std::u16string name, uint64_t size, uint64_t offset, uint8_t* data) 
@@ -26,8 +25,8 @@ namespace lce::fs {
         std::string getName() const;
         std::u16string getNameU16() const { return name; }
         uint64_t getOffset() const { return offset; }
-        uint64_t getSize() const override { return size; }
-        uint8_t* create() const override;
+        uint64_t getSize() const { return size; }
+        uint8_t* create() const;
         uint8_t* getData() { return data; }
         std::vector<uint8_t> getDataVec() const;
         

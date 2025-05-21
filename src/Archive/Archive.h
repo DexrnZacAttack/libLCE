@@ -5,17 +5,17 @@
 #ifndef ARCHIVE_H
 #define ARCHIVE_H
 #include <vector>
-#include "../Filesystem/File.h"
+#include "../Filesystem/Filesystem.h"
 #include "../libLCE.h"
 
 
 namespace lce::arc {
+
     class LIBLCE_API Archive : public fs::Filesystem {
     public:
         uint32_t fileCount;
-        std::vector<fs::File> index;
 
-        Archive(uint32_t fileCount, const std::vector<fs::File> &index);
+        Archive(uint32_t fileCount, std::vector<fs::File> &index);
         Archive();
 
         Archive(uint8_t* data);
@@ -23,10 +23,6 @@ namespace lce::arc {
         uint8_t* create() const override;
 
         uint64_t getSize() const override;
-
-        void addFile(fs::File file);
-
-        void removeFile(uint32_t index);
     };
 }
 

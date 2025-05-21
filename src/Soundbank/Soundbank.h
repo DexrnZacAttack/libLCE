@@ -7,7 +7,7 @@
 
 #include "../libLCE.h"
 #include "../IO/ByteEnums.h"
-#include "../Filesystem/File.h"
+#include "../Filesystem/Filesystem.h"
 #include <vector>
 #include <stdexcept> //Remove when implemented
 
@@ -32,14 +32,11 @@ namespace lce::msscmp {
 		
 		uint64_t getSize() const override { std::logic_error("Function not yet implemented"); return 0;  }
 		uint8_t* create() const override { std::logic_error("Function not yet implemented"); return nullptr; }
-		
-		std::vector<SoundbankInnerFile> getIndex2() const { return index2; }
 	private:
 		ByteOrder byteOrder;
 		Generation gen;
 		
 		uint32_t index2Size;
-		std::vector<SoundbankInnerFile> index2;
 	};
 }
 
