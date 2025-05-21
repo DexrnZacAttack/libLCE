@@ -46,7 +46,7 @@ namespace lce::save {
         this->version = io.read<uint16_t>(this->endian);
 
         DebugLog("Index offset: " << this->indexOffset);
-        DebugLog("Index file count: " << this->indexFileCount);
+        DebugLog("Index file count: " << getIndexSize());
         DebugLog("Version: " << this->version);
         DebugLog("Orig version: " << this->originalVersion);
 
