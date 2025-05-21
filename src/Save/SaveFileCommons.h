@@ -10,6 +10,7 @@
 #include <vector>
 #include "../IO/ByteEnums.h"
 #include "../libLCE.h"
+#include "../File/File.h"
 
 namespace lce::save {
     class SaveFileOld;
@@ -28,7 +29,7 @@ namespace lce::save {
         TU69
     };
 
-    class LIBLCE_API SaveFileCommons {
+    class LIBLCE_API SaveFileCommons : file::File {
         protected:
         static constexpr uint32_t HEADER_SIZE = 12;
         uint32_t indexOffset;
@@ -48,7 +49,7 @@ namespace lce::save {
 
             void removeFile(uint32_t index);
 
-            uint64_t getSize();
+            uint64_t getSize() const override;
 
             std::optional<IndexInnerFile> getFileByName(std::u16string name);
 
@@ -71,7 +72,7 @@ namespace lce::save {
             void setVersion(uint16_t version);
             void setEndian(ByteOrder endian);
         protected:
-            virtual uint32_t getIndexEntrySize();
+            virtual uint32_t getIndexEntrySize() const;
     };
 }
 

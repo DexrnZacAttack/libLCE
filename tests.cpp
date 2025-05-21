@@ -147,8 +147,7 @@ namespace lce::tests {
             std::cout << f.getName() << std::endl;
         }
 
-
-        // write be file
+        // write the file
         const uint8_t* file2 = file.create();
 
         std::ofstream outFile("../testFiles/savegame_pr-be_out.dat", std::ios::binary);

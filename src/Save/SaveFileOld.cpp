@@ -51,6 +51,11 @@ namespace lce::save {
             // set the entry
             index[i] = inf;
         }
+        
+        for (auto& file: index) {
+            file.setOffset(io.getPosition());
+            io.writeBytes(file.getData(), file.getSize());
+        }
 
         this->index = index;
     }
@@ -59,10 +64,10 @@ namespace lce::save {
      * Writes the save file
      * @return Pointer to the save file
      */
-    const uint8_t *SaveFileOld::create() {
+    uint8_t* SaveFileOld::create() const {
         io::BinaryIO io(this->getSize());
 
-        this->indexOffset = this->calculateIndexOffset();
+        uint32_t indexOffset = this->calculateIndexOffset();
 
         if (this->getIndexOffset() > 0xFFFFFFFF - HEADER_SIZE)
             throw std::runtime_error("Index offset is too big to be stored in a 32-bit integer.");
@@ -71,11 +76,6 @@ namespace lce::save {
         io.write<uint32_t>(this->indexFileCount * this->getIndexEntrySize(), this->endian);
         io.write<uint16_t>(this->originalVersion, this->endian);
         io.write<uint16_t>(this->version, this->endian);
-
-        for (auto& file: this->index) {
-            file.setOffset(io.getPosition());
-            io.writeBytes(file.getData(), file.getSize());
-        }
 
         io.seek(this->indexOffset);
         for (auto& file: this->index) {
@@ -123,7 +123,7 @@ namespace lce::save {
      * Gets the size of an index entry based on the save file class type.
      * @return The size of an index entry
      */
-    uint32_t SaveFileOld::getIndexEntrySize() {
+    uint32_t SaveFileOld::getIndexEntrySize() const {
         return 136;
     }
 

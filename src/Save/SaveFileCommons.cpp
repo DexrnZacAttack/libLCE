@@ -14,6 +14,8 @@
 #include "SaveFile.h"
 #include "../IO/BinaryIO.h"
 
+#include <stdexcept> //Remove when implemented
+
 namespace lce::save {
     class SaveFileOld;
     class SaveFile;
@@ -36,7 +38,7 @@ namespace lce::save {
         this->indexFileCount--;
     }
 
-    uint64_t SaveFileCommons::getSize() {
+    uint64_t SaveFileCommons::getSize() const {
         uint64_t size = HEADER_SIZE + (this->indexFileCount * getIndexEntrySize()); // for each index entry there is 144 bytes (136 bytes with old save file format)
         for (const auto& file: this->index) {
             size += file.getSize();
@@ -44,7 +46,7 @@ namespace lce::save {
 
         return size;
     }
-
+	
     std::optional<IndexInnerFile> SaveFileCommons::getFileByName(std::u16string name) {
         const auto find = std::find_if(index.begin(), index.end(), [&name](const IndexInnerFile& file) {
             return file.getNameU16() == name;
@@ -73,7 +75,7 @@ namespace lce::save {
      * Gets the size of an index entry based on the save file class type.
      * @return The size of an index entry
      */
-    uint32_t SaveFileCommons::getIndexEntrySize() {
+    uint32_t SaveFileCommons::getIndexEntrySize() const {
         return 0;
     }
 

@@ -22,10 +22,10 @@ public:
 
     explicit SaveFile(std::vector<uint8_t> data, ByteOrder endian = LITTLE);
 
-    const uint8_t *create();
+    uint8_t* create() const override;
 
     protected:
-        uint32_t getIndexEntrySize() override;
+        uint32_t getIndexEntrySize() const override;
 };
 
 } // lce::save
