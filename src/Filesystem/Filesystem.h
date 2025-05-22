@@ -35,6 +35,7 @@ namespace lce::fs {
 		std::vector<std::shared_ptr<File>>& getIndex() { return index; }
 		
 		void setIndex(std::vector<std::shared_ptr<File>>& index) { this->index = index; }
+		
 	private:
 		std::vector<std::shared_ptr<File>> index; // shared_ptr for the polymorphism ig
 		uint32_t indexCount;
