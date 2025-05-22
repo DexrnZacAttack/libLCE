@@ -2,9 +2,6 @@
 // Created by DexrnZacAttack on 12/28/2024.
 //
 
-#include <codecvt>
-#include <locale>
-
 #include "BinaryIO.h"
 
 namespace lce::io {
