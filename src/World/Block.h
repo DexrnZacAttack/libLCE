@@ -6,7 +6,7 @@
 #define BLOCK_H
 #include <cstdint>
 
-#include "../IO/ByteOrder.h"
+#include "../IO/ByteEnums.h"
 #include "../libLCE.h"
 
 namespace lce::world {

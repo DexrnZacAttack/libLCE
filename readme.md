@@ -56,5 +56,5 @@ Downloads for Linux, Windows, and Emscripten are available at https://nightly.li
     - [X] Reading
     - [X] Writing
   - [ ] MSSCMP
-    - [ ] Reading
+    - [X] Reading
     - [ ] Writing

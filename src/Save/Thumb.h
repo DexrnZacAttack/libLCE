@@ -7,7 +7,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include "../IO/ByteOrder.h"
+#include "../IO/ByteEnums.h"
 #include "../IO/BinaryIO.h"
 #include "../libLCE.h"
 

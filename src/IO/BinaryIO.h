@@ -6,11 +6,11 @@
 #define BINARYIO_H
 
 #include <cstdint>
-#include <iostream>
 #include <cstring>
+#include <string>
 #include <vector>
 
-#include "ByteOrder.h"
+#include "ByteEnums.h"
 #include "../libLCE.h"
 
 
@@ -71,6 +71,9 @@ class BinaryIO {
         uint32_t readUint24(ByteOrder endian);
 
         int32_t readInt24(ByteOrder endian);
+        
+        uint64_t readUintByGeneration(ByteOrder endian, Generation gen);
+        
         template <typename T>
         T readLE() {
             const T v = little2sys(*reinterpret_cast<const T*>(this->data));
@@ -140,6 +143,8 @@ class BinaryIO {
         [[nodiscard]] size_t getPosition() const;
 
         std::string readUtf8(size_t size);
+        
+        std::string readUtf8NullTerminated();
 
         void writeUtf8(const std::string &input);
 
@@ -160,7 +165,11 @@ class BinaryIO {
         static LIBLCE_API std::wstring u16stringToWstring(const std::u16string &str);
 
         static LIBLCE_API std::wstring u32stringToWstring(const std::u32string &str);
-};
-}
+    
+        static LIBLCE_API std::string u16stringToString(const std::u16string &str);
+    
+        static LIBLCE_API std::u16string stringToU16String(const std::string &str);
+    };
+} // lce::io
 
 #endif //BINARYIO_H

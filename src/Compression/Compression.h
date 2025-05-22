@@ -8,7 +8,7 @@
 #include <vector>
 
 #include "../libLCE.h"
-#include "../IO/ByteOrder.h"
+#include "../IO/ByteEnums.h"
 
 namespace lce::compression {
 

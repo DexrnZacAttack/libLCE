@@ -83,17 +83,19 @@ EMSCRIPTEN_BINDINGS(libLCE) {
         .function("getFileByName", &lce::save::SaveFileCommons::getFileByName)
         .function("calculateIndexOffset", &lce::save::SaveFileCommons::calculateIndexOffset)
         .function("getFilesSize", &lce::save::SaveFileCommons::getFilesSize)
+        .function("index", emscripten::select_overload<std::vector<std::shared_ptr<lce::fs::File>>&()>
+        (&lce::save::SaveFileCommons::getIndex)) // Select the non const function
         // .class_function("readAuto", &lce::save::SaveFileCommons::readAuto)
         .class_function("getVersionFromData", &lce::save::SaveFileCommons::getVersionFromData)
-        .property("indexFileCount", &lce::save::SaveFileCommons::getFileCount)
+        .property("indexFileCount", &lce::save::SaveFileCommons::getIndexCount)
         .property("originalVersion", &lce::save::SaveFileCommons::getOriginalVersion, &lce::save::SaveFileCommons::setOriginalVersion)
         .property("version", &lce::save::SaveFileCommons::getVersion, &lce::save::SaveFileCommons::setVersion)
         .property("indexOffset", &lce::save::SaveFileCommons::getIndexOffset)
-        .property("endian", &lce::save::SaveFileCommons::getEndian, &lce::save::SaveFileCommons::setEndian)
-        .property("index", &lce::save::SaveFileCommons::getFiles);
+        .property("endian", &lce::save::SaveFileCommons::getEndian, &lce::save::SaveFileCommons::setEndian);
+        
 
     emscripten::class_<lce::save::SaveFile, emscripten::base<lce::save::SaveFileCommons>>("SaveFile")
-    .constructor<uint32_t, uint32_t, uint16_t, uint16_t, const std::vector<lce::save::IndexInnerFile> &>()
+    .constructor<uint32_t, uint32_t, uint16_t, uint16_t, const std::vector<std::shared_ptr<lce::save::IndexInnerFile>> &>()
     .constructor<ByteOrder>()
     .constructor<std::vector<uint8_t>, ByteOrder>()
     .constructor()

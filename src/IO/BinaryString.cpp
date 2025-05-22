@@ -2,15 +2,27 @@
 // Created by DexrnZacAttack on 12/28/2024.
 //
 
-#include <codecvt>
-#include <locale>
-
 #include "BinaryIO.h"
+#include <codecvt>
+#include <locale> 
+#include <string>
 
 namespace lce::io {
     std::string BinaryIO::readUtf8(size_t size) {
         uint8_t* buf = readOfSize(size);
         return {reinterpret_cast<char*>(buf), size};
+    }
+    
+    std::string BinaryIO::readUtf8NullTerminated() {
+		std::string result;
+		
+		while (true) {
+			char ch = *this->data++;
+			if(ch == '\0') break;
+			result += ch;
+		}
+		
+		return result;
     }
 
     void BinaryIO::writeUtf8(const std::string& input) {
@@ -114,6 +126,16 @@ namespace lce::io {
         }
         return result;
 #endif
+    }
+
+    std::string BinaryIO::u16stringToString(const std::u16string &str) {
+        std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
+        return convert.to_bytes(str);
+    }
+    
+    std::u16string BinaryIO::stringToU16String(const std::string &str) {
+        std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
+        return convert.from_bytes(str);
     }
 
     // endregion
