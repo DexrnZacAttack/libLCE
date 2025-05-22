@@ -3,6 +3,9 @@
 //
 
 #include "BinaryIO.h"
+#include <codecvt>
+#include <locale> 
+#include <string>
 
 namespace lce::io {
     std::string BinaryIO::readUtf8(size_t size) {
@@ -123,6 +126,16 @@ namespace lce::io {
         }
         return result;
 #endif
+    }
+
+    std::string BinaryIO::u16stringToString(const std::u16string &str) {
+        std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
+        return convert.to_bytes(str);
+    }
+    
+    std::u16string BinaryIO::stringToU16String(const std::string &str) {
+        std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
+        return convert.from_bytes(str);
     }
 
     // endregion

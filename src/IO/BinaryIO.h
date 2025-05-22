@@ -6,8 +6,8 @@
 #define BINARYIO_H
 
 #include <cstdint>
-#include <iostream>
 #include <cstring>
+#include <string>
 #include <vector>
 
 #include "ByteEnums.h"
@@ -165,7 +165,11 @@ class BinaryIO {
         static LIBLCE_API std::wstring u16stringToWstring(const std::u16string &str);
 
         static LIBLCE_API std::wstring u32stringToWstring(const std::u32string &str);
-};
-}
+    
+        static LIBLCE_API std::string u16stringToString(const std::u16string &str);
+    
+        static LIBLCE_API std::u16string stringToU16String(const std::string &str);
+    };
+} // lce::io
 
 #endif //BINARYIO_H

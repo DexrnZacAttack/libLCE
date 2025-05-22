@@ -6,7 +6,6 @@
 
 #include <vector>
 #include <cstring>
-#include <iostream>
 
 namespace lce::io {
     BinaryIO::BinaryIO(uint8_t *input, size_t size) : dataOrigin(input), data(input), size(size) {

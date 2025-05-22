@@ -3,23 +3,19 @@
 //
 
 #include "File.h"
-
-#include <locale> 
-#include <codecvt> 
-#include <string> 
+#include <string>
+#include "../IO/BinaryIO.h" 
 
 namespace lce::fs {
 	
 	// TODO: Move to BinaryIO and find a way that isn't deprecated
     
     std::string File::getName() const {
-		std::wstring_convert<std::codecvt_utf8_utf16<char16_t>,char16_t> convert; // DEPRECATED
-		return convert.to_bytes(name);     
+		return io::BinaryIO::u16stringToString(name);
 	}
 	
 	void File::setName(std::string _name) {
-		std::wstring_convert<std::codecvt_utf8_utf16<char16_t>,char16_t> convert; // DEPRECATED
-		name = convert.from_bytes(_name);
+		this->name = io::BinaryIO::stringToU16String(_name);
 	}
 	
 	std::vector<uint8_t> File::getDataVec() const {
