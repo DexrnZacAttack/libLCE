@@ -2,7 +2,6 @@
 // Created by Boreal on 5/20/2025.
 //
 
-#include "../IO/BinaryIO.h"
 #include "File.h"
 
 #include <locale> 
@@ -14,12 +13,12 @@ namespace lce::fs {
 	// TODO: Move to BinaryIO and find a way that isn't deprecated
     
     std::string File::getName() const {
-		std::wstring_convert<std::codecvt_utf8_utf16<char16_t>,char16_t> convert;
+		std::wstring_convert<std::codecvt_utf8_utf16<char16_t>,char16_t> convert; // DEPRECATED
 		return convert.to_bytes(name);     
 	}
 	
 	void File::setName(std::string _name) {
-		std::wstring_convert<std::codecvt_utf8_utf16<char16_t>,char16_t> convert; 
+		std::wstring_convert<std::codecvt_utf8_utf16<char16_t>,char16_t> convert; // DEPRECATED
 		name = convert.from_bytes(_name);
 	}
 	

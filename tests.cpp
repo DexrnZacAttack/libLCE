@@ -1,9 +1,6 @@
 #include <chrono>
-#include <codecvt>
 #include <fstream>
-#include <iomanip>
 #include <iostream>
-#include <sstream>
 #include <vector>
 #include <cstdarg>
 #include <filesystem>
@@ -12,7 +9,6 @@
 #include "src/Colour/ColourFile.h"
 #include "src/Save/SaveFileOld.h"
 #include "src/Save/Thumb.h"
-#include "src/World/Chunk.h"
 #include "src/World/Region.h"
 #include "src/libLCEExports.h"
 
@@ -43,7 +39,7 @@ namespace lce::tests {
 
         const uint8_t* file2 = file.create();
 
-        std::ofstream outFile("../testFiles/testarc.arc", std::ios::binary);
+        std::ofstream outFile("../testFiles/example_copy.arc", std::ios::binary);
         if (!outFile) {
             throw std::ios_base::failure("Failed to open file");
         }

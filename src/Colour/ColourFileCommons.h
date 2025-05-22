@@ -13,7 +13,7 @@
 
 namespace lce::colour {
 
-class LIBLCE_API ColourFileCommons : public fs::Filesystem {
+class LIBLCE_API ColourFileCommons {
 public:
     uint32_t version;
     std::vector<Colour> colours;
@@ -24,8 +24,9 @@ public:
     ColourFileCommons(const std::vector<Colour> & colours, uint32_t version);
 
     void addColour(Colour colour);
-    
-    uint64_t getSize() const override;
+
+    virtual uint8_t *create() const = 0;
+    virtual uint64_t getSize() const = 0;
 };
 
 } // lce::colour

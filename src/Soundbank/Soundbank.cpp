@@ -5,7 +5,6 @@
 #include "Soundbank.h"
 #include "../IO/BinaryIO.h"
 
-#include <iostream>
 #include <utility>
 
 namespace lce::msscmp {
