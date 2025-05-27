@@ -25,66 +25,70 @@ set(LODEPNG_FILES
     external/lodepng/lodepng_util.cpp)
 
 set(ZLIB_FILES
-        external/zlib/zlib.h
-        external/zlib/inflate.h
-        external/zlib/inflate.c
-        external/zlib/adler32.c
-        external/zlib/crc32.c
-        external/zlib/zutil.c
-        external/zlib/inffast.c
-        external/zlib/inftrees.c
+	external/zlib/zlib.h
+	external/zlib/inflate.h
+	external/zlib/inflate.c
+	external/zlib/adler32.c
+	external/zlib/crc32.c
+	external/zlib/zutil.c
+	external/zlib/inffast.c
+	external/zlib/inftrees.c
 )
 
 set(FILES
-        src/libLCE.h
-        src/libLCEExports.h
-        src/libLCEExports.cpp
-        src/EmscriptenBindings.cpp
-        src/World/Region.cpp
-        src/World/Region.h
-        src/World/Chunk.cpp
-        src/World/Chunk.h
-        src/Save/SaveFile.cpp
-        src/Save/SaveFile.h
-        src/IO/BinaryIO.cpp
-        src/IO/BinaryIO.h
-        src/Save/IndexInnerFile.cpp
-        src/Save/IndexInnerFile.h
-        src/Archive/Archive.cpp
-        src/Archive/Archive.h
-        src/Archive/ArchiveInnerFile.cpp
-        src/Archive/ArchiveInnerFile.h
+	src/libLCE.h
+	src/libLCEExports.h
+	src/libLCEExports.cpp
+	src/EmscriptenBindings.cpp
+	src/World/Region.cpp
+	src/World/Region.h
+	src/World/Chunk.cpp
+	src/World/Chunk.h
+	src/Save/SaveFile.cpp
+	src/Save/SaveFile.h
+	src/IO/BinaryIO.cpp
+	src/IO/BinaryIO.h
+	src/Save/IndexInnerFile.cpp
+	src/Save/IndexInnerFile.h
+	src/Filesystem/Filesystem.cpp
+	src/Filesystem/Filesystem.h
+	src/Filesystem/File.cpp
+	src/Filesystem/File.h
+	src/Archive/Archive.cpp
+	src/Archive/Archive.h
+	src/Colour/Colours/Colour.cpp
+	src/Colour/Colours/Colour.h
+	src/Colour/ColourFileOld.cpp
+	src/Colour/ColourFileOld.h
+	src/Colour/ColourFileCommons.cpp
+	src/Colour/ColourFileCommons.h
+	src/Colour/ColourFile.cpp
+	src/Colour/ColourFile.h
+	src/Colour/Colours/ColourCommons.cpp
+	src/Colour/Colours/ColourCommons.h
+	src/Colour/Colours/WorldColour.cpp
+	src/Colour/Colours/WorldColour.h
 	src/Localization/LocalizationFile.cpp
-        src/Localization/LocalizationFile.h
-        src/Localization/Language.cpp
+	src/Localization/LocalizationFile.h
+	src/Localization/Language.cpp
 	src/Localization/Language.h
+	src/Soundbank/Soundbank.cpp
+	src/Soundbank/Soundbank.h
 	src/Save/SaveFileOld.cpp
-        src/Save/SaveFileOld.h
-        src/Save/SaveFileCommons.cpp
-        src/Save/SaveFileCommons.h
-        src/IO/BinaryString.cpp
-        src/Compression/Compression.cpp
-        src/Compression/Compression.h
-        src/Color/Colors/Color.cpp
-        src/Color/Colors/Color.h
-        src/Color/ColorFileOld.cpp
-        src/Color/ColorFileOld.h
-        src/Color/ColorFileCommons.cpp
-        src/Color/ColorFileCommons.h
-        src/Color/ColorFile.cpp
-        src/Color/ColorFile.h
-        src/Color/Colors/ColorCommons.cpp
-        src/Color/Colors/ColorCommons.h
-        src/Color/Colors/WorldColor.cpp
-        src/Color/Colors/WorldColor.h
-        src/IO/ByteOrder.h
-        src/Save/Thumb.cpp
-        src/Save/Thumb.h
-        src/World/SplitSave.cpp
-        src/World/SplitSave.h
-        src/World/Block.cpp
-        src/World/Block.h
-        src/World/Chunk/V12.cpp
+	src/Save/SaveFileOld.h
+	src/Save/SaveFileCommons.cpp
+	src/Save/SaveFileCommons.h
+	src/IO/BinaryString.cpp
+	src/Compression/Compression.cpp
+	src/Compression/Compression.h
+	src/IO/ByteEnums.h
+	src/Save/Thumb.cpp
+	src/Save/Thumb.h
+	src/World/SplitSave.cpp
+	src/World/SplitSave.h
+	src/World/Block.cpp
+	src/World/Block.h
+	src/World/Chunk/V12.cpp
 )
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Emscripten")

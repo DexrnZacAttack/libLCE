@@ -6,7 +6,6 @@
 
 #include <vector>
 #include <cstring>
-#include <iostream>
 
 namespace lce::io {
     BinaryIO::BinaryIO(uint8_t *input, size_t size) : dataOrigin(input), data(input), size(size) {
@@ -69,6 +68,11 @@ namespace lce::io {
 
         return static_cast<int32_t>(res);
     }
+    
+    uint64_t BinaryIO::readUintByGeneration(ByteOrder endian, Generation gen) {
+		if(gen == NEW_GEN) return read<uint64_t>(endian);
+		else return read<uint32_t>(endian);
+	}
 
     void BinaryIO::writeByte(const uint8_t v) {
         *this->data++ = v;

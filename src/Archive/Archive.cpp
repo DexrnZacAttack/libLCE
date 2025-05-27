@@ -4,62 +4,65 @@
 
 #include "Archive.h"
 #include "../IO/BinaryIO.h"
+#include <iostream>
 
 namespace lce::arc {
-    Archive::Archive(uint32_t fileCount, const std::vector<ArchiveInnerFile> &index): fileCount(fileCount), index(index) {
+    Archive::Archive(uint32_t fileCount, std::vector<std::shared_ptr<fs::File>>& index): fileCount(fileCount), Filesystem(index) {
     }
 
     Archive::Archive() = default;
 
     Archive::Archive(uint8_t *data) {
         io::BinaryIO io(data);
-
+		std::cout << "Archive\n";
         this->fileCount = io.readBE<uint32_t>();
 
-        std::vector<ArchiveInnerFile> index(this->fileCount);
-
-        io::BinaryIO& io2 = io;
-
         for (uint32_t i = 0; i < this->fileCount; i++) {
-            ArchiveInnerFile af(io2);
+            uint16_t name_size = io.readBE<uint16_t>();
+            std::string name = io.readUtf8(name_size);
+			
+			uint32_t offset = io.readBE<uint32_t>();
+			uint32_t size = io.readBE<uint32_t>();
+			uint8_t* data = new uint8_t[size];
+            
             uint32_t oldPos = io.getPosition();
-            io.seek(af.offset);
-            af.data = new uint8_t[af.size];
-            io.readInto(af.data, af.size);
-            index[i] = af;
+            io.seek(offset);
+            io.readInto(data, size);
             io.seek(oldPos);
+            
+            fs::File af(name, size, offset, std::move(data));
+           
+            addFile( std::make_shared<fs::File>(af) );
         }
-
-        this->index = index;
     }
 
-    uint8_t *Archive::create() {
+    uint8_t* Archive::create() const {
         const uint32_t fileSize = this->getSize();
         uint8_t *data = new uint8_t[fileSize];
         io::BinaryIO io(data);
 
-        uint32_t *offsetPositions = new uint32_t[this->index.size()];
+        uint32_t *offsetPositions = new uint32_t[getIndexCount()];
         uint32_t i = 0;
 
-        io.writeBE<uint32_t>(this->index.size());
-        for (auto file: this->index) {
-            io.writeBE<uint16_t>(file.name.length());
-            io.writeUtf8(file.name);
+        io.writeBE<uint32_t>(getIndexCount());
+        for (auto& file: getIndex()) {
+            io.writeBE<uint16_t>(file->getName().length());
+            io.writeUtf8(file->getName());
             // this stores the area where the file offset is written.
             offsetPositions[i] = io.getPosition();
             io.writeBE<uint32_t>(0);
-            io.writeBE<uint32_t>(file.size);
+            io.writeBE<uint32_t>(file->getSize());
 
             i++;
         }
 
         uint32_t j = 0;
 
-        for (auto file: this->index) {
+        for (auto& file: getIndex()) {
             // get current position (this is the position of the file)
             uint32_t pos = io.getPosition();
             // write the file
-            io.writeBytes(file.data, file.size);
+            io.writeBytes(file->create(), file->getSize());
             // get the position after the file was written (we return here to write the next one)
             uint32_t pos2 = io.getPosition();
             // go to the offset offset (lol) and write the actual offset.
@@ -74,26 +77,16 @@ namespace lce::arc {
         return io.getData();
     }
 
-    uint32_t Archive::getSize() const {
+    uint64_t Archive::getSize() const {
         uint32_t size = 0;
-        for (const auto& file: this->index) {
+        for (const auto& file: getIndex()) {
             size += 2; // string length prefix
-            size += file.name.length(); // name length
+            size += file->getName().length(); // name length
             size += 8; // offset, size
-            size += file.size; // file size
+            size += file->getSize(); // file size
         }
 
         return size;
-    }
-
-    void Archive::addFile(const ArchiveInnerFile file) {
-        this->index.push_back(file);
-    }
-
-    void Archive::removeFile(const uint32_t index) {
-        const ArchiveInnerFile file = this->index[index];
-
-        this->index.erase(this->index.begin() + index);
     }
 
 }

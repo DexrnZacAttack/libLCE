@@ -2,18 +2,21 @@
 // Created by Boreal on 05/15/2025.
 //
 
+// Documentation for this format is available at:
+// https://team-lodestone.github.io/Documentation/LCE/File%20Types/LOC.html
+
 #include "LocalizationFile.h"
 #include "../IO/BinaryIO.h"
 
 namespace lce::loc {
-	
+
 	LocalizationFile::LocalizationFile(uint32_t version, uint32_t languageCount, 
 		std::unordered_map<uint32_t, std::string> langIds, std::vector<Language> languages)
 		: version(version), 
 		languageCount(languageCount), 
 		langIds(langIds), 
 		languages(languages) {}
-	
+
 	LocalizationFile::LocalizationFile(uint32_t version, uint32_t languageCount, std::vector<uint32_t> keys, 
 		std::unordered_map<uint32_t, std::string> langIds, std::vector<Language> languages)
 		: version(version), 
@@ -23,7 +26,7 @@ namespace lce::loc {
 		languageCount(languageCount), 
 		langIds(langIds), 
 		languages(languages) {}
-	
+
 	LocalizationFile::LocalizationFile() = default;
 	
 	LocalizationFile::LocalizationFile(uint8_t *data) {
@@ -52,7 +55,7 @@ namespace lce::loc {
 		}
 	}
 	
-	uint32_t LocalizationFile::getSize() const {
+	uint64_t LocalizationFile::getSize() const {
 		uint32_t size = 0;
 		
 		size += sizeof(version);

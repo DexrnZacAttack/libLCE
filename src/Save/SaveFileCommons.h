@@ -8,8 +8,9 @@
 #include <string>
 #include <variant>
 #include <vector>
-#include "../IO/ByteOrder.h"
+#include "../IO/ByteEnums.h"
 #include "../libLCE.h"
+#include "../Filesystem/Filesystem.h"
 
 namespace lce::save {
     class SaveFileOld;
@@ -28,29 +29,19 @@ namespace lce::save {
         TU69
     };
 
-    class LIBLCE_API SaveFileCommons {
+    class LIBLCE_API SaveFileCommons : public fs::Filesystem {
         protected:
         static constexpr uint32_t HEADER_SIZE = 12;
         uint32_t indexOffset;
-        uint32_t indexFileCount;
         uint16_t originalVersion;
         uint16_t version;
         ByteOrder endian;
-        std::vector<IndexInnerFile> index;
         public:
-            SaveFileCommons(): endian(ByteOrder::LITTLE), indexOffset(0), indexFileCount(0), originalVersion(11), version(11) {};
+            SaveFileCommons(): endian(ByteOrder::LITTLE), indexOffset(0), originalVersion(11), version(11) {};
 
             virtual ~SaveFileCommons() = default;
 
-            std::vector<IndexInnerFile> getFiles() const;
-
-            void addFile(const IndexInnerFile &file);
-
-            void removeFile(uint32_t index);
-
-            uint64_t getSize();
-
-            std::optional<IndexInnerFile> getFileByName(std::u16string name);
+            uint64_t getSize() const override;
 
             uint32_t calculateIndexOffset() const;
 
@@ -59,19 +50,18 @@ namespace lce::save {
 #ifndef __EMSCRIPTEN__
             static std::variant<SaveFile, SaveFileOld> readAuto(std::vector<uint8_t> data, ByteOrder endian = LITTLE);
 #endif
-
             static uint16_t getVersionFromData(std::vector<uint8_t> data, ByteOrder endian = LITTLE);
-            uint32_t getFileCount() const;
             uint32_t getIndexOffset() const;
             uint16_t getOriginalVersion() const;
             uint16_t getVersion() const;
-            ByteOrder getEndian() const;
-
+            ByteOrder getEndian() const;   
             void setOriginalVersion(uint16_t version);
             void setVersion(uint16_t version);
             void setEndian(ByteOrder endian);
+            
+            uint8_t* create() const override;
         protected:
-            virtual uint32_t getIndexEntrySize();
+            virtual uint32_t getIndexEntrySize() const;
     };
 }
 
