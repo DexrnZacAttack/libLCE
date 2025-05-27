@@ -24,10 +24,12 @@ jobs:
       # To add more build types (Release, Debug, RelWithDebInfo, etc.) customize the build_type list.
       matrix:
         os: [ubuntu-latest, windows-latest]
+        arch: [x86, arm64]
         build_type: [Release, Debug]
         c_compiler: [gcc, clang, cl, emcc]
         include:
           - os: windows-latest
+            arch: x86
             platform_name: Windows
             compiler_name: MSVC
             c_compiler: cl
@@ -44,11 +46,25 @@ jobs:
               -DEMSCRIPTEN_DIR="$/home/runner/work/libLCE/libLCE/external/emsdk/upstream/emscripten"
               -DCMAKE_TOOLCHAIN_FILE=/home/runner/work/libLCE/libLCE/external/emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake
           - os: ubuntu-latest
+            arch: x86
+            platform_name: Linux
+            compiler_name: GCC
+            c_compiler: gcc
+            cpp_compiler: g++
+          - os: ubuntu-24.04-arm
+            arch: arm64
             platform_name: Linux
             compiler_name: GCC
             c_compiler: gcc
             cpp_compiler: g++
           - os: ubuntu-latest
+            arch: x86
+            platform_name: Linux
+            compiler_name: Clang
+            c_compiler: clang
+            cpp_compiler: clang++
+          - os: ubuntu-24.04-arm
+            arch: arm64
             platform_name: Linux
             compiler_name: Clang
             c_compiler: clang
@@ -61,6 +77,8 @@ jobs:
           - os: ubuntu-latest
             c_compiler: cl
           - os: windows-latest
+            c_compiler: emcc
+          - os: ubuntu-24.04-arm
             c_compiler: emcc
 
     steps:
@@ -91,6 +109,7 @@ jobs:
         -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
         -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+        -DCMAKE_SYSTEM_PROCESSOR=${{ matrix.arch }}
         ${{ matrix.settings }}
 
     - name: Build
