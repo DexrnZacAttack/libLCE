@@ -35,6 +35,7 @@ jobs:
             c_compiler: cl
             cpp_compiler: cl
           - os: ubuntu-latest
+            arch: x86
             platform_name: WASM
             compiler_name: Emscripten
             c_compiler: emcc
@@ -98,7 +99,7 @@ jobs:
       id: strings
       shell: bash
       run: |
-        echo "build-output-dir=${{ github.workspace }}/cmake-build-${{ matrix.build_type }}-${{ matrix.c_compiler }}" >> "$GITHUB_OUTPUT"
+        echo "build-output-dir=${{ github.workspace }}/cmake-build-${{ matrix.build_type }}-${{ matrix.arch }}-${{ matrix.c_compiler }}" >> "$GITHUB_OUTPUT"
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. CMAKE_BUILD_TYPE is only required if you are using a single-configuration generator such as make.
@@ -109,7 +110,6 @@ jobs:
         -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
         -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
-        -DCMAKE_SYSTEM_PROCESSOR=${{ matrix.arch }}
         ${{ matrix.settings }}
 
     - name: Build
@@ -121,17 +121,17 @@ jobs:
       uses: actions/upload-artifact@v4
       if: matrix.os == 'ubuntu-latest'
       with:
-        name: ${{ matrix.platform_name }}-${{ matrix.compiler_name }}_${{ matrix.build_type }}
+        name: ${{ matrix.platform_name }}-${{ matrix.arch }}-${{ matrix.compiler_name }}_${{ matrix.build_type }}
         path: |
-          ${{ github.workspace }}/cmake-build-${{ matrix.build_type }}-${{ matrix.c_compiler }}/*.so
-          ${{ github.workspace }}/cmake-build-${{ matrix.build_type }}-${{ matrix.c_compiler }}/*.js
-          ${{ github.workspace }}/cmake-build-${{ matrix.build_type }}-${{ matrix.c_compiler }}/*.wasm
-          ${{ github.workspace }}/cmake-build-${{ matrix.build_type }}-${{ matrix.c_compiler }}/tests
+          ${{ github.workspace }}/cmake-build-${{ matrix.build_type }}-${{ matrix.arch }}-${{ matrix.c_compiler }}/*.so
+          ${{ github.workspace }}/cmake-build-${{ matrix.build_type }}-${{ matrix.arch }}-${{ matrix.c_compiler }}/*.js
+          ${{ github.workspace }}/cmake-build-${{ matrix.build_type }}-${{ matrix.arch }}-${{ matrix.c_compiler }}/*.wasm
+          ${{ github.workspace }}/cmake-build-${{ matrix.build_type }}-${{ matrix.arch }}-${{ matrix.c_compiler }}/tests
     
     - name: Upload Artifact (Windows)
       uses: actions/upload-artifact@v4
       if: matrix.os != 'ubuntu-latest'
       with:
         name: ${{ matrix.platform_name }}-${{ matrix.compiler_name }}_${{ matrix.build_type }}
-        path: ${{ github.workspace }}/cmake-build-${{ matrix.build_type }}-${{ matrix.c_compiler }}/${{ matrix.build_type }}
+        path: ${{ github.workspace }}/cmake-build-${{ matrix.build_type }}-${{ matrix.arch }}-${{ matrix.c_compiler }}/${{ matrix.build_type }}
 
