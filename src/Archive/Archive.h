@@ -19,10 +19,9 @@ namespace lce::arc {
         Archive();
 
         Archive(uint8_t* data);
+        uint64_t getSize() const;
 
-        uint8_t* create() const override;
-
-        uint64_t getSize() const override;
+        uint8_t* toData() const;
     };
 }
 

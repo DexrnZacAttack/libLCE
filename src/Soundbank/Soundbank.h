@@ -11,31 +11,41 @@
 #include <vector>
 #include <stdexcept> //Remove when implemented
 
+#include "../IO/BinaryIO.h"
+
 namespace lce::msscmp {
 	
-	class LIBLCE_API SoundbankInnerFile : public fs::File {
+	class LIBLCE_API BinkaFile : public fs::File {
 	public:
-		SoundbankInnerFile() = default;
+		BinkaFile() = delete;
 		
-        SoundbankInnerFile(std::string name, uint64_t size, uint64_t offset, uint8_t* data, uint32_t sampleRate) 
-			: fs::File(name, size, offset, data), sampleRate(sampleRate) {}
+        BinkaFile(std::wstring name, std::vector<uint8_t> data, uint32_t sampleRate, fs::Directory *parent)
+			: fs::File(name, data, parent), sampleRate(sampleRate) {}
 		
-		uint32_t getSampleRate() { return sampleRate; }
-		void setSampleRate(uint32_t _sampleRate) { sampleRate = _sampleRate; }
+		uint32_t getSampleRate() const { return sampleRate; }
+		void setSampleRate(const uint32_t _sampleRate) { sampleRate = _sampleRate; }
 	private:
 		uint32_t sampleRate;
 	};
 	
-	class LIBLCE_API SoundbankFile : public fs::Filesystem {
+	class LIBLCE_API Soundbank : public fs::Filesystem {
 	public:
-		SoundbankFile(uint8_t* data);
-		
-		uint64_t getSize() const override { std::logic_error("Function not yet implemented"); return 0;  }
-		uint8_t* create() const override { std::logic_error("Function not yet implemented"); return nullptr; }
+		enum Generation {
+			OLD_GEN, // read a uint32_t
+			NEW_GEN // read a uint64_t
+		};
+
+		Soundbank(uint8_t* data);
+
+		uint8_t* toData() const { std::logic_error("Function not yet implemented"); return nullptr; }
 	private:
 		ByteOrder byteOrder;
 		Generation gen;
-		
+
+		static uint64_t readUintByGeneration(io::BinaryIO &io, ByteOrder endian, Generation gen) {
+			return gen == NEW_GEN ? io.read<uint64_t>(endian) : io.read<uint32_t>(endian);
+		}
+
 		uint32_t index2Size;
 	};
 }

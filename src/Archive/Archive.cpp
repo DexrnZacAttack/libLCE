@@ -5,10 +5,11 @@
 #include "Archive.h"
 #include "../IO/BinaryIO.h"
 #include <iostream>
+#include <stack>
 
 namespace lce::arc {
-    Archive::Archive(uint32_t fileCount, std::vector<std::shared_ptr<fs::File>>& index): fileCount(fileCount), Filesystem(index) {
-    }
+    // Archive::Archive(uint32_t fileCount, std::vector<std::shared_ptr<fs::File>>& index): fileCount(fileCount), Filesystem(index) {
+    // }
 
     Archive::Archive() = default;
 
@@ -20,58 +21,99 @@ namespace lce::arc {
         for (uint32_t i = 0; i < this->fileCount; i++) {
             uint16_t name_size = io.readBE<uint16_t>();
             std::string name = io.readUtf8(name_size);
-			
+
 			uint32_t offset = io.readBE<uint32_t>();
 			uint32_t size = io.readBE<uint32_t>();
-			uint8_t* data = new uint8_t[size];
-            
+
+            std::vector<uint8_t> data;
+            data.resize(size);
+
             uint32_t oldPos = io.getPosition();
             io.seek(offset);
-            io.readInto(data, size);
+            io.readInto(data.data(), size);
             io.seek(oldPos);
-            
-            fs::File af(name, size, offset, std::move(data));
-           
-            addFile( std::make_shared<fs::File>(af) );
+
+            std::wstring wname = io::BinaryIO::stringToWString(name);
+            Filesystem::windowsToUnixDelimiter(wname); // convert paths
+
+            this->createFileRecursive(wname, data);
         }
     }
 
-    uint8_t* Archive::create() const {
+    uint8_t* Archive::toData() const {
         const uint32_t fileSize = this->getSize();
         uint8_t *data = new uint8_t[fileSize];
         io::BinaryIO io(data);
 
-        uint32_t *offsetPositions = new uint32_t[getIndexCount()];
+        fs::Directory *root = getRoot();
+        size_t count = root->getFileCount();
+
+        uint32_t *offsetPositions = new uint32_t[count];
         uint32_t i = 0;
 
-        io.writeBE<uint32_t>(getIndexCount());
-        for (auto& file: getIndex()) {
-            io.writeBE<uint16_t>(file->getName().length());
-            io.writeUtf8(file->getName());
-            // this stores the area where the file offset is written.
-            offsetPositions[i] = io.getPosition();
-            io.writeBE<uint32_t>(0);
-            io.writeBE<uint32_t>(file->getSize());
+        io.writeBE<uint32_t>(count);
+        std::stack<const fs::Directory*> stack;
+        stack.push(root);
 
-            i++;
+        while (!stack.empty())
+        {
+            const fs::Directory* d = stack.top();
+            stack.pop();
+
+            for (const auto& [name, child] : d->getChildren())
+            {
+                if (!child->isFile()) {
+                    stack.push(dynamic_cast<const fs::Directory*>(child.get()));
+                    continue;
+                }
+
+                std::wstring path = child->getPath().substr(1);
+                Filesystem::unixToWindowsDelimiter(path);
+
+                const fs::File *f = static_cast<const fs::File*>(child.get());
+                io.writeBE<uint16_t>(path.length());
+                io.writeUtf8(io::BinaryIO::wstringToString(path));
+                // this stores the area where the file offset is written.
+                offsetPositions[i] = io.getPosition();
+                io.writeBE<uint32_t>(0);
+                io.writeBE<uint32_t>(f->getSize());
+
+                i++;
+            }
         }
 
         uint32_t j = 0;
 
-        for (auto& file: getIndex()) {
-            // get current position (this is the position of the file)
-            uint32_t pos = io.getPosition();
-            // write the file
-            io.writeBytes(file->create(), file->getSize());
-            // get the position after the file was written (we return here to write the next one)
-            uint32_t pos2 = io.getPosition();
-            // go to the offset offset (lol) and write the actual offset.
-            io.seek(offsetPositions[j]);
-            io.writeBE<uint32_t>(pos);
-            // seek back over to the next file's position.
-            io.seek(pos2);
-            // and then we increment this.
-            j++;
+        stack = std::stack<const fs::Directory*>();
+        stack.push(root);
+
+        while (!stack.empty())
+        {
+            const fs::Directory* d = stack.top();
+            stack.pop();
+
+            for (const auto& [name, child] : d->getChildren())
+            {
+                if (!child->isFile()) {
+                    stack.push(dynamic_cast<const fs::Directory*>(child.get()));
+                    continue;
+                }
+
+                const fs::File *f = static_cast<const fs::File*>(child.get());
+                // get current position (this is the position of the file)
+                uint32_t pos = io.getPosition();
+                // write the file
+                io.writeBytes(f->getData().data(), f->getSize());
+                // get the position after the file was written (we return here to write the next one)
+                uint32_t pos2 = io.getPosition();
+                // go to the offset offset (lol) and write the actual offset.
+                io.seek(offsetPositions[j]);
+                io.writeBE<uint32_t>(pos);
+                // seek back over to the next file's position.
+                io.seek(pos2);
+                // and then we increment this.
+                j++;
+            }
         }
 
         return io.getData();
@@ -79,11 +121,28 @@ namespace lce::arc {
 
     uint64_t Archive::getSize() const {
         uint32_t size = 0;
-        for (const auto& file: getIndex()) {
-            size += 2; // string length prefix
-            size += file->getName().length(); // name length
-            size += 8; // offset, size
-            size += file->getSize(); // file size
+        std::stack<const fs::Directory*> stack;
+        stack.push(getRoot());
+
+        while (!stack.empty()) {
+            const fs::Directory* d = stack.top();
+            stack.pop();
+
+            for (const auto& [name, child] : d->getChildren())
+            {
+                if (!child->isFile()) {
+                    stack.push(dynamic_cast<const fs::Directory*>(child.get()));
+                    continue;
+                }
+
+                std::wstring path = child->getPath().substr(1);
+                Filesystem::unixToWindowsDelimiter(path);
+
+                size += 2; // string length prefix
+                size += path.length(); // name length
+                size += 8; // offset, size
+                size += dynamic_cast<const fs::File*>(child.get())->getSize(); // file size
+            }
         }
 
         return size;

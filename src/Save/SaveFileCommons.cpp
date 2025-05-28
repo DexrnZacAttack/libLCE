@@ -9,7 +9,6 @@
 #include <variant>
 #include <algorithm>
 
-#include "IndexInnerFile.h"
 #include "SaveFileOld.h"
 #include "SaveFile.h"
 #include "../IO/BinaryIO.h"
@@ -21,51 +20,20 @@ namespace lce::save {
     class SaveFile;
 
     uint64_t SaveFileCommons::getSize() const {
-        uint64_t size = HEADER_SIZE + (getIndexCount() * getIndexEntrySize()); // for each index entry there is 144 bytes (136 bytes with old save file format)
-        for (const auto& file: getIndex()) {
-            size += file->getSize();
-        }
+        uint64_t size = HEADER_SIZE + (getRoot()->getFileCount() * getIndexEntrySize()); // for each index entry there is 144 bytes (136 bytes with old save file format)
+        size += this->getRoot()->getSize();
 
         return size;
     }
 
     uint32_t SaveFileCommons::calculateIndexOffset() const {
-        return HEADER_SIZE + this->getFilesSize();
+        return HEADER_SIZE + this->getRoot()->getSize();
     }
-
-    uint32_t SaveFileCommons::getFilesSize() const {
-        uint32_t size = 0;
-        for (const auto& file: getIndex()) {
-            size += file->getSize();
-            DebugLog("Name: " + file->getName());
-        }
-        
-        DebugLog("FileSize: " + std::to_string(size));
-        DebugLog("FileCount: " + std::to_string(getIndexCount()));
-		
-        return size;
-    }
-
-#ifndef __EMSCRIPTEN__
-    std::variant<SaveFile, SaveFileOld> SaveFileCommons::readAuto(std::vector<uint8_t> data, ByteOrder endian) {
-        io::BinaryIO io(data.data());
-        io.seek(10);
-
-        if (const auto version = static_cast<SaveFileVersion>(io.read<uint16_t>(endian)); version > PR)
-            return SaveFile(data, endian);
-
-        return SaveFileOld(data, endian);
-    }
-#endif
 
     uint16_t SaveFileCommons::getVersionFromData(std::vector<uint8_t> data, ByteOrder endian) {
         io::BinaryIO io(data.data());
         io.seek(10);
         return io.read<uint16_t>(endian);
-    }
-    
-    uint32_t SaveFileCommons::getIndexOffset() const {
-        return calculateIndexOffset();
     }
 
     uint16_t SaveFileCommons::getOriginalVersion() const {
@@ -79,10 +47,6 @@ namespace lce::save {
     ByteOrder SaveFileCommons::getEndian() const {
         return this->endian;
     }
-    
-    uint8_t* SaveFileCommons::create() const {
-		return nullptr; // Fix emscripten
-	}
 
     void SaveFileCommons::setOriginalVersion(uint16_t version) {
         this->originalVersion = version;
@@ -95,12 +59,4 @@ namespace lce::save {
     void SaveFileCommons::setEndian(ByteOrder endian) {
         this->endian = endian;
     }
-    
-	/**
-	* Gets the size of an index entry based on the save file class type.
-	* @return The size of an index entry
-	*/
-	uint32_t SaveFileCommons::getIndexEntrySize() const {
-		return 0;
-	}
 }

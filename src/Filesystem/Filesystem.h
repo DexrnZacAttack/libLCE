@@ -11,34 +11,33 @@
 #include <algorithm>
 #include <memory>
 
+#include "Directory.h"
+
 namespace lce::fs {
-	
+
 	class LIBLCE_API Filesystem {
 	public:
-		Filesystem() = default;
-		virtual ~Filesystem();
-		
-		Filesystem(std::vector<std::shared_ptr<File>>& index) : index(index) {}
-		
-		virtual uint64_t getSize() const = 0;
-		virtual uint8_t* create() const = 0;
-		
-		void addFile(const std::shared_ptr<File> file);
-		void removeFile(uint32_t index);
-		void setIndexCount(uint32_t count);
-		
-		std::shared_ptr<File> getFileByName(std::string name) const;
-		std::shared_ptr<File> getFileByIndex(size_t i) const { return index[i]; }
-		
-		size_t getIndexCount() const { return indexCount; }
-		const std::vector<std::shared_ptr<File>>& getIndex() const { return index; }
-		std::vector<std::shared_ptr<File>>& getIndex() { return index; }
-		
-		void setIndex(std::vector<std::shared_ptr<File>>& index) { this->index = index; }
-		
+		Filesystem();
+		/// Gets a directory by path, but if it doesn't already exist, it creates a new one and returns that.
+		Directory* getOrCreateDirByPath(const std::wstring& path) const;
+
+		/// Get root directory (/)
+		Directory* getRoot() const { return root.get(); };
+
+		/// Get an object by path
+		///
+		/// Returns nullptr if it doesn't exist. (or in case of other error)
+		FSObject* getByPath(const std::wstring& path) const;
+
+		/// Recursively creates a file (create all directories leading down to it)
+		FSObject *createFileRecursive(const std::wstring &path, std::vector<uint8_t> data) const;
+
+		/// Converts Windows' path delimiter ("\") to Unix's ("/")
+		static void windowsToUnixDelimiter(std::wstring& name);
+		/// Converts Unix path delimiter ("/") to Windows' ("\")
+		static void unixToWindowsDelimiter(std::wstring& name);
 	private:
-		std::vector<std::shared_ptr<File>> index; // shared_ptr for the polymorphism ig
-		uint32_t indexCount;
+		std::unique_ptr<Directory> root;
 	};
 }
 

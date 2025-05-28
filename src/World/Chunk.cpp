@@ -6,6 +6,7 @@
 #include "../Compression/Compression.h"
 
 #include <fstream>
+#include <sstream>
 #include <utility>
 
 #include "../Compression/Compression.h"
@@ -48,7 +49,27 @@ namespace lce::world {
         //     chunkData = std::make_unique<std::vector<uint8_t>>(uncompData.begin(), uncompData.end());
         // }
 
+
         io::BinaryIO chunkIO(chunkData.data());
+
+        // uint16_t ver = chunkIO.readBE<uint16_t>();
+        // int32_t x = chunkIO.readBE<int32_t>();
+        // int32_t z = chunkIO.readBE<int32_t>();
+
+        // std::ostringstream ss;
+        // ss << "../testFiles/decompressed/chunk_";
+        // ss << x << ".";
+        // ss << z << ".dat";
+        //
+        // std::ofstream o(ss.str(), std::ios::binary);
+        // if (!o) {
+        //     throw std::ios_base::failure("Failed to open file");
+        // }
+        //
+        // o.write(reinterpret_cast<const char*>(chunkData.data()), chunkData.size());
+        // if (!o) {
+        //     throw std::ios_base::failure("Failed to write");
+        // }
 
         this->version = chunkIO.read<uint16_t>(endian);
 

@@ -13,12 +13,16 @@ namespace lce::save {
         explicit SaveFileOld(ByteOrder endian);
         explicit SaveFileOld(std::vector<uint8_t> data, ByteOrder endian = BIG); // big endian cuz xb360 was the only edition with this format
 
-        uint8_t* create() const override;
+        SaveFile* upgrade(uint16_t version);
 
-        SaveFile* migrate(uint16_t version);
+        uint8_t* toData() const override;
     
     protected:
-		uint32_t getIndexEntrySize() const override;
+        /**
+         * Gets the size of an index entry based on the save file class type.
+         * @return The size of an index entry
+         */
+		uint32_t getIndexEntrySize() const override { return 136; };
     };
 }
 

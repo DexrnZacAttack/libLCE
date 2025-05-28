@@ -24,18 +24,15 @@ jobs:
       # To add more build types (Release, Debug, RelWithDebInfo, etc.) customize the build_type list.
       matrix:
         os: [ubuntu-latest, windows-latest]
-        arch: [x86, arm64]
         build_type: [Release, Debug]
         c_compiler: [gcc, clang, cl, emcc]
         include:
           - os: windows-latest
-            arch: x86
             platform_name: Windows
             compiler_name: MSVC
             c_compiler: cl
             cpp_compiler: cl
           - os: ubuntu-latest
-            arch: x86
             platform_name: WASM
             compiler_name: Emscripten
             c_compiler: emcc
@@ -47,25 +44,11 @@ jobs:
               -DEMSCRIPTEN_DIR="$/home/runner/work/libLCE/libLCE/external/emsdk/upstream/emscripten"
               -DCMAKE_TOOLCHAIN_FILE=/home/runner/work/libLCE/libLCE/external/emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake
           - os: ubuntu-latest
-            arch: x86
-            platform_name: Linux
-            compiler_name: GCC
-            c_compiler: gcc
-            cpp_compiler: g++
-          - os: ubuntu-24.04-arm
-            arch: arm64
             platform_name: Linux
             compiler_name: GCC
             c_compiler: gcc
             cpp_compiler: g++
           - os: ubuntu-latest
-            arch: x86
-            platform_name: Linux
-            compiler_name: Clang
-            c_compiler: clang
-            cpp_compiler: clang++
-          - os: ubuntu-24.04-arm
-            arch: arm64
             platform_name: Linux
             compiler_name: Clang
             c_compiler: clang
@@ -78,8 +61,6 @@ jobs:
           - os: ubuntu-latest
             c_compiler: cl
           - os: windows-latest
-            c_compiler: emcc
-          - os: ubuntu-24.04-arm
             c_compiler: emcc
 
     steps:
@@ -99,7 +80,7 @@ jobs:
       id: strings
       shell: bash
       run: |
-        echo "build-output-dir=${{ github.workspace }}/cmake-build-${{ matrix.build_type }}-${{ matrix.arch }}-${{ matrix.c_compiler }}" >> "$GITHUB_OUTPUT"
+        echo "build-output-dir=${{ github.workspace }}/cmake-build-${{ matrix.build_type }}-${{ matrix.c_compiler }}" >> "$GITHUB_OUTPUT"
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. CMAKE_BUILD_TYPE is only required if you are using a single-configuration generator such as make.
@@ -121,17 +102,17 @@ jobs:
       uses: actions/upload-artifact@v4
       if: matrix.os == 'ubuntu-latest'
       with:
-        name: ${{ matrix.platform_name }}-${{ matrix.arch }}-${{ matrix.compiler_name }}_${{ matrix.build_type }}
+        name: ${{ matrix.platform_name }}-${{ matrix.compiler_name }}_${{ matrix.build_type }}
         path: |
-          ${{ github.workspace }}/cmake-build-${{ matrix.build_type }}-${{ matrix.arch }}-${{ matrix.c_compiler }}/*.so
-          ${{ github.workspace }}/cmake-build-${{ matrix.build_type }}-${{ matrix.arch }}-${{ matrix.c_compiler }}/*.js
-          ${{ github.workspace }}/cmake-build-${{ matrix.build_type }}-${{ matrix.arch }}-${{ matrix.c_compiler }}/*.wasm
-          ${{ github.workspace }}/cmake-build-${{ matrix.build_type }}-${{ matrix.arch }}-${{ matrix.c_compiler }}/tests
+          ${{ github.workspace }}/cmake-build-${{ matrix.build_type }}-${{ matrix.c_compiler }}/*.so
+          ${{ github.workspace }}/cmake-build-${{ matrix.build_type }}-${{ matrix.c_compiler }}/*.js
+          ${{ github.workspace }}/cmake-build-${{ matrix.build_type }}-${{ matrix.c_compiler }}/*.wasm
+          ${{ github.workspace }}/cmake-build-${{ matrix.build_type }}-${{ matrix.c_compiler }}/tests
     
     - name: Upload Artifact (Windows)
       uses: actions/upload-artifact@v4
       if: matrix.os != 'ubuntu-latest'
       with:
         name: ${{ matrix.platform_name }}-${{ matrix.compiler_name }}_${{ matrix.build_type }}
-        path: ${{ github.workspace }}/cmake-build-${{ matrix.build_type }}-${{ matrix.arch }}-${{ matrix.c_compiler }}/${{ matrix.build_type }}
+        path: ${{ github.workspace }}/cmake-build-${{ matrix.build_type }}-${{ matrix.c_compiler }}/${{ matrix.build_type }}
 

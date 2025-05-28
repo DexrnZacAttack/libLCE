@@ -4,9 +4,10 @@
 #include <vector>
 #include <cstdarg>
 #include <filesystem>
+#include <stack>
 
 #include "src/Archive/Archive.h"
-#include "src/Colour/ColourFile.h"
+#include "src/Color/ColorFile.h"
 #include "src/Save/SaveFileOld.h"
 #include "src/Save/Thumb.h"
 #include "src/World/Region.h"
@@ -17,12 +18,12 @@
 
 namespace lce::tests {
     void arcTest() {
-        FILE* f = fopen("../testFiles/example.arc", "rb");
+        FILE* f = fopen("testFiles/example.arc", "rb");
         if (f == nullptr) {
-            std::cerr << "Failed to open file." << std::endl;
+            DebugErrLog("Failed to open file.");
             return;
         }
-        
+
         fseek(f, 0, SEEK_END);
         const size_t endPos = ftell(f);
         fseek(f, 0, SEEK_SET);
@@ -37,9 +38,9 @@ namespace lce::tests {
 
         lce::arc::Archive file = lce::arc::Archive(ass);
 
-        const uint8_t* file2 = file.create();
+        const uint8_t* file2 = file.toData();
 
-        std::ofstream outFile("../testFiles/example_copy.arc", std::ios::binary);
+        std::ofstream outFile("../testFiles/example_out.arc", std::ios::binary);
         if (!outFile) {
             throw std::ios_base::failure("Failed to open file");
         }
@@ -51,11 +52,11 @@ namespace lce::tests {
 
         outFile.close();
     }
-    
+
     void locTest() {
         FILE* f = fopen("../testFiles/example.loc", "rb");
         if (f == nullptr) {
-            std::cerr << "Failed to open file." << std::endl;
+            DebugErrLog("Failed to open file.");
             return;
         }
 
@@ -70,8 +71,8 @@ namespace lce::tests {
         fread(ass, 1, length, f);
 
         lce::loc::LocalizationFile file = lce::loc::LocalizationFile(ass);
-		
-		const uint8_t* file2 = file.create();
+
+		const uint8_t* file2 = file.toData();
 
         std::ofstream outFile("../testFiles/example_copy.loc", std::ios::binary);
         if (!outFile) {
@@ -84,14 +85,16 @@ namespace lce::tests {
         }
 
         outFile.close();
-		
+
         fclose(f);
 	}
-	
-	void msscmpTest() {
-        FILE* f = fopen("../testFiles/Minecraft.msscmp", "rb");
+
+    void msscmpTest(ByteOrder endian) {
+        std::string order = endian == ByteOrder::LITTLE ? "le" : "be";
+
+        FILE* f = fopen(("../testFiles/msscmp-" + order + ".msscmp").c_str(), "rb");
         if (f == nullptr) {
-            std::cerr << "Failed to open file." << std::endl;
+            DebugErrLog("Failed to open file.");
             return;
         }
 
@@ -105,86 +108,101 @@ namespace lce::tests {
 
         fread(ass, 1, length, f);
 
-        lce::msscmp::SoundbankFile file = lce::msscmp::SoundbankFile(ass);
-        
-        for(const auto& innerFile : file.getIndex()) {
-			std::filesystem::path innerFilePath = "../testFiles/" + innerFile->getName() + ".binka";
-			std::filesystem::create_directories(innerFilePath.parent_path());
-			
-			std::ofstream outFile(innerFilePath, std::ios::binary | std::ios::trunc);
-			if (!outFile) {
-				throw std::ios_base::failure("Failed to open file");
-			}
-			
-			outFile.write(reinterpret_cast<const char*>(innerFile->create()), innerFile->getSize());
-		}
-        
+        lce::msscmp::Soundbank file = lce::msscmp::Soundbank(ass);
+
+        std::stack<const fs::Directory*> stack;
+        stack.push(file.getRoot());
+
+        while (!stack.empty())
+        {
+            const fs::Directory* d = stack.top();
+            stack.pop();
+
+            for (const auto& [name, child] : d->getChildren()) {
+                if (!child->isFile()) {
+                    stack.push(dynamic_cast<const fs::Directory*>(child.get()));
+                    continue;
+                }
+
+                fs::File* innerFile = dynamic_cast<fs::File *>(child.get());
+                std::filesystem::path innerFilePath = std::filesystem::path(L"../testFiles/msscmp") / (L"msscmp-" + lce::io::BinaryIO::stringToWString(order)) / innerFile->getPath().substr(1);
+                std::filesystem::create_directories(innerFilePath.parent_path());
+
+                std::ofstream outFile(innerFilePath, std::ios::binary | std::ios::trunc);
+                if (!outFile) {
+                    throw std::ios_base::failure("Failed to open file");
+                }
+
+                outFile.write(reinterpret_cast<const char*>(innerFile->getData().data()), innerFile->getSize());
+            }
+        }
+
         fclose(f);
 	}
 
-    void oldSaveTest() {
-        FILE* f = fopen("../testFiles/savegame_pr.dat", "rb");
-        if (f == nullptr) {
-            std::cerr << "Failed to open file." << std::endl;
-            return;
-        }
+ void oldSaveTest() {
+     FILE* f = fopen("../testFiles/savegame_pr.dat", "rb");
+     if (f == nullptr) {
+         DebugErrLog("Failed to open file.");
+         return;
+     }
 
-        fseek(f, 0, SEEK_END);
-        const size_t endPos = ftell(f);
-        fseek(f, 0, SEEK_SET);
-        const size_t length = endPos;
+     fseek(f, 0, SEEK_END);
+     const size_t endPos = ftell(f);
+     fseek(f, 0, SEEK_SET);
+     const size_t length = endPos;
 
-        std::vector<uint8_t> ass(length);
+     std::vector<uint8_t> ass(length);
 
-        fread(ass.data(), 1, length, f);
+     fread(ass.data(), 1, length, f);
 
-        fclose(f);
+     fclose(f);
 
-        // read be file
-        lce::save::SaveFileOld file = lce::save::SaveFileOld(ass, BIG);
-        std::cout << "oldSaveTest: " << "File version is " << static_cast<lce::save::SaveFileVersion>(file.getVersion()) << std::endl;
+     // read be file
+     lce::save::SaveFileOld file = lce::save::SaveFileOld(ass, BIG);
+     DebugLog("oldSaveTest: File version is " << file.getVersion());
 
-        for (auto& f : file.getIndex()) {
-            std::cout << f->getName() << std::endl;
-        }
+     for (const auto& [name, child] : file.getRoot()->getChildren()) {
+         DebugLogW(name);
+     }
 
-        // write the file
-        const uint8_t* file2 = file.create();
+     // write the file
+     const uint8_t* file2 = file.toData();
 
-        std::ofstream outFile("../testFiles/savegame_pr-be_out.dat", std::ios::binary);
-        if (!outFile) {
-            throw std::ios_base::failure("Failed to open file");
-        }
+     std::ofstream outFile("../testFiles/savegame_pr-be_out.dat", std::ios::binary);
+     if (!outFile) {
+         throw std::ios_base::failure("Failed to open file");
+     }
 
-        outFile.write(reinterpret_cast<const char*>(file2), file.getSize());
-        if (!outFile) {
-            throw std::ios_base::failure("Failed to write");
-        }
+     outFile.write(reinterpret_cast<const char*>(file2), file.getSize());
+     if (!outFile) {
+         throw std::ios_base::failure("Failed to write");
+     }
 
-        outFile.close();
+     outFile.close();
 
-        // write le file
-        file.setEndian(LITTLE);
+     // write le file
+     file.setEndian(LITTLE);
 
-        std::ofstream outFile2("../testFiles/savegame_pr_switch-to-le_out.dat", std::ios::binary);
-        if (!outFile2) {
-            throw std::ios_base::failure("Failed to open file");
-        }
+     std::ofstream outFile2("../testFiles/savegame_pr_switch-to-le_out.dat", std::ios::binary);
+     if (!outFile2) {
+         throw std::ios_base::failure("Failed to open file");
+     }
 
-        outFile2.write(reinterpret_cast<const char*>(file.create()), file.getSize());
-        if (!outFile2) {
-            throw std::ios_base::failure("Failed to write");
-        }
+     outFile2.write(reinterpret_cast<const char*>(file.toData()), file.getSize());
+     if (!outFile2) {
+         throw std::ios_base::failure("Failed to write");
+     }
 
-        outFile2.close();
-    }
+     outFile2.close();
+ }
 
     void saveTestEndian(ByteOrder endian) {
         std::string order = endian == ByteOrder::LITTLE ? "le" : "be";
 
         std::ifstream f("../testFiles/savegame-" + order + ".dat", std::ios::in | std::ios::binary | std::ios::ate);
         if (!f.is_open()) {
-            std::cerr << "Failed to open file." << std::endl;
+            DebugErrLog("Failed to open file.");
             return;
         }
 
@@ -197,13 +215,17 @@ namespace lce::tests {
         f.read(reinterpret_cast<char *>(ass.data()), size);
 
         lce::save::SaveFile file = lce::save::SaveFile(ass, endian);
-        std::cout << "saveTestEndian: " << "File version is " << static_cast<lce::save::SaveFileVersion>(file.getVersion()) << std::endl;
+        // lce::tests::writeFS(&file, L"savegame-" + io::BinaryIO::stringToWString(order));
 
-        for (auto& f : file.getIndex()) {
-            std::cout << f->getName() << std::endl;
+        DebugLog("saveTestEndian: File version is " << file.getVersion());
+
+        for (const auto& [name, child] : file.getRoot()->getChildren()) {
+            DebugLogW(name);
         }
 
-        const uint8_t* file2 = file.create();
+        // __debugbreak();
+
+        const uint8_t* file2 = file.toData();
 
         std::ofstream outFile("../testFiles/savegame-" + order + "_out.dat", std::ios::binary);
         if (!outFile) {
@@ -216,13 +238,14 @@ namespace lce::tests {
         }
 
         outFile.close();
+
     }
 
     void saveTestVita() {
 
         std::ifstream f("../testFiles/savegame-vita.dat", std::ios::in | std::ios::binary | std::ios::ate);
         if (!f.is_open()) {
-            std::cerr << "Failed to open file." << std::endl;
+            DebugErrLog("Failed to open file.");
             return;
         }
 
@@ -256,13 +279,8 @@ namespace lce::tests {
         }
 
         lce::save::SaveFile file = lce::save::SaveFile(assd, LITTLE);
-        std::cout << "saveTestEndian: " << "File version is " << static_cast<lce::save::SaveFileVersion>(file.getVersion()) << std::endl;
 
-        for (auto& f : file.getIndex()) {
-            std::cout << f->getName() << std::endl;
-        }
-        
-        const uint8_t* file2 = file.create();
+        const uint8_t* file2 = file.toData();
 
         std::ofstream outFile("../testFiles/savegame-vita_out.dat", std::ios::binary);
         if (!outFile) {
@@ -279,9 +297,9 @@ namespace lce::tests {
 
     void regionTest() {
 
-        std::ifstream f("../testFiles/DIM-1r.-1.-1.mcr", std::ios::in | std::ios::binary | std::ios::ate);
+        std::ifstream f("../testFiles/r.0.0.mcr", std::ios::in | std::ios::binary | std::ios::ate);
         if (!f.is_open()) {
-            std::cerr << "Failed to open file." << std::endl;
+            DebugErrLog("Failed to open file.");
             return;
         }
 
@@ -293,7 +311,7 @@ namespace lce::tests {
 
         f.read(reinterpret_cast<char *>(ass.data()), size);
 
-        lce::world::Region file = lce::world::Region(ass, L"DIM-1r.-1.-1.mcr", lce::compression::CompressionType::ZLIB, BIG);
+        lce::world::Region file = lce::world::Region(ass, L"r.0.0.mcr", lce::compression::CompressionType::ZLIB, BIG);
         std::cout << "regionTest: " << "X: " << file.getX() << ", Z: " <<  file.getZ() << ", DIM: " << file.getDim() << std::endl;
 
     }
@@ -303,7 +321,7 @@ namespace lce::tests {
 
         std::ifstream f("../testFiles/savegame-" + std::string(endian == LITTLE ? "be" : "le") + ".dat", std::ios::in | std::ios::binary | std::ios::ate);
         if (!f.is_open()) {
-            std::cerr << "Failed to open file." << std::endl;
+            DebugErrLog("Failed to open file.");
             return;
         }
 
@@ -316,14 +334,9 @@ namespace lce::tests {
         f.read(reinterpret_cast<char *>(ass.data()), size);
 
         lce::save::SaveFile file = lce::save::SaveFile(ass, endian == LITTLE ? BIG : LITTLE);
-        std::cout << "saveTestSwitch: " << "File version is " << static_cast<lce::save::SaveFileVersion>(file.getVersion()) << std::endl;
-
-        for (auto& f : file.getIndex()) {
-            std::cout << f->getName() << std::endl;
-        }
 
         file.setEndian(endian);
-        const uint8_t* file2 = file.create();
+        const uint8_t* file2 = file.toData();
 
         std::ofstream outFile("../testFiles/savegame-" + std::string(endian == LITTLE ? "be" : "le") + "_switch-to-" + order + "_out.dat", std::ios::binary);
         if (!outFile) {
@@ -338,28 +351,33 @@ namespace lce::tests {
         outFile.close();
     }
 
-    void colourWriteTest(colour::ColourFile colours) {
+    void colorWriteTest(color::ColorFile colors) {
         std::ofstream outFile("../testFiles/out.col", std::ios::binary);
         if (!outFile) {
             std::cerr << "Failed to create the file." << std::endl;
         }
 
-        outFile.write(reinterpret_cast<const char *>(colours.create()), colours.getSize());
+        outFile.write(reinterpret_cast<const char *>(colors.create()), colors.getSize());
 
         outFile.close();
     }
 
-    void colourTest() {
+    void colorTest() {
         std::ifstream fin("../testFiles/colours.col", std::ios::binary);
+        if (!fin.is_open()) {
+            DebugErrLog("Failed to open file.");
+            return;
+        }
+
         std::vector<uint8_t> v(std::istreambuf_iterator<char>(fin), {});
 
         fin.close();
 
         std::cout << "Read" << std::endl;
 
-        lce::colour::ColourFile file = lce::colour::ColourFile::read(v);
+        lce::color::ColorFile file = lce::color::ColorFile::read(v);
 
-        colourWriteTest(file);
+        colorWriteTest(file);
     }
 
     void thumbTest(ByteOrder endian, int headerSize, bool use4Byte = false) {
@@ -367,7 +385,7 @@ namespace lce::tests {
 
         std::ifstream f("../testFiles/THUMB-" + order + (use4Byte ? "_switch" : ""), std::ios::in | std::ios::binary | std::ios::ate);
         if (!f.is_open()) {
-            std::cerr << "Failed to open file." << std::endl;
+            DebugErrLog("Failed to open file.");
             return;
         }
 
@@ -416,15 +434,13 @@ namespace lce::tests {
 
     template<class... Args>
     void runTest(void (*test)(Args...), const std::string name, Args... args) {
-        const auto startTime = std::chrono::high_resolution_clock::now();
-
         std::cout << "Running test \"" << name << "\"" << std::endl;
+
+        const auto startTime = std::chrono::high_resolution_clock::now();
         test(args...);
+        std::chrono::duration<double, std::milli> duration = std::chrono::high_resolution_clock::now() - startTime;
 
-        const auto endTime = std::chrono::high_resolution_clock::now();
-        const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
-
-        std::cout << "\"" << name << "\" finished after " << duration.count() << "ms." << std::endl;
+        std::cout << "\"" << name << "\" finished after " << duration.count() << "ms" << std::endl;
     }
 
     int run() {
@@ -436,20 +452,21 @@ namespace lce::tests {
 int main(int argc, char** argv) {
     printLibraryInfo();
 
-    lce::tests::runTest(lce::tests::saveTestEndian, "Read Big Endian savegame.dat", ByteOrder::BIG);
-    // lce::tests::runTest(lce::tests::saveTestEndian, "Read Little Endian savegame.dat", ByteOrder::LITTLE);
-    // lce::tests::runTest(lce::tests::saveTestSwitch, "Switch Big Endian to Little Endian savegame.dat", ByteOrder::LITTLE);
-    // lce::tests::runTest(lce::tests::saveTestSwitch, "Switch Little Endian to Big Endian savegame.dat", ByteOrder::BIG);
-    // lce::tests::runTest(lce::tests::oldSaveTest, "Read PR savegame.dat");
-    // lce::tests::runTest(lce::tests::saveTestVita, "Read PSVita savegame.dat");
-    // lce::tests::runTest(lce::tests::arcTest, "Read example.arc");
-    // lce::tests::runTest(lce::tests::locTest, "Read example.loc");
-    // lce::tests::runTest(lce::tests::msscmpTest, "Read Minecraft.msscmp");
-    // lce::tests::runTest(lce::tests::colourTest, "Read COL file");
-    // lce::tests::runTest(lce::tests::thumbTest, "Read Big Endian THUMB", ByteOrder::BIG, 0x100, false);
-    // lce::tests::runTest(lce::tests::thumbTest, "Read Little Endian THUMB", ByteOrder::LITTLE, 0x100, false);
-    // lce::tests::runTest(lce::tests::thumbTest, "Read Switch THUMB", ByteOrder::LITTLE, 0x208, true);
-    // lce::tests::runTest(lce::tests::compressedChunkTest, "Read compressed chunk");
-    // lce::tests::runTest(lce::tests::regionTest, "Read region");
+    lce::tests::runTest(lce::tests::saveTestEndian, "Read & Write Big Endian savegame.dat", ByteOrder::BIG);
+    lce::tests::runTest(lce::tests::saveTestEndian, "Read & Write Little Endian savegame.dat", ByteOrder::LITTLE);
+    lce::tests::runTest(lce::tests::saveTestSwitch, "Switch Big Endian to Little Endian savegame.dat", ByteOrder::LITTLE);
+    lce::tests::runTest(lce::tests::saveTestSwitch, "Switch Little Endian to Big Endian savegame.dat", ByteOrder::BIG);
+    lce::tests::runTest(lce::tests::oldSaveTest, "Read & Write PR savegame.dat");
+    lce::tests::runTest(lce::tests::saveTestVita, "Read & Write PSVita savegame.dat");
+    lce::tests::runTest(lce::tests::arcTest, "Read example.arc");
+    lce::tests::runTest(lce::tests::locTest, "Read example.loc");
+    lce::tests::runTest(lce::tests::colorTest, "Read COL file");
+    lce::tests::runTest(lce::tests::thumbTest, "Read Big Endian THUMB", ByteOrder::BIG, 0x100, false);
+    lce::tests::runTest(lce::tests::thumbTest, "Read Little Endian THUMB", ByteOrder::LITTLE, 0x100, false);
+    lce::tests::runTest(lce::tests::thumbTest, "Read Switch THUMB", ByteOrder::LITTLE, 0x208, true);
+    lce::tests::runTest(lce::tests::compressedChunkTest, "Read compressed chunk");
+    lce::tests::runTest(lce::tests::regionTest, "Read region");
+    lce::tests::runTest(lce::tests::msscmpTest, "Read newgen MSSCMP", LITTLE);
+    lce::tests::runTest(lce::tests::msscmpTest, "Read oldgen MSSCMP", BIG);
     return 0;
 }

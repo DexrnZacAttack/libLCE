@@ -8,7 +8,6 @@
 #include <string>
 #include <vector>
 
-#include "IndexInnerFile.h"
 #include "SaveFileCommons.h"
 #include "../IO/ByteEnums.h"
 
@@ -16,16 +15,20 @@ namespace lce::save {
 
 class LIBLCE_API SaveFile : public SaveFileCommons {
 public:
-    SaveFile(uint32_t indexOffset, uint32_t indexFileCount, uint16_t origVersion, uint16_t version, const std::vector<std::shared_ptr<IndexInnerFile>> &index);
+    SaveFile(uint32_t indexFileCount, uint16_t origVersion, uint16_t version);
     SaveFile();
     explicit SaveFile(ByteOrder endian);
 
     explicit SaveFile(std::vector<uint8_t> data, ByteOrder endian = LITTLE);
 
-    uint8_t* create() const override;
+    uint8_t* toData() const override;
 
     protected:
-        uint32_t getIndexEntrySize() const override;
+    /**
+     * Gets the size of an index entry based on the save file class type.
+     * @return The size of an index entry
+     */
+    uint32_t getIndexEntrySize() const override { return 144; };
 };
 
 } // lce::save

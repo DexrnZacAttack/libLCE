@@ -3,51 +3,52 @@
 //
 
 #include "Soundbank.h"
+
+#include <filesystem>
+
 #include "../IO/BinaryIO.h"
 
 #include <utility>
 
 namespace lce::msscmp {
 	
-	SoundbankFile::SoundbankFile(uint8_t* data) {
+	Soundbank::Soundbank(uint8_t* data) {
 		io::BinaryIO io(data);
-		
+
 		std::string magic = io.readUtf8(4);
 		
-		if (magic == "BANK") byteOrder = BIG;
-		else if (magic == "KNAB") byteOrder = LITTLE;
-		
+		byteOrder = magic == "BANK" ? BIG : LITTLE;
+
 		io.seek(0x18);
 		uint32_t firstVal = io.read<uint32_t>(byteOrder);
 		uint32_t secondVal = io.read<uint32_t>(byteOrder);
 		gen = (firstVal != secondVal) ? NEW_GEN : OLD_GEN; // if the two uint32_t's match, its old gen. idk why.
+		// Dexrn: iirc this was just a difference that was consistent between the 2 so we can leverage it to figure out which version it is
 
 		io.seek(0x04); // go back
 		
 		io.read<uint32_t>(byteOrder); // Unknown "I forgot what this is"
 		
-		uint64_t dataStartOffset = io.readUintByGeneration(byteOrder, gen);
+		uint64_t dataStartOffset = readUintByGeneration(io, byteOrder, gen);
 		
 		io.read<uint64_t>(byteOrder); // Unknown
 
-		uint64_t firstEntryOffset = io.readUintByGeneration(byteOrder, gen);
+		uint64_t firstEntryOffset = readUintByGeneration(io, byteOrder, gen);
 
-		uint64_t lastEntryOffset = io.readUintByGeneration(byteOrder, gen);
+		uint64_t lastEntryOffset = readUintByGeneration(io, byteOrder, gen);
 		
 		io.read<uint64_t>(byteOrder); // Unknown
 
-		if(gen == NEW_GEN) {
-			uint64_t unknownNewGen = io.read<uint64_t>(byteOrder);
-		}
+		if (gen == NEW_GEN) io.read<uint64_t>(byteOrder); // Unknown
 		
-		io.readUintByGeneration(byteOrder, gen);
+		readUintByGeneration(io, byteOrder, gen);
 		
-		uint64_t index1Size = io.readUintByGeneration(byteOrder, gen);
+		uint64_t index1Size = readUintByGeneration(io, byteOrder, gen);
 		
 		io.read<uint32_t>(byteOrder); // Unknown
 		
 		Generation opposite = (gen == NEW_GEN) ? OLD_GEN : NEW_GEN;
-		index2Size = io.readUintByGeneration(byteOrder, opposite);
+		index2Size = readUintByGeneration(io, byteOrder, opposite);
 		
 		std::string name =  io.readUtf8(12);
 		
@@ -82,12 +83,21 @@ namespace lce::msscmp {
 			
 			int32_t oldPos = io.getPosition();
 
-			uint8_t* data = new uint8_t[fileSize];
+			std::vector<uint8_t> d;
+			d.resize(fileSize);
+
 			io.seek(dataOffset);
-			io.readInto(data, fileSize);
+			io.readInto(d.data(), fileSize);
 			io.seek(oldPos);
-			
-			addFile( std::make_shared<SoundbankInnerFile>(SoundbankInnerFile(fileName, fileSize, dataOffset, std::move(data), sampleRate)) );
+
+			std::wstring wname = io::BinaryIO::stringToWString(fileName);
+
+			std::filesystem::path path(wname); // TODO: I forgot about this, we could use this I think inside the FS class
+
+			std::unique_ptr<BinkaFile> f = std::make_unique<BinkaFile>(path.filename().wstring() + L".binka", d, sampleRate, nullptr);
+			fs::Directory *dir = getOrCreateDirByPath(path.parent_path().wstring());
+
+			dir->addChild(std::move(f));
 		}
 	}
 }

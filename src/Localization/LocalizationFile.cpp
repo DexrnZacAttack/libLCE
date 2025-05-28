@@ -77,7 +77,7 @@ namespace lce::loc {
 		return size;
 	}
 	
-	uint8_t* LocalizationFile::create() const {
+	uint8_t* LocalizationFile::toData() const {
 		const uint32_t fileSize = this->getSize();
         uint8_t *data = new uint8_t[fileSize];
         io::BinaryIO io(data);
@@ -97,7 +97,7 @@ namespace lce::loc {
 		}
 		
 		for(const auto& language : languages) {
-			io.writeBytes(language.create(), language.getSize());
+			io.writeBytes(language.toData(), language.getSize());
 		}
 		
         return io.getData();

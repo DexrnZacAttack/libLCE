@@ -16,7 +16,7 @@
 
 namespace lce::io {
     template <typename T>
-    constexpr T swapOrder(const T input) {
+    constexpr T swapOrder_f(const T input) {
         uint8_t resultBytes[sizeof(T)];
         const uint8_t* ib = reinterpret_cast<const uint8_t*>(&input);
         uint8_t* r = resultBytes + (sizeof(T) - 1);
@@ -29,6 +29,43 @@ namespace lce::io {
         memcpy(&result, resultBytes, sizeof(T));
         return result;
     }
+
+    // this is a mess but theoretically will actually use the byteswap instruction
+    template <typename T>
+constexpr T swapOrder(const T input) {
+        if constexpr (std::is_integral_v<T>) {
+            if constexpr (sizeof(T) == 2) {
+#if defined(__clang__) || defined(__GNUC__)
+                return static_cast<T>(__builtin_bswap16(static_cast<uint16_t>(input)));
+#elif defined(_MSC_VER)
+                return static_cast<T>(_byteswap_ushort(static_cast<unsigned short>(input)));
+#else
+                return swapOrder_f(input);
+#endif
+            } else if constexpr (sizeof(T) == 4) {
+#if defined(__clang__) || defined(__GNUC__)
+                return static_cast<T>(__builtin_bswap32(static_cast<uint32_t>(input)));
+#elif defined(_MSC_VER)
+                return static_cast<T>(_byteswap_ulong(static_cast<unsigned long>(input)));
+#else
+                return swapOrder_f(input);
+#endif
+            } else if constexpr (sizeof(T) == 8) {
+#if defined(__clang__) || defined(__GNUC__)
+                return static_cast<T>(__builtin_bswap64(static_cast<uint64_t>(input)));
+#elif defined(_MSC_VER)
+                return static_cast<T>(_byteswap_uint64(static_cast<unsigned __int64>(input)));
+#else
+                return swapOrder_f(input);
+#endif
+            } else {
+                return swapOrder_f(input);
+            }
+        } else {
+            return swapOrder_f(input);
+        }
+    }
+
 
     template <typename T>
     constexpr T big2sys(const T a) {
@@ -47,7 +84,6 @@ namespace lce::io {
         return a;
 #endif
     }
-
 
     // todo: implement size shits
 class BinaryIO {
@@ -71,9 +107,7 @@ class BinaryIO {
         uint32_t readUint24(ByteOrder endian);
 
         int32_t readInt24(ByteOrder endian);
-        
-        uint64_t readUintByGeneration(ByteOrder endian, Generation gen);
-        
+
         template <typename T>
         T readLE() {
             const T v = little2sys(*reinterpret_cast<const T*>(this->data));
@@ -148,7 +182,7 @@ class BinaryIO {
 
         void writeUtf8(const std::string &input);
 
-        static void trimWString(std::wstring &inp);
+        static void trimWString(std::wstring &input);
 
         std::u16string readWChar2Byte(size_t size, ByteOrder endian);
 
@@ -164,12 +198,16 @@ class BinaryIO {
 
         static LIBLCE_API std::wstring u16stringToWstring(const std::u16string &str);
 
+        static LIBLCE_API std::u16string wstringToU16string(const std::wstring &str);
+
         static LIBLCE_API std::wstring u32stringToWstring(const std::u32string &str);
     
         static LIBLCE_API std::string u16stringToString(const std::u16string &str);
     
         static LIBLCE_API std::u16string stringToU16String(const std::string &str);
-    };
+        static LIBLCE_API std::string wstringToString(const std::wstring &str);
+        static LIBLCE_API std::wstring stringToWString(const std::string &str);
+};
 } // lce::io
 
 #endif //BINARYIO_H

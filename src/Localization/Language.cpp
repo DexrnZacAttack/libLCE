@@ -38,7 +38,7 @@ namespace lce::loc {
         return size;
     }
     
-    uint8_t* Language::create() const {
+    uint8_t* Language::toData() const {
 		const uint32_t fileSize = this->getSize();
         uint8_t *data = new uint8_t[fileSize];
         io::BinaryIO io(data);

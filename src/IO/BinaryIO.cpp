@@ -18,11 +18,6 @@ namespace lce::io {
         this->size = size;
     }
 
-    // BinaryIO::~BinaryIO() {
-    //     delete[] data;
-    //     delete[] dataOrigin;
-    // }
-
     void BinaryIO::seek(const size_t offset) {
         this->data = this->dataOrigin+offset;
     }
@@ -44,20 +39,14 @@ namespace lce::io {
     }
 
     uint32_t BinaryIO::readUint24(ByteOrder endian) {
-        uint32_t res = 0;
+        uint8_t b0 = readByte();
+        uint8_t b1 = readByte();
+        uint8_t b2 = readByte();
 
-        if (endian == ByteOrder::LITTLE) {
-            res = static_cast<uint32_t>(this->readByte()) |
-                    (static_cast<uint32_t>(this->readByte()) << 8) |
-                    (static_cast<uint32_t>(this->readByte()) << 16);
-        } else if (endian == ByteOrder::BIG) {
-            res = (static_cast<uint32_t>(this->readByte()) << 16) |
-                    (static_cast<uint32_t>(this->readByte()) << 8) |
-                    static_cast<uint32_t>(this->readByte());
-        }
-
-        return res;
+        if (endian == ByteOrder::LITTLE) return static_cast<uint32_t>(b0) | (static_cast<uint32_t>(b1) << 8) | (static_cast<uint32_t>(b2) << 16);
+        else  return (static_cast<uint32_t>(b0) << 16) | (static_cast<uint32_t>(b1) << 8) | static_cast<uint32_t>(b2);
     }
+
 
     int32_t BinaryIO::readInt24(ByteOrder endian) {
         uint32_t res = readUint24(endian);
@@ -68,11 +57,6 @@ namespace lce::io {
 
         return static_cast<int32_t>(res);
     }
-    
-    uint64_t BinaryIO::readUintByGeneration(ByteOrder endian, Generation gen) {
-		if(gen == NEW_GEN) return read<uint64_t>(endian);
-		else return read<uint32_t>(endian);
-	}
 
     void BinaryIO::writeByte(const uint8_t v) {
         *this->data++ = v;
@@ -105,28 +89,24 @@ namespace lce::io {
 
     uint8_t* BinaryIO::readOfSize(size_t size) {
         uint8_t* result = new uint8_t[size];
-
-        for (size_t i = 0; i < size; i++) {
-            result[i] = *this->data++;
-        }
-
+        std::memcpy(result, this->data, size);
+        this->data += size;
         return result;
     }
+
 
     std::vector<uint8_t> BinaryIO::readOfSizeVec(size_t size) {
-        std::vector<uint8_t> result = std::vector<uint8_t>(size);
-
-        for (size_t i = 0; i < size; i++) {
-            result[i] = *this->data++;
-        }
-
+        std::vector<uint8_t> result(size);
+        std::memcpy(result.data(), this->data, size);
+        this->data += size;
         return result;
     }
 
+
     void BinaryIO::readInto(uint8_t* into, size_t size) {
-        for (size_t i = 0; i < size; i++) {
-            into[i] = *this->data++;
-        }
+        std::memcpy(into, this->data, size);
+        this->data += size;
     }
+
 
 }

@@ -24,7 +24,11 @@ namespace lce::world {
         std::wsmatch match;
 
         if (std::regex_match(filename, match, re)) {
-            this->dim = std::stoi(match.str(2), nullptr, 10);
+            try {
+                this->dim = std::stoi(match.str(2), nullptr, 10);
+            } catch (std::exception& e) {
+                this->dim = 0;
+            }
             this->x = std::stoi(match.str(4), nullptr, 10);
             this->z = std::stoi(match.str(5), nullptr, 10);
         }
@@ -126,7 +130,7 @@ namespace lce::world {
         this->z = z;
     }
 
-    void Region::setDim(uint16_t dim) {
+    void Region::setDim(int16_t dim) {
         this->dim = dim;
     }
 } // lce::world

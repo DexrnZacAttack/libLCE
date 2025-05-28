@@ -7,6 +7,8 @@ add_definitions(-DCOMPILER_NAME="${CMAKE_CXX_COMPILER_ID}")
 add_definitions(-DPLATFORM_NAME="${CMAKE_SYSTEM_NAME}")
 add_definitions(-DPLATFORM_ARCH="${CMAKE_SYSTEM_PROCESSOR}")
 
+message(STATUS "${CMAKE_SYSTEM_PROCESSOR}")
+
 # because _DEBUG is not universal
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_definitions(-DCMAKE_BUILD_DEBUG)
@@ -48,26 +50,23 @@ set(FILES
 	src/Save/SaveFile.h
 	src/IO/BinaryIO.cpp
 	src/IO/BinaryIO.h
-	src/Save/IndexInnerFile.cpp
-	src/Save/IndexInnerFile.h
 	src/Filesystem/Filesystem.cpp
 	src/Filesystem/Filesystem.h
-	src/Filesystem/File.cpp
 	src/Filesystem/File.h
 	src/Archive/Archive.cpp
 	src/Archive/Archive.h
-	src/Colour/Colours/Colour.cpp
-	src/Colour/Colours/Colour.h
-	src/Colour/ColourFileOld.cpp
-	src/Colour/ColourFileOld.h
-	src/Colour/ColourFileCommons.cpp
-	src/Colour/ColourFileCommons.h
-	src/Colour/ColourFile.cpp
-	src/Colour/ColourFile.h
-	src/Colour/Colours/ColourCommons.cpp
-	src/Colour/Colours/ColourCommons.h
-	src/Colour/Colours/WorldColour.cpp
-	src/Colour/Colours/WorldColour.h
+		src/Color/Colors/Color.cpp
+		src/Color/Colors/Color.h
+		src/Color/ColorFileOld.cpp
+		src/Color/ColorFileOld.h
+		src/Color/ColorFileCommons.cpp
+		src/Color/ColorFileCommons.h
+		src/Color/ColorFile.cpp
+		src/Color/ColorFile.h
+		src/Color/Colors/ColorCommons.cpp
+		src/Color/Colors/ColorCommons.h
+		src/Color/Colors/WorldColor.cpp
+		src/Color/Colors/WorldColor.h
 	src/Localization/LocalizationFile.cpp
 	src/Localization/LocalizationFile.h
 	src/Localization/Language.cpp
@@ -89,6 +88,10 @@ set(FILES
 	src/World/Block.cpp
 	src/World/Block.h
 	src/World/Chunk/V12.cpp
+	src/Filesystem/FSObject.cpp
+	src/Filesystem/FSObject.h
+	src/Filesystem/Directory.cpp
+	src/Filesystem/Directory.h
 )
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Emscripten")

@@ -25,7 +25,7 @@ namespace lce::loc {
 			std::unordered_map<uint32_t, std::string> langIds, std::vector<Language> languages);
 		
 		uint64_t getSize() const;
-		uint8_t* create() const;
+		uint8_t* toData() const;
 	
 		uint32_t version;
 		uint32_t languageCount;

@@ -8,8 +8,14 @@
 
 // prevents duplicating these defines over and over
 
-#define VERSION "1.0.8"
-#define LIBRARY_STRING "libLCE v" VERSION " (" COMPILER_NAME " | " PLATFORM_NAME " " PLATFORM_ARCH ") | https://github.com/DexrnZacAttack/libLCE"
+#if CMAKE_BUILD_DEBUG
+    #define BUILD_TYPE "Debug"
+#else
+    #define BUILD_TYPE "Release"
+#endif
+
+#define VERSION "1.1.0"
+#define LIBRARY_STRING "libLCE v" VERSION " (" COMPILER_NAME " / " BUILD_TYPE " | " PLATFORM_NAME " " PLATFORM_ARCH ") | https://github.com/DexrnZacAttack/libLCE"
 
 LIBLCE_API NO_DISCARD const char* getLibraryVersion();
 LIBLCE_API NO_DISCARD void printLibraryInfo();

@@ -19,7 +19,7 @@ namespace lce::loc {
 			: byte(_byte), shouldReadByte(_shouldReadByte), code(_code), stringCount(_stringCount), strings(_strings) {}
 			
 		uint32_t getSize() const;
-		uint8_t* create() const;
+		uint8_t* toData() const;
 	
 		uint8_t byte;
 		uint32_t shouldReadByte;

@@ -58,7 +58,7 @@ namespace lce::world {
         [[nodiscard]] int16_t getDim() const;
         void setX(int16_t x);
         void setZ(int16_t z);
-        void setDim(uint16_t dim);
+        void setDim(int16_t dim);
 
         int16_t getSizeInSectors() const;
         //endregion
