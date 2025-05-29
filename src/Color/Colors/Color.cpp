@@ -20,7 +20,6 @@ namespace lce::color {
         return {name, color};
     }
 
-    // ugh doing this again
     Color Color::read(io::BinaryIO& io) {
         const auto strLength = io.readBE<uint16_t>();
         std::string name = io.readUtf8(strLength);
