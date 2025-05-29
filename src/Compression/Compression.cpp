@@ -3,14 +3,14 @@
 //
 
 #include <Compression/Compression.h>
-#include <zlib/zlib.h>
 #include <IO/BinaryIO.h>
+#include <zlib/zlib.h>
 
-#include <iostream>
 #include <fstream>
+#include <iostream>
 
 namespace lce::compression {
-bool Compression::decompressZlib(std::vector<uint8_t>& in, std::vector<uint8_t>& out) {
+    bool Compression::decompressZlib(std::vector<uint8_t>& in, std::vector<uint8_t>& out) {
         if (in.size() < 2) {
             std::cerr << "Input is too small." << std::endl;
             return false;
@@ -66,7 +66,8 @@ bool Compression::decompressZlib(std::vector<uint8_t>& in, std::vector<uint8_t>&
      *
      * @returns false — If there is no error
      */
-    bool Compression::decompressZlibWithLength(std::vector<uint8_t>& in, std::vector<uint8_t>& out, uint32_t bufSize, uint32_t offset = 0) {
+    bool Compression::decompressZlibWithLength(std::vector<uint8_t>& in, std::vector<uint8_t>& out, uint32_t bufSize,
+                                               uint32_t offset = 0) {
         if (in.size() < 2) {
             std::cerr << "Input is too small" << std::endl;
             return true;
@@ -104,13 +105,14 @@ bool Compression::decompressZlib(std::vector<uint8_t>& in, std::vector<uint8_t>&
     }
 
     // Modified version of fully decompiled & matching Compression::internalDecompressRle from Nintendo Switch Edition
-    bool Compression::decompressChunk(std::vector<uint8_t> &in, std::vector<uint8_t> &out) {
+    bool Compression::decompressChunk(std::vector<uint8_t>& in, std::vector<uint8_t>& out) {
         // todo: could make it auto allocate out to 0x40000 like LCE does
         io::BinaryIO io(in.data());
 
         int i = 0;
 
-        // to sum it up: read byte, if byte is not 255, push to out vec, otherwise read count and the value (if the count is 3+, otherwise value is 0xFF) and push it
+        // to sum it up: read byte, if byte is not 255, push to out vec, otherwise read count and the value (if the
+        // count is 3+, otherwise value is 0xFF) and push it
         while (i < in.size()) {
             uint8_t byte = io.readByte();
             // if the byte isn't 0xFF (255)
@@ -152,7 +154,8 @@ bool Compression::decompressZlib(std::vector<uint8_t>& in, std::vector<uint8_t>&
      *
      * It's much simpler than the pseudocode made it look.
      */
-    bool Compression::decompressVita(std::vector<uint8_t> &in, std::vector<uint8_t> &out, uint32_t outBuf, uint32_t offset) {
+    bool Compression::decompressVita(std::vector<uint8_t>& in, std::vector<uint8_t>& out, uint32_t outBuf,
+                                     uint32_t offset) {
         // todo: could make it auto allocate out to 0x40000 like LCE does
         io::BinaryIO io(in.data());
         io.seek(offset);
@@ -178,19 +181,24 @@ bool Compression::decompressZlib(std::vector<uint8_t>& in, std::vector<uint8_t>&
         return true;
     }
 
-    bool Compression::decompress(std::vector<uint8_t> &in, std::vector<uint8_t> &out,
+    bool Compression::decompress(std::vector<uint8_t>& in, std::vector<uint8_t>& out,
                                  compression::CompressionType type) {
         switch (type) {
-            case compression::CompressionType::ZLIB: return decompressZlib(in, out); break;
-            case compression::CompressionType::VITA: return decompressVita(in, out, 0); break;
-            default: throw std::runtime_error("Invalid compression type");
+        case compression::CompressionType::ZLIB:
+            return decompressZlib(in, out);
+            break;
+        case compression::CompressionType::VITA:
+            return decompressVita(in, out, 0);
+            break;
+        default:
+            throw std::runtime_error("Invalid compression type");
         }
     }
 
-    uint32_t Compression::getSizeFromSave(std::vector<uint8_t> &in, ByteOrder endian) {
+    uint32_t Compression::getSizeFromSave(std::vector<uint8_t>& in, io::ByteOrder endian) {
         io::BinaryIO io(in.data());
         io.seek(4);
 
         return io.read<uint32_t>(endian);
     }
-} // lce::compression
+} // namespace lce::compression

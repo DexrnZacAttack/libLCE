@@ -2,9 +2,9 @@
 // Created by DexrnZacAttack on 12/28/2024.
 //
 
-#include <World/Chunk.h>
 #include <Compression/Compression.h>
 #include <IO/BinaryIO.h>
+#include <World/Chunk.h>
 
 #include <fstream>
 #include <sstream>
@@ -13,7 +13,7 @@
 namespace lce::world {
     Chunk::Section::Section() {}
 
-    Chunk::Chunk(std::vector<uint8_t> data, compression::CompressionType outerCompression, ByteOrder endian) {
+    Chunk::Chunk(std::vector<uint8_t> data, compression::CompressionType outerCompression, io::ByteOrder endian) {
         io::BinaryIO io(data.data(), data.size());
 
         const auto compressedSizeFlags = io.read<uint32_t>(endian);
@@ -30,11 +30,13 @@ namespace lce::world {
 
         /// unmodified compressed chunk data
         std::vector<uint8_t> compData = io.readOfSizeVec(compressedSize);
-        /// data from first layer decompression, note that the size given does not fully reflect the decompressed size of the first layer.
+        /// data from first layer decompression, note that the size given does not fully reflect the decompressed size
+        /// of the first layer.
         std::vector<uint8_t> uncompData(uncompressedSize);
 
         bool err = compression::Compression::decompressZlibWithLength(compData, uncompData, uncompressedSize, 0);
-        if (err) throw std::runtime_error("Outer chunk decompression failed");
+        if (err)
+            throw std::runtime_error("Outer chunk decompression failed");
 
         std::vector<uint8_t> chunkData(uncompressedSize);
 
@@ -74,32 +76,22 @@ namespace lce::world {
         DebugLog("Version: " << this->version);
 
         switch (this->version) {
-            case 12:
-                this->readV12(chunkData, endian);
-                break;
-            default:
-                throw std::runtime_error("Unsupported chunk version " + std::to_string(this->version));
-                break;
+        case 12:
+            this->readV12(chunkData, endian);
+            break;
+        default:
+            throw std::runtime_error("Unsupported chunk version " + std::to_string(this->version));
+            break;
         }
     }
 
-    uint16_t Chunk::getVersion() const {
-        return this->version;
-    }
+    uint16_t Chunk::getVersion() const { return this->version; }
 
-    int32_t Chunk::getX() const {
-        return this->x;
-    }
+    int32_t Chunk::getX() const { return this->x; }
 
-    int32_t Chunk::getZ() const {
-        return this->z;
-    }
+    int32_t Chunk::getZ() const { return this->z; }
 
-    uint64_t Chunk::getLastUpdate() const {
-        return this->lastUpdate;
-    }
+    uint64_t Chunk::getLastUpdate() const { return this->lastUpdate; }
 
-    uint64_t Chunk::getInhabitedTime() const {
-        return this->inhabitedTime;
-    }
-} // lce::world
+    uint64_t Chunk::getInhabitedTime() const { return this->inhabitedTime; }
+} // namespace lce::world

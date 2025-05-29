@@ -8,8 +8,8 @@
 #include <cstdint>
 #include <vector>
 
-#include <World/Region.h>
 #include <IO/BinaryIO.h>
+#include <World/Region.h>
 #include <libLCE.h>
 
 #include <Compression/Compression.h>
@@ -23,23 +23,25 @@ namespace lce::world {
         int32_t z;
         uint64_t lastUpdate;
         uint64_t inhabitedTime;
+
     public:
         class LIBLCE_API Section {
         public:
-            std::array<uint16_t, 16*256*16> blocks; // blocks
+            std::array<uint16_t, 16 * 256 * 16> blocks; // blocks
 
             Section();
         };
 
         Chunk();
 
-        Chunk(std::vector<uint8_t> data, compression::CompressionType outerCompression, ByteOrder endian = ByteOrder::LITTLE);
+        Chunk(std::vector<uint8_t> data, compression::CompressionType outerCompression,
+              io::ByteOrder endian = io::ByteOrder::LITTLE);
 
-        Chunk(uint8_t *data, compression::CompressionType outerCompression, ByteOrder endian);
+        Chunk(uint8_t* data, compression::CompressionType outerCompression, io::ByteOrder endian);
 
         // region Readers
 
-        void readV12(std::vector<uint8_t> data, ByteOrder endian);
+        void readV12(std::vector<uint8_t> data, io::ByteOrder endian);
 
         // endregion
 
@@ -57,6 +59,6 @@ namespace lce::world {
 
         // endregion
     };
-} // lce::world
+} // namespace lce::world
 
-#endif //CHUNK_H
+#endif // CHUNK_H

@@ -10,7 +10,8 @@
 namespace lce::color {
     ColorFile::ColorFile() {}
 
-    ColorFile::ColorFile(std::vector<Color> colors, std::vector<WorldColor> worldColors): ColorFileCommons(colors, 4), worldColors(worldColors) {}
+    ColorFile::ColorFile(std::vector<Color> colors, std::vector<WorldColor> worldColors) :
+        ColorFileCommons(colors, 4), worldColors(worldColors) {}
 
     ColorFile ColorFile::read(std::vector<uint8_t> data) {
         lce::io::BinaryIO io(data.data());
@@ -49,7 +50,7 @@ namespace lce::color {
         return size;
     }
 
-    uint8_t *ColorFile::create() const {
+    uint8_t* ColorFile::create() const {
         io::BinaryIO io(this->getSize());
 
         io.writeBE<uint32_t>(this->version);
@@ -67,4 +68,21 @@ namespace lce::color {
 
         return io.getData();
     }
-} // lce
+
+    std::optional<Color> ColorFileCommons::getColorByName(std::string name) {
+        const auto find =
+            std::find_if(colors.begin(), colors.end(), [&name](const Color& color) { return color.name == name; });
+
+        if (find != colors.end())
+            return *find;
+
+        return std::nullopt;
+    }
+
+    ColorFileCommons::ColorFileCommons(const std::vector<Color>& colors, uint32_t version) :
+        colors(colors), version(version) {}
+
+    uint64_t ColorFileCommons::getSize() const {
+        return 4; // atleast 4
+    }
+} // namespace lce::color

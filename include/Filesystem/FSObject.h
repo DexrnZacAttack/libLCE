@@ -6,8 +6,8 @@
 #define FSOBJECT_H
 #include <utility>
 
-#include "string"
 #include <libLCE.h>
+#include "string"
 
 namespace lce::fs {
     class Directory;
@@ -20,7 +20,8 @@ namespace lce::fs {
         std::wstring name;
         std::uint64_t modifiedTime;
         std::uint64_t creationTime;
-        Directory *parent;
+        Directory* parent;
+
     protected:
         explicit FSObject(std::wstring name) : name(std::move(name)) {
             const uint64_t ms = lce::system::getTimestamp();
@@ -37,14 +38,11 @@ namespace lce::fs {
         }
 
         /// Set's the object's modified timestamp
-        void setModifiedTimestamp(uint64_t n) {
-            this->modifiedTime = n;
-        }
+        void setModifiedTimestamp(uint64_t n) { this->modifiedTime = n; }
 
         /// Set's the object's creation timestamp
-        void setCreationTimestamp(uint64_t n) {
-            this->creationTime = n;
-        }
+        void setCreationTimestamp(uint64_t n) { this->creationTime = n; }
+
     public:
         virtual ~FSObject() = default;
 
@@ -60,6 +58,6 @@ namespace lce::fs {
         [[nodiscard]] std::wstring getPath() const;
     };
 
-}
+} // namespace lce::fs
 
-#endif //FSOBJECT_H
+#endif // FSOBJECT_H

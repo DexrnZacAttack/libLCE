@@ -1,0 +1,1 @@
+foreach ($file in Get-ChildItem -Path src,include -Recurse -Include *.cpp,*.h) { clang-format -i $file --verbose }

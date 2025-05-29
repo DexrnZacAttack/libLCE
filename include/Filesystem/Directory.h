@@ -16,14 +16,14 @@ namespace lce::fs {
 
     class LIBLCE_API Directory : public FSObject {
     public:
-        explicit Directory(std::wstring name, Directory *parent) : fs::FSObject(std::move(name)) {
+        explicit Directory(std::wstring name, Directory* parent) : fs::FSObject(std::move(name)) {
             this->parent = parent;
         }
 
         /// Creates a file with the specified name and data
-        File *createFile(const std::wstring& name, std::vector<uint8_t> data);
+        File* createFile(const std::wstring& name, std::vector<uint8_t> data);
         /// Creates a directory with the specified name
-        Directory *createDirectory(const std::wstring& name);
+        Directory* createDirectory(const std::wstring& name);
 
         /// Gets a child with the specified name (if available)
         ///
@@ -51,9 +51,7 @@ namespace lce::fs {
         size_t getSize() const;
 
         /// Returns the map of FSObjects under this directory
-        const std::unordered_map<std::wstring, std::unique_ptr<FSObject>>& getChildren() const {
-            return children;
-        }
+        const std::unordered_map<std::wstring, std::unique_ptr<FSObject>>& getChildren() const { return children; }
 
         /// Prints the file listing into stdout
         void printListing();
@@ -72,6 +70,6 @@ namespace lce::fs {
         std::unordered_map<std::wstring, std::unique_ptr<FSObject>> children;
     };
 
-}
+} // namespace lce::fs
 
-#endif //DIRECTORY_H
+#endif // DIRECTORY_H

@@ -14,12 +14,13 @@ namespace lce::io {
         delete[] buf;
         return result;
     }
-    
+
     std::string BinaryIO::readUtf8NullTerminated() {
         const char* start = reinterpret_cast<const char*>(this->data);
 
         size_t len = 0;
-        while (this->data[len] != 0) ++len;
+        while (this->data[len] != 0)
+            ++len;
 
         std::string result(start, len);
 
@@ -39,15 +40,15 @@ namespace lce::io {
         input.resize(len);
     }
 
-    std::u16string BinaryIO::readWChar2Byte(const size_t size, ByteOrder endian) {
+    std::u16string BinaryIO::readWChar2Byte(const size_t size, io::ByteOrder endian) {
         std::u16string result(size, u'\0');
         std::memcpy(&result[0], this->data, size * sizeof(char16_t));
         this->data += size * sizeof(char16_t);
 
 #if defined(BR_BIG_ENDIAN)
-        if (endian == ByteOrder::LITTLE) {
+        if (endian == io::ByteOrder::LITTLE) {
 #else
-        if (endian == ByteOrder::BIG) {
+        if (endian == io::ByteOrder::BIG) {
 #endif
             for (size_t i = 0; i < size; ++i) {
                 result[i] = swapOrder(result[i]);
@@ -55,20 +56,20 @@ namespace lce::io {
         }
 
         return result;
-
     }
 
-    std::u16string BinaryIO::readWChar2ByteNT(ByteOrder endian) {
+    std::u16string BinaryIO::readWChar2ByteNT(io::ByteOrder endian) {
         const char16_t* ptr = reinterpret_cast<const char16_t*>(this->data);
         size_t len = 0;
-        while (ptr[len] != 0) ++len;
+        while (ptr[len] != 0)
+            ++len;
 
         auto result = readWChar2Byte(len, endian);
         this->data += (len + 1) * sizeof(char16_t);
         return result;
     }
 
-    void BinaryIO::writeWChar2Byte(const std::u16string& input, ByteOrder endian, bool nullTerminate = false) {
+    void BinaryIO::writeWChar2Byte(const std::u16string& input, io::ByteOrder endian, bool nullTerminate = false) {
         for (const char16_t& ch : input) {
             this->write<char16_t>(ch, endian);
         }
@@ -77,15 +78,15 @@ namespace lce::io {
             this->write<char16_t>(0, endian);
     }
 
-    std::u32string BinaryIO::readWChar4Byte(const size_t size,ByteOrder endian) {
+    std::u32string BinaryIO::readWChar4Byte(const size_t size, io::ByteOrder endian) {
         std::u32string result(size, u'\0');
         std::memcpy(&result[0], this->data, size * sizeof(char32_t));
         this->data += size * sizeof(char32_t);
 
 #if defined(BR_BIG_ENDIAN)
-        if (endian == ByteOrder::LITTLE) {
+        if (endian == io::ByteOrder::LITTLE) {
 #else
-        if (endian == ByteOrder::BIG) {
+        if (endian == io::ByteOrder::BIG) {
 #endif
             for (size_t i = 0; i < size; ++i) {
                 result[i] = swapOrder(result[i]);
@@ -95,17 +96,18 @@ namespace lce::io {
         return result;
     }
 
-    std::u32string BinaryIO::readWChar4ByteNT(ByteOrder endian) {
+    std::u32string BinaryIO::readWChar4ByteNT(io::ByteOrder endian) {
         const char32_t* ptr = reinterpret_cast<const char32_t*>(this->data);
         size_t len = 0;
-        while (ptr[len] != 0) ++len;
+        while (ptr[len] != 0)
+            ++len;
 
         auto result = readWChar4Byte(len, endian);
         this->data += (len + 1) * sizeof(char32_t);
         return result;
     }
 
-    void BinaryIO::writeWChar4Byte(const std::u32string& input, ByteOrder endian, bool nullTerminate = false) {
+    void BinaryIO::writeWChar4Byte(const std::u32string& input, io::ByteOrder endian, bool nullTerminate = false) {
         for (const char32_t& ch : input) {
             this->write<char32_t>(ch, endian);
         }
@@ -128,7 +130,6 @@ namespace lce::io {
         }
         return result;
 #endif
-
     }
 
 
@@ -148,7 +149,7 @@ namespace lce::io {
 
     std::wstring BinaryIO::u32stringToWstring(const std::u32string& str) {
 #if WCHAR_MAX == 0x7fffffff
-            return std::wstring(str.begin(), str.end());
+        return std::wstring(str.begin(), str.end());
 #else
         // LOSSY LOSSY LOSSY LOSSY LOSSY AAAAAAAAAAAAA
         std::wstring result;
@@ -161,12 +162,12 @@ namespace lce::io {
 #endif
     }
 
-    std::string BinaryIO::u16stringToString(const std::u16string &str) {
+    std::string BinaryIO::u16stringToString(const std::u16string& str) {
         std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
         return convert.to_bytes(str);
     }
-    
-    std::u16string BinaryIO::stringToU16String(const std::string &str) {
+
+    std::u16string BinaryIO::stringToU16String(const std::string& str) {
         std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
         return convert.from_bytes(str);
     }
@@ -185,4 +186,4 @@ namespace lce::io {
 
     // endregion
 
-} // lce
+} // namespace lce::io

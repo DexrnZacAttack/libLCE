@@ -1,12 +1,8 @@
 //
 // Created by DexrnZacAttack on 4/10/2025.
 //
-#include "../include/libLCEExports.h"
+#include <libLCEExports.h>
 
-const char * getLibraryVersion() {
-    return VERSION;
-}
+const char* getLibraryVersion() { return VERSION; }
 
-void printLibraryInfo() {
-    std::cout << LIBRARY_STRING << std::endl;
-}
+void printLibraryInfo() { std::cout << LIBRARY_STRING << std::endl; }

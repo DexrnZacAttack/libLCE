@@ -5,12 +5,12 @@
 #include <World/Block.h>
 
 namespace lce::world {
-    Block::Block(uint16_t id, uint8_t data, bool waterlogged): id(id), data(data), waterlogged(waterlogged) {
-    }
+    Block::Block(uint16_t id, uint8_t data, bool waterlogged) : id(id), data(data), waterlogged(waterlogged) {}
 
     // UNTESTED
-    Block::Block(uint16_t packed, ByteOrder endian) {
-        if (endian == BIG) {
+    Block::Block(uint16_t packed, io::ByteOrder endian) {
+        if (endian == io::ByteOrder::BIG) {
+            // what was I smoking
             const uint8_t lBlk = (packed & 0xF0) >> 4;
             const uint8_t uBlk = (packed >> 8) & 0x7F;
             this->id = (uBlk << 4) | lBlk;
@@ -24,19 +24,11 @@ namespace lce::world {
     }
 
     // todo
-    uint16_t Block::getPacked() const {
-        return 0;
-    }
+    uint16_t Block::getPacked() const { return 0; }
 
-    uint16_t Block::getId() const {
-        return this->id;
-    }
+    uint16_t Block::getId() const { return this->id; }
 
-    uint8_t Block::getData() const {
-        return this->data;
-    }
+    uint8_t Block::getData() const { return this->data; }
 
-    bool Block::isWaterlogged() const {
-        return this->waterlogged;
-    }
-} // lce
+    bool Block::isWaterlogged() const { return this->waterlogged; }
+} // namespace lce::world

@@ -2,10 +2,11 @@
 // Created by DexrnZacAttack on 1/2/2025.
 //
 
-#include <Color/Colors/WorldColor.h>
+#include <Color/Color.h>
 
 namespace lce::color {
-    WorldColor::WorldColor(std::string name, ARGB waterColor, ARGB underwaterColor, ARGB fogColor): ColorCommons(name), waterColor(waterColor), underwaterColor(underwaterColor), fogColor(fogColor) {}
+    WorldColor::WorldColor(std::string name, ARGB waterColor, ARGB underwaterColor, ARGB fogColor) :
+        ColorCommons(name), waterColor(waterColor), underwaterColor(underwaterColor), fogColor(fogColor) {}
 
     WorldColor WorldColor::read(std::vector<uint8_t> data) {
         io::BinaryIO io((data.data()));
@@ -30,7 +31,7 @@ namespace lce::color {
         return {name, water, underwater, fog};
     }
 
-    uint8_t *WorldColor::create() {
+    uint8_t* WorldColor::create() {
         io::BinaryIO io(getSize());
 
         io.writeBE<uint16_t>(name.size());
@@ -51,4 +52,4 @@ namespace lce::color {
         size += sizeof(ARGB);
         return size;
     }
-} // lce::color
+} // namespace lce::color

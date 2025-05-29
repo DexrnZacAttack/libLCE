@@ -8,18 +8,15 @@
 #include <World/Region.h>
 
 namespace lce::world {
-    Region::Region(int16_t x, int16_t z, int16_t dim): x(x), z(z), dim(dim) {
+    Region::Region(int16_t x, int16_t z, int16_t dim) : x(x), z(z), dim(dim) {}
 
-    }
+    Region::Region(std::vector<uint8_t> data, int16_t x, int16_t z, int16_t dim,
+                   compression::CompressionType outerCompression, io::ByteOrder endian) : x(x), z(z), dim(dim) {}
 
-    Region::Region(std::vector<uint8_t> data, int16_t x, int16_t z, int16_t dim, compression::CompressionType outerCompression, ByteOrder endian): x(x), z(z), dim(dim) {
+    Region::Region(std::wstring filename) {}
 
-    }
-
-    Region::Region(std::wstring filename) {
-    }
-
-    Region::Region(std::vector<uint8_t> data, std::wstring filename, compression::CompressionType outerCompression, ByteOrder endian) {
+    Region::Region(std::vector<uint8_t> data, std::wstring filename, compression::CompressionType outerCompression,
+                   io::ByteOrder endian) {
         std::wregex re(L"(DIM([-0-9]{1,2}))?(r)\\.([-0-9]{1,2})\\.([-0-9]{1,2}).mcr");
         std::wsmatch match;
 
@@ -42,15 +39,15 @@ namespace lce::world {
         for (short i = 0; i < 1024; i++) {
             ChunkLocation loc{};
 
-            if (endian == LITTLE)
+            if (endian == io::ByteOrder::LITTLE)
                 loc.size = io.readByte() * 4096;
 
             loc.offset = io.readInt24(endian) * 4096;
 
-            if (endian == BIG)
+            if (endian == io::ByteOrder::BIG)
                 loc.size = io.readByte() * 4096;
 
-            DebugLog("Chunk at " << loc.offset << ": " << loc.size);
+            // DebugLog("Chunk at " << loc.offset << ": " << loc.size);
 
             locations[i] = loc;
         }
@@ -110,27 +107,15 @@ namespace lce::world {
         return -9999;
     }
 
-    int16_t Region::getX() const {
-        return this->x;
-    }
+    int16_t Region::getX() const { return this->x; }
 
-    int16_t Region::getZ() const {
-        return this->z;
-    }
+    int16_t Region::getZ() const { return this->z; }
 
-    int16_t Region::getDim() const {
-        return this->dim;
-    }
+    int16_t Region::getDim() const { return this->dim; }
 
-    void Region::setX(int16_t x) {
-        this->x = x;
-    }
+    void Region::setX(int16_t x) { this->x = x; }
 
-    void Region::setZ(int16_t z) {
-        this->z = z;
-    }
+    void Region::setZ(int16_t z) { this->z = z; }
 
-    void Region::setDim(int16_t dim) {
-        this->dim = dim;
-    }
-} // lce::world
+    void Region::setDim(int16_t dim) { this->dim = dim; }
+} // namespace lce::world

@@ -10,11 +10,11 @@
 #include <string>
 #include <vector>
 
-#include <IO/ByteEnums.h>
 #include <libLCE.h>
 
-
 namespace lce::io {
+    enum class ByteOrder { BIG, LITTLE };
+
     template <typename T>
     constexpr T swapOrder_f(const T input) {
         uint8_t resultBytes[sizeof(T)];
@@ -32,7 +32,7 @@ namespace lce::io {
 
     // this is a mess but theoretically will actually use the byteswap instruction
     template <typename T>
-constexpr T swapOrder(const T input) {
+    constexpr T swapOrder(const T input) {
         if constexpr (std::is_integral_v<T>) {
             if constexpr (sizeof(T) == 2) {
 #if defined(__clang__) || defined(__GNUC__)
@@ -77,7 +77,7 @@ constexpr T swapOrder(const T input) {
     }
 
     template <typename T>
-    constexpr T little2sys(const T a) { //also is working as sys2little
+    constexpr T little2sys(const T a) { // also is working as sys2little
 #ifdef BR_BIG_ENDIAN
         return swapOrder(a);
 #else
@@ -86,11 +86,12 @@ constexpr T swapOrder(const T input) {
     }
 
     // todo: implement size shits
-class BinaryIO {
+    class BinaryIO {
     private:
         uint8_t* dataOrigin;
         uint8_t* data;
         size_t size;
+
     public:
         explicit BinaryIO(uint8_t* input, size_t size = 0);
         explicit BinaryIO(size_t size);
@@ -100,114 +101,114 @@ class BinaryIO {
         void seek(size_t offset);
         void seekRelative(size_t offset);
 
-        //reading
+        // reading
         uint8_t readByte();
         int8_t readSignedByte();
 
-        uint32_t readUint24(ByteOrder endian);
+        uint32_t readUint24(io::ByteOrder endian);
 
-        int32_t readInt24(ByteOrder endian);
+        int32_t readInt24(io::ByteOrder endian);
 
         template <typename T>
         T readLE() {
             const T v = little2sys(*reinterpret_cast<const T*>(this->data));
-            this->data+=sizeof(T);
+            this->data += sizeof(T);
             return v;
         }
 
         template <typename T>
         T readBE() {
             const T v = big2sys(*reinterpret_cast<const T*>(this->data));
-            this->data+=sizeof(T);
+            this->data += sizeof(T);
             return v;
         }
 
         template <typename T>
-        T read(const ByteOrder endian) {
+        T read(const io::ByteOrder endian) {
             T v;
-            if (endian == LITTLE)
+            if (endian == io::ByteOrder::LITTLE)
                 v = little2sys(*reinterpret_cast<const T*>(this->data));
             else
                 v = big2sys(*reinterpret_cast<const T*>(this->data));
-            this->data+=sizeof(T);
+            this->data += sizeof(T);
             return v;
         }
 
-        //writing
+        // writing
         void writeByte(uint8_t v);
 
-        void writeBytes(const uint8_t *v, size_t size);
+        void writeBytes(const uint8_t* v, size_t size);
 
         void writeSignedByte(int8_t v);
         template <typename T>
-        void write(const T v, const ByteOrder endian) {
-            if (endian == LITTLE)
+        void write(const T v, const io::ByteOrder endian) {
+            if (endian == io::ByteOrder::LITTLE)
                 *reinterpret_cast<T*>(this->data) = little2sys(v);
             else
                 *reinterpret_cast<T*>(this->data) = big2sys(v);
-            this->data+=sizeof(T);
+            this->data += sizeof(T);
         }
 
         template <typename T>
         void writeLE(const T v) {
             *reinterpret_cast<T*>(this->data) = little2sys(v);
-            this->data+=sizeof(T);
+            this->data += sizeof(T);
         }
 
         template <typename T>
         void writeBE(const T v) {
             *reinterpret_cast<T*>(this->data) = big2sys(v);
-            this->data+=sizeof(T);
+            this->data += sizeof(T);
         }
 
         uint8_t* getData();
 
-        uint8_t *getDataRelative() const;
+        uint8_t* getDataRelative() const;
 
-        uint8_t *&getDataRef();
+        uint8_t*& getDataRef();
 
-        uint8_t *&getDataRefRelative();
+        uint8_t*& getDataRefRelative();
 
-        uint8_t *readOfSize(size_t size);
+        uint8_t* readOfSize(size_t size);
 
         std::vector<uint8_t> readOfSizeVec(size_t size);
 
-        void readInto(uint8_t *into, size_t size);
+        void readInto(uint8_t* into, size_t size);
 
         [[nodiscard]] size_t getPosition() const;
 
         std::string readUtf8(size_t size);
-        
+
         std::string readUtf8NullTerminated();
 
-        void writeUtf8(const std::string &input);
+        void writeUtf8(const std::string& input);
 
-        static void trimWString(std::wstring &input);
+        static void trimWString(std::wstring& input);
 
-        std::u16string readWChar2Byte(size_t size, ByteOrder endian);
+        std::u16string readWChar2Byte(size_t size, io::ByteOrder endian);
 
-        std::u16string readWChar2ByteNT(ByteOrder endian);
+        std::u16string readWChar2ByteNT(io::ByteOrder endian);
 
-        void writeWChar2Byte(const std::u16string &input, ByteOrder endian, bool nullTerminate);
+        void writeWChar2Byte(const std::u16string& input, io::ByteOrder endian, bool nullTerminate);
 
-        std::u32string readWChar4Byte(size_t size, ByteOrder endian);
+        std::u32string readWChar4Byte(size_t size, io::ByteOrder endian);
 
-        std::u32string readWChar4ByteNT(ByteOrder endian);
+        std::u32string readWChar4ByteNT(io::ByteOrder endian);
 
-        void writeWChar4Byte(const std::u32string &input, ByteOrder endian, bool nullTerminate);
+        void writeWChar4Byte(const std::u32string& input, io::ByteOrder endian, bool nullTerminate);
 
-        static LIBLCE_API std::wstring u16stringToWstring(const std::u16string &str);
+        static LIBLCE_API std::wstring u16stringToWstring(const std::u16string& str);
 
-        static LIBLCE_API std::u16string wstringToU16string(const std::wstring &str);
+        static LIBLCE_API std::u16string wstringToU16string(const std::wstring& str);
 
-        static LIBLCE_API std::wstring u32stringToWstring(const std::u32string &str);
-    
-        static LIBLCE_API std::string u16stringToString(const std::u16string &str);
-    
-        static LIBLCE_API std::u16string stringToU16String(const std::string &str);
-        static LIBLCE_API std::string wstringToString(const std::wstring &str);
-        static LIBLCE_API std::wstring stringToWString(const std::string &str);
-};
-} // lce::io
+        static LIBLCE_API std::wstring u32stringToWstring(const std::u32string& str);
 
-#endif //BINARYIO_H
+        static LIBLCE_API std::string u16stringToString(const std::u16string& str);
+
+        static LIBLCE_API std::u16string stringToU16String(const std::string& str);
+        static LIBLCE_API std::string wstringToString(const std::wstring& str);
+        static LIBLCE_API std::wstring stringToWString(const std::string& str);
+    };
+} // namespace lce::io
+
+#endif // BINARYIO_H

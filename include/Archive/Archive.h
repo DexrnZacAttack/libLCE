@@ -4,10 +4,9 @@
 
 #ifndef ARCHIVE_H
 #define ARCHIVE_H
-#include <vector>
 #include <Filesystem/Filesystem.h>
 #include <libLCE.h>
-
+#include <vector>
 
 namespace lce::arc {
 
@@ -15,7 +14,7 @@ namespace lce::arc {
     public:
         uint32_t fileCount;
 
-        Archive(uint32_t fileCount, std::vector<std::shared_ptr<fs::File>> &index);
+        Archive(uint32_t fileCount, std::vector<std::shared_ptr<fs::File>>& index);
         Archive();
 
         Archive(uint8_t* data);
@@ -23,7 +22,7 @@ namespace lce::arc {
 
         uint8_t* toData() const;
     };
-}
+} // namespace lce::arc
 
 
-#endif //ARCHIVE_H
+#endif // ARCHIVE_H

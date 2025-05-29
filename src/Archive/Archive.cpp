@@ -8,60 +8,58 @@
 #include <stack>
 
 namespace lce::arc {
-    // Archive::Archive(uint32_t fileCount, std::vector<std::shared_ptr<fs::File>>& index): fileCount(fileCount), Filesystem(index) {
+    // Archive::Archive(uint32_t fileCount, std::vector<std::shared_ptr<fs::File>>& index): fileCount(fileCount),
+    // Filesystem(index) {
     // }
 
     Archive::Archive() = default;
 
-    Archive::Archive(uint8_t *data) {
+    Archive::Archive(uint8_t* data) {
         io::BinaryIO io(data);
-		std::cout << "Archive\n";
         this->fileCount = io.readBE<uint32_t>();
 
         for (uint32_t i = 0; i < this->fileCount; i++) {
-            uint16_t name_size = io.readBE<uint16_t>();
-            std::string name = io.readUtf8(name_size);
+            std::string name = io.readUtf8(io.readBE<uint16_t>());
 
-			uint32_t offset = io.readBE<uint32_t>();
-			uint32_t size = io.readBE<uint32_t>();
+            uint32_t offset = io.readBE<uint32_t>();
+            uint32_t size = io.readBE<uint32_t>();
 
-            std::vector<uint8_t> data;
-            data.resize(size);
+            std::vector<uint8_t> d;
+            d.resize(size);
 
             uint32_t oldPos = io.getPosition();
             io.seek(offset);
-            io.readInto(data.data(), size);
+            io.readInto(d.data(), size);
             io.seek(oldPos);
 
             std::wstring wname = io::BinaryIO::stringToWString(name);
             Filesystem::windowsToUnixDelimiter(wname); // convert paths
 
-            this->createFileRecursive(wname, data);
+            this->createFileRecursive(wname, d);
         }
+        __debugbreak();
     }
 
     uint8_t* Archive::toData() const {
         const uint32_t fileSize = this->getSize();
-        uint8_t *data = new uint8_t[fileSize];
+        uint8_t* data = new uint8_t[fileSize];
         io::BinaryIO io(data);
 
-        fs::Directory *root = getRoot();
+        fs::Directory* root = getRoot();
         size_t count = root->getFileCount();
 
-        uint32_t *offsetPositions = new uint32_t[count];
+        uint32_t* offsetPositions = new uint32_t[count];
         uint32_t i = 0;
 
         io.writeBE<uint32_t>(count);
         std::stack<const fs::Directory*> stack;
         stack.push(root);
 
-        while (!stack.empty())
-        {
+        while (!stack.empty()) {
             const fs::Directory* d = stack.top();
             stack.pop();
 
-            for (const auto& [name, child] : d->getChildren())
-            {
+            for (const auto& [name, child] : d->getChildren()) {
                 if (!child->isFile()) {
                     stack.push(dynamic_cast<const fs::Directory*>(child.get()));
                     continue;
@@ -70,7 +68,7 @@ namespace lce::arc {
                 std::wstring path = child->getPath().substr(1);
                 Filesystem::unixToWindowsDelimiter(path);
 
-                const fs::File *f = static_cast<const fs::File*>(child.get());
+                const fs::File* f = static_cast<const fs::File*>(child.get());
                 io.writeBE<uint16_t>(path.length());
                 io.writeUtf8(io::BinaryIO::wstringToString(path));
                 // this stores the area where the file offset is written.
@@ -87,19 +85,17 @@ namespace lce::arc {
         stack = std::stack<const fs::Directory*>();
         stack.push(root);
 
-        while (!stack.empty())
-        {
+        while (!stack.empty()) {
             const fs::Directory* d = stack.top();
             stack.pop();
 
-            for (const auto& [name, child] : d->getChildren())
-            {
+            for (const auto& [name, child] : d->getChildren()) {
                 if (!child->isFile()) {
                     stack.push(dynamic_cast<const fs::Directory*>(child.get()));
                     continue;
                 }
 
-                const fs::File *f = static_cast<const fs::File*>(child.get());
+                const fs::File* f = static_cast<const fs::File*>(child.get());
                 // get current position (this is the position of the file)
                 uint32_t pos = io.getPosition();
                 // write the file
@@ -128,8 +124,7 @@ namespace lce::arc {
             const fs::Directory* d = stack.top();
             stack.pop();
 
-            for (const auto& [name, child] : d->getChildren())
-            {
+            for (const auto& [name, child] : d->getChildren()) {
                 if (!child->isFile()) {
                     stack.push(dynamic_cast<const fs::Directory*>(child.get()));
                     continue;
@@ -148,4 +143,4 @@ namespace lce::arc {
         return size;
     }
 
-}
+} // namespace lce::arc

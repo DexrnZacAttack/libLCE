@@ -8,23 +8,24 @@
 
 namespace lce::world {
 
-class SplitSave : public Region {
-public:
-    //split save region constructors
-    SplitSave() = default;
-    SplitSave(int16_t x, int16_t z, int16_t dim);
-    SplitSave(std::vector<uint8_t> data, int16_t x, int16_t z, int16_t dim);
-    SplitSave(std::wstring filename);
-    SplitSave(std::vector<uint8_t> data, std::wstring filename, lce::compression::CompressionType outerCompression = lce::compression::CompressionType::ZLIB, ByteOrder endian = LITTLE);
-    //endregion
+    class SplitSave : public Region {
+    public:
+        // split save region constructors
+        SplitSave() = default;
+        SplitSave(int16_t x, int16_t z, int16_t dim);
+        SplitSave(std::vector<uint8_t> data, int16_t x, int16_t z, int16_t dim);
+        SplitSave(std::wstring filename);
+        SplitSave(std::vector<uint8_t> data, std::wstring filename,
+                  lce::compression::CompressionType outerCompression = lce::compression::CompressionType::ZLIB,
+                  io::ByteOrder endian = io::ByteOrder::LITTLE);
+        // endregion
 
-    //region helpers
-    static std::map<int16_t, int16_t> getXZFromFilename(const std::wstring& name);
-    static int16_t getDimFromFilename(std::wstring name);
-    //endregion
+        // region helpers
+        static std::map<int16_t, int16_t> getXZFromFilename(const std::wstring& name);
+        static int16_t getDimFromFilename(std::wstring name);
+        // endregion
+    };
 
-};
+} // namespace lce::world
 
-} // lce::world
-
-#endif //SPLITSAVE_H
+#endif // SPLITSAVE_H

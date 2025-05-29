@@ -2,17 +2,15 @@
 // Created by DexrnZacAttack on 12/21/2024.
 //
 
-#include <Save/SaveFileOld.h>
-#include <Save/SaveFile.h>
 #include <IO/BinaryIO.h>
+#include <Save/SaveFile.h>
+#include <Save/SaveFileOld.h>
 
 #include <chrono>
 #include <stack>
 
 namespace lce::save {
-    SaveFileOld::SaveFileOld(ByteOrder endian) {
-        this->endian = endian;
-    }
+    SaveFileOld::SaveFileOld(io::ByteOrder endian) { this->endian = endian; }
 
     /**
      * Reads an old-format save file from a pointer to the data
@@ -20,7 +18,7 @@ namespace lce::save {
      * @param endian The endian/byte order of the save file (default Big)
      * @return The old-format save file.
      */
-    SaveFileOld::SaveFileOld(std::vector<uint8_t> data, ByteOrder endian) {
+    SaveFileOld::SaveFileOld(std::vector<uint8_t> data, io::ByteOrder endian) {
         this->endian = endian;
         io::BinaryIO io(data.data());
 
@@ -29,11 +27,12 @@ namespace lce::save {
         if (indexOffset > data.size())
             throw std::runtime_error("Index offset points to an area that is out of bounds of the data given.");
 
-        DebugLog(""<<io.getPosition());
+        DebugLog("" << io.getPosition());
         uint32_t fileCount = io.read<uint32_t>(this->endian) / this->SaveFileOld::getIndexEntrySize();
 
-        if (fileCount > (0xFFFFFFFF - HEADER_SIZE) / this->SaveFileOld::getIndexEntrySize() )
-            throw std::runtime_error("File count (" + std::to_string(fileCount) + ") makes the file too big for it's index offset to stored in a 32-bit integer.");
+        if (fileCount > (0xFFFFFFFF - HEADER_SIZE) / this->SaveFileOld::getIndexEntrySize())
+            throw std::runtime_error("File count (" + std::to_string(fileCount) +
+                                     ") makes the file too big for it's index offset to stored in a 32-bit integer.");
 
         this->originalVersion = io.read<uint16_t>(this->endian);
         this->version = io.read<uint16_t>(this->endian);
@@ -72,8 +71,8 @@ namespace lce::save {
      * @return Pointer to the save file
      */
     uint8_t* SaveFileOld::toData() const {
-          io::BinaryIO io(this->getSize());
-        fs::Directory *root = getRoot();
+        io::BinaryIO io(this->getSize());
+        fs::Directory* root = getRoot();
 
         uint32_t indexOffset = calculateIndexOffset();
 
@@ -102,7 +101,8 @@ namespace lce::save {
                 }
 
                 const fs::File* innerFile = dynamic_cast<const fs::File*>(child.get());
-                if (!innerFile) continue;
+                if (!innerFile)
+                    continue;
 
                 std::wstring path = innerFile->getPath().substr(1);
 
@@ -139,9 +139,10 @@ namespace lce::save {
      * @param version The version you want to migrate to (has no effect except for changing the version in the header)
      * @return A shared_ptr to the SaveFile
      */
-    SaveFile *SaveFileOld::upgrade(uint16_t version = 2) {
+    SaveFile* SaveFileOld::upgrade(uint16_t version = 2) {
         if (version <= 1)
-            throw std::invalid_argument("Version must be greater than 1. (otherwise it's not really a migration now is it?)");
+            throw std::invalid_argument(
+                "Version must be greater than 1. (otherwise it's not really a migration now is it?)");
 
         const uint32_t indexFileCount = getRoot()->getFileCount(); // new format
 
@@ -151,15 +152,14 @@ namespace lce::save {
         else
             originalVersion = 0;
 
-        SaveFile *s = new SaveFile(indexFileCount, originalVersion, version);
+        SaveFile* s = new SaveFile(indexFileCount, originalVersion, version);
 
-        fs::Directory *root = getRoot();
-        for (const auto& [name, child] : root->getChildren())
-        {
+        fs::Directory* root = getRoot();
+        for (const auto& [name, child] : root->getChildren()) {
             root->moveChild(name, s->getRoot());
         }
 
         return s;
     }
 
-}
+} // namespace lce::save

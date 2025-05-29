@@ -49,19 +49,12 @@ set(HEADERS
 		include/Filesystem/Filesystem.h
 		include/Filesystem/File.h
 		include/Archive/Archive.h
-		include/Color/Colors/Color.h
-		include/Color/ColorFileOld.h
-		include/Color/ColorFileCommons.h
+		include/Color/Color.h
 		include/Color/ColorFile.h
-		include/Color/Colors/ColorCommons.h
-		include/Color/Colors/WorldColor.h
 		include/Localization/LocalizationFile.h
 		include/Localization/Language.h
 		include/Soundbank/Soundbank.h
-		include/Save/SaveFileOld.h
-		include/Save/SaveFileCommons.h
 		include/Compression/Compression.h
-		include/IO/ByteEnums.h
 		include/Save/Thumb.h
 		include/World/SplitSave.h
 		include/World/Block.h
@@ -79,11 +72,9 @@ set(FILES
 	src/Filesystem/Filesystem.cpp
 	src/Archive/Archive.cpp
 	src/Color/Colors/Color.cpp
-	src/Color/ColorFileOld.cpp
-	src/Color/ColorFileCommons.cpp
-	src/Color/ColorFile.cpp
-	src/Color/Colors/ColorCommons.cpp
 	src/Color/Colors/WorldColor.cpp
+	src/Color/ColorFile.cpp
+	src/Color/ColorFileOld.cpp
 	src/Localization/LocalizationFile.cpp
 	src/Localization/Language.cpp
 	src/Soundbank/Soundbank.cpp
@@ -107,7 +98,8 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
 #    target_link_options(libLCE PRIVATE --emit-tsd libLCE.d.ts)
 else ()
     set(ENVIRONMENT_TYPE "Native")
-    set(LIB_TYPE SHARED)
+    set(LIB_TYPE SHARED
+			include/Color/Color.h)
     add_library(libLCE ${LIB_TYPE} ${HEADERS} ${FILES} ${LODEPNG_FILES} ${ZLIB_FILES})
 
     target_compile_definitions(libLCE PRIVATE LIBLCE_EXPORTS)

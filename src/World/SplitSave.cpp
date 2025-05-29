@@ -7,16 +7,14 @@
 #include <regex>
 
 namespace lce::world {
-    SplitSave::SplitSave(int16_t x, int16_t z, int16_t dim): Region(x, z, dim) {
-    }
+    SplitSave::SplitSave(int16_t x, int16_t z, int16_t dim) : Region(x, z, dim) {}
 
-    SplitSave::SplitSave(std::vector<uint8_t> data, int16_t x, int16_t z, int16_t dim): Region(x, z, dim) {
-    }
+    SplitSave::SplitSave(std::vector<uint8_t> data, int16_t x, int16_t z, int16_t dim) : Region(x, z, dim) {}
 
-    SplitSave::SplitSave(std::wstring filename) {
-    }
+    SplitSave::SplitSave(std::wstring filename) {}
 
-    SplitSave::SplitSave(std::vector<uint8_t> data, std::wstring filename, lce::compression::CompressionType outerCompression, ByteOrder endian) {
+    SplitSave::SplitSave(std::vector<uint8_t> data, std::wstring filename,
+                         lce::compression::CompressionType outerCompression, io::ByteOrder endian) {
         std::map<int16_t, int16_t> xz = getXZFromFilename(filename);
         int16_t dim = getDimFromFilename(filename);
 
@@ -61,4 +59,4 @@ namespace lce::world {
 
         return -9999;
     }
-} // lce::world
+} // namespace lce::world

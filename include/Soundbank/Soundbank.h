@@ -5,36 +5,40 @@
 #ifndef SOUNDBANK_H
 #define SOUNDBANK_H
 
-#include <libLCE.h>
-#include <IO/ByteEnums.h>
 #include <Filesystem/Filesystem.h>
-#include <Soundbank/BinkaFile.h>
 #include <IO/BinaryIO.h>
-#include <vector>
+#include <IO/BinaryIO.h>
+#include <Soundbank/BinkaFile.h>
+#include <libLCE.h>
 #include <stdexcept> //Remove when implemented
+#include <vector>
 
 namespace lce::msscmp {
-	
-	class LIBLCE_API Soundbank : public fs::Filesystem {
-	public:
-		enum Generation {
-			OLD_GEN, // read uint32_t
-			NEW_GEN // read uint64_t
-		};
 
-		Soundbank(uint8_t* data);
+    class LIBLCE_API Soundbank : public fs::Filesystem {
+    public:
+        enum Generation {
+            OLD_GEN, // read uint32_t
+            NEW_GEN // read uint64_t
+        };
 
-		uint8_t* toData() const { std::logic_error("Function not yet implemented"); return nullptr; }
-	private:
-		ByteOrder byteOrder;
-		Generation gen;
+        Soundbank(uint8_t* data);
 
-		static uint64_t readUintByGeneration(io::BinaryIO &io, ByteOrder endian, Generation gen) {
-			return gen == NEW_GEN ? io.read<uint64_t>(endian) : io.read<uint32_t>(endian);
-		}
+        uint8_t* toData() const {
+            std::logic_error("Function not yet implemented");
+            return nullptr;
+        }
 
-		uint32_t index2Size;
-	};
-}
+    private:
+        io::ByteOrder byteOrder;
+        Generation gen;
+
+        static uint64_t readUintByGeneration(io::BinaryIO& io, io::ByteOrder endian, Generation gen) {
+            return gen == NEW_GEN ? io.read<uint64_t>(endian) : io.read<uint32_t>(endian);
+        }
+
+        uint32_t index2Size;
+    };
+} // namespace lce::msscmp
 
 #endif

@@ -2,13 +2,13 @@
 // Created by DexrnZacAttack on 1/2/2025.
 //
 
-#include <Color/Colors/Color.h>
-#include <Color/Colors/ColorCommons.h>
+#include <Color/Color.h>
+#include <Color/ColorFile.h>
 
 #include <fstream>
 
 namespace lce::color {
-    Color::Color(std::string name, ARGB color): color::ColorCommons(name), color(color) {}
+    Color::Color(std::string name, ARGB color) : color::ColorCommons(name), color(color) {}
 
     Color Color::read(std::vector<uint8_t> data) {
         io::BinaryIO io((data.data()));
@@ -38,7 +38,7 @@ namespace lce::color {
         return size;
     }
 
-    uint8_t *Color::create() {
+    uint8_t* Color::create() {
         io::BinaryIO io(getSize());
 
         io.writeBE<uint16_t>(name.size());
@@ -47,4 +47,10 @@ namespace lce::color {
 
         return io.getData();
     }
-} // lce::color
+
+    ColorCommons::ColorCommons() {}
+
+    ColorCommons::ColorCommons(std::string name) : name(name) {}
+
+    uint32_t ColorCommons::getSize() { return sizeof(uint16_t); }
+} // namespace lce::color

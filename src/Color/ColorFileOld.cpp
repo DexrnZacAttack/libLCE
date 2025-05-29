@@ -2,18 +2,15 @@
 // Created by DexrnZacAttack on 1/2/2025.
 //
 
-#include <Color/ColorFileOld.h>
 #include <Color/ColorFile.h>
 #include <IO/BinaryIO.h>
-
-#include <optional>
 
 namespace lce::color {
     ColorFileOld::ColorFileOld() {}
 
-    ColorFileOld::ColorFileOld(std::vector<Color> colors): ColorFileCommons(colors, 0) {}
+    ColorFileOld::ColorFileOld(std::vector<Color> colors) : ColorFileCommons(colors, 0) {}
 
-    ColorFileOld::ColorFileOld(std::vector<Color> colors, uint32_t version): ColorFileCommons(colors, version) {}
+    ColorFileOld::ColorFileOld(std::vector<Color> colors, uint32_t version) : ColorFileCommons(colors, version) {}
 
     ColorFileOld ColorFileOld::read(std::vector<uint8_t> data) {
         lce::io::BinaryIO io(data.data());
@@ -30,7 +27,7 @@ namespace lce::color {
         return cfo;
     }
 
-    uint8_t *ColorFileOld::create() const {
+    uint8_t* ColorFileOld::create() const {
         io::BinaryIO io(this->getSize());
 
         io.writeBE<uint32_t>(this->version);
@@ -52,4 +49,4 @@ namespace lce::color {
         }
         return size;
     }
-} // lce::color
+} // namespace lce::color

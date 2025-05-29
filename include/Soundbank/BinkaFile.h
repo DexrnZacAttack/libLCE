@@ -7,22 +7,22 @@
 
 #include <Filesystem/File.h>
 
-namespace lce::msscmp
-{
+namespace lce::msscmp {
 
     class LIBLCE_API BinkaFile : public fs::File {
     public:
         BinkaFile() = delete;
 
-        BinkaFile(std::wstring name, std::vector<uint8_t> data, uint32_t sampleRate, fs::Directory *parent)
-            : fs::File(name, data, parent), sampleRate(sampleRate) {}
+        BinkaFile(std::wstring name, std::vector<uint8_t> data, uint32_t sampleRate, fs::Directory* parent) :
+            fs::File(name, data, parent), sampleRate(sampleRate) {}
 
         uint32_t getSampleRate() const { return sampleRate; }
         void setSampleRate(const uint32_t _sampleRate) { sampleRate = _sampleRate; }
+
     private:
         uint32_t sampleRate;
     };
 
-}
+} // namespace lce::msscmp
 
-#endif //BINKAFILE_H
+#endif // BINKAFILE_H

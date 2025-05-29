@@ -22,16 +22,20 @@ namespace lce::fs {
         std::wostringstream oss;
 
         for (auto i = objs.rbegin(); i != objs.rend(); ++i) {
-            if (const FSObject *obj = *i; obj->parent == nullptr) {
-                oss << obj->getName(); // is parent is nullptr then we hit the root directory (there should not be an orphaned file outside the filesystem*)
+            if (const FSObject* obj = *i; obj->parent == nullptr) {
+                oss << obj->getName(); // is parent is nullptr then we hit the root directory (there should not be an
+                                       // orphaned file outside the filesystem*)
             } else {
                 std::wstring name = obj->getName();
 
-                if (name == L"/" || obj->parent->getName() == L"/") oss << name; // if parent is root or the current object is root then we don't want double path delimiters
-                else oss << L"/" << name;
+                if (name == L"/" || obj->parent->getName() == L"/")
+                    oss << name; // if parent is root or the current object is root then we don't want double path
+                                 // delimiters
+                else
+                    oss << L"/" << name;
             }
         }
 
         return oss.str();
     }
-}
+} // namespace lce::fs

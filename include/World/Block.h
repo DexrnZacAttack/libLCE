@@ -6,28 +6,28 @@
 #define BLOCK_H
 #include <cstdint>
 
-#include <IO/ByteEnums.h>
+#include <IO/BinaryIO.h>
 #include <libLCE.h>
 
 namespace lce::world {
 
-class LIBLCE_API Block {
-protected:
-    bool waterlogged;
-    uint16_t id;
-    uint8_t data;
+    class LIBLCE_API Block {
+    protected:
+        bool waterlogged;
+        uint16_t id;
+        uint8_t data;
 
-public:
-    Block(uint16_t id, uint8_t data, bool waterlogged);
-    Block(uint16_t packed, ByteOrder endian = LITTLE);
+    public:
+        Block(uint16_t id, uint8_t data, bool waterlogged);
+        Block(uint16_t packed, io::ByteOrder endian = io::ByteOrder::LITTLE);
 
-    uint16_t getPacked() const;
+        uint16_t getPacked() const;
 
-    uint16_t getId() const;
-    uint8_t getData() const;
-    bool isWaterlogged() const;
-};
+        uint16_t getId() const;
+        uint8_t getData() const;
+        bool isWaterlogged() const;
+    };
 
-} // lce
+} // namespace lce::world
 
-#endif //BLOCK_H
+#endif // BLOCK_H

@@ -10,21 +10,18 @@
 #include <Save/SaveFile.h>
 
 namespace lce::save {
-    SaveFile::SaveFile(uint32_t indexFileCount, uint16_t origVersion, uint16_t version) {
-    }
+    SaveFile::SaveFile(uint32_t indexFileCount, uint16_t origVersion, uint16_t version) {}
 
     SaveFile::SaveFile() = default;
 
-    SaveFile::SaveFile(ByteOrder endian) {
-        this->endian = endian;
-    }
+    SaveFile::SaveFile(io::ByteOrder endian) { this->endian = endian; }
 
     /**
      * Reads a save file from a pointer to the data
      * @param data The data you want to read (a save file)
      * @return The save file.
      */
-    SaveFile::SaveFile(std::vector<uint8_t> data, ByteOrder endian) {
+    SaveFile::SaveFile(std::vector<uint8_t> data, io::ByteOrder endian) {
         this->endian = endian;
         io::BinaryIO io(data.data());
 
@@ -32,12 +29,13 @@ namespace lce::save {
 
         if (indexOffset > data.size())
             throw std::runtime_error("Index offset points to an area that is out of bounds of the data given.");
-		
-		DebugLog(""<<io.getPosition());
+
+        DebugLog("" << io.getPosition());
         uint32_t fileCount = io.read<uint32_t>(this->endian);
 
-        if (fileCount > (0xFFFFFFFF - HEADER_SIZE) / this->SaveFile::getIndexEntrySize() )
-            throw std::runtime_error("File count (" + std::to_string(fileCount) + ") makes the file too big for it's index offset to stored in a 32-bit integer.");
+        if (fileCount > (0xFFFFFFFF - HEADER_SIZE) / this->SaveFile::getIndexEntrySize())
+            throw std::runtime_error("File count (" + std::to_string(fileCount) +
+                                     ") makes the file too big for it's index offset to stored in a 32-bit integer.");
 
         this->originalVersion = io.read<uint16_t>(this->endian);
         this->version = io.read<uint16_t>(this->endian);
@@ -57,7 +55,7 @@ namespace lce::save {
             uint32_t size = io.read<uint32_t>(this->endian);
             uint32_t offset = io.read<uint32_t>(this->endian);
             uint64_t modifiedTimestamp = io.read<uint64_t>(this->endian); // unused for now
-            
+
             DebugLogW(name);
 
             // read the data, maybe should be changed
@@ -78,7 +76,7 @@ namespace lce::save {
      */
     uint8_t* SaveFile::toData() const {
         io::BinaryIO io(this->getSize());
-        fs::Directory *root = getRoot();
+        fs::Directory* root = getRoot();
 
         uint32_t indexOffset = calculateIndexOffset();
 
@@ -107,7 +105,8 @@ namespace lce::save {
                 }
 
                 const fs::File* innerFile = dynamic_cast<const fs::File*>(child.get());
-                if (!innerFile) continue;
+                if (!innerFile)
+                    continue;
 
                 std::wstring path = innerFile->getPath().substr(1);
 
@@ -140,4 +139,4 @@ namespace lce::save {
         return io.getData();
     }
 
-} // lce
+} // namespace lce::save
