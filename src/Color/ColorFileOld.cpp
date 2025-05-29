@@ -44,7 +44,7 @@ namespace lce::color {
     }
 
     uint64_t ColorFileOld::getSize() const {
-        uint32_t size = 8; // 4 for version 4 for count
+        uint32_t size = 8; // 4 for version, 4 for count
         for (const auto& color : colors) {
             size += 2;
             size += (color.name).size();
