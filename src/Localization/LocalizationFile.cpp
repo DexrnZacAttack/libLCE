@@ -5,8 +5,8 @@
 // Documentation for this format is available at:
 // https://team-lodestone.github.io/Documentation/LCE/File%20Types/LOC.html
 
-#include "LocalizationFile.h"
-#include "../IO/BinaryIO.h"
+#include <Localization/LocalizationFile.h>
+#include <IO/BinaryIO.h>
 
 namespace lce::loc {
 

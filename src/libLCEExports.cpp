@@ -1,7 +1,7 @@
 //
 // Created by DexrnZacAttack on 4/10/2025.
 //
-#include "libLCEExports.h"
+#include "../include/libLCEExports.h"
 
 const char * getLibraryVersion() {
     return VERSION;

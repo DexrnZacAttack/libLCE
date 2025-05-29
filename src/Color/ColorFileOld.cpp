@@ -2,13 +2,11 @@
 // Created by DexrnZacAttack on 1/2/2025.
 //
 
-#include "ColorFileOld.h"
-
-#include "ColorFile.h"
+#include <Color/ColorFileOld.h>
+#include <Color/ColorFile.h>
+#include <IO/BinaryIO.h>
 
 #include <optional>
-
-#include "../IO/BinaryIO.h"
 
 namespace lce::color {
     ColorFileOld::ColorFileOld() {}

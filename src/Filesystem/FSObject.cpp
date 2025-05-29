@@ -2,12 +2,12 @@
 // Created by DexrnZacAttack on 5/26/2025 (ZPC-I1)
 //
 
-#include "FSObject.h"
+#include <Filesystem/FSObject.h>
 
 #include <sstream>
 #include <vector>
 
-#include "Directory.h"
+#include <Filesystem/Directory.h>
 
 namespace lce::fs {
     std::wstring FSObject::getPath() const {

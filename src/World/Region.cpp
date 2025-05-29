@@ -4,8 +4,8 @@
 
 #include <regex>
 
-#include "Chunk.h"
-#include "Region.h"
+#include <World/Chunk.h>
+#include <World/Region.h>
 
 namespace lce::world {
     Region::Region(int16_t x, int16_t z, int16_t dim): x(x), z(z), dim(dim) {

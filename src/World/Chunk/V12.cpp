@@ -2,7 +2,7 @@
 // Created by DexrnZacAttack on 4/3/2025.
 //
 
-#include "../Chunk.h"
+#include <World/Chunk.h>
 
 namespace lce::world {
 

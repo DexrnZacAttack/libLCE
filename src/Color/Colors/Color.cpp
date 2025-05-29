@@ -2,12 +2,13 @@
 // Created by DexrnZacAttack on 1/2/2025.
 //
 
-#include "Color.h"
+#include <Color/Colors/Color.h>
+#include <Color/Colors/ColorCommons.h>
 
 #include <fstream>
 
 namespace lce::color {
-    Color::Color(std::string name, ARGB color): ColorCommons(name), color(color) {}
+    Color::Color(std::string name, ARGB color): color::ColorCommons(name), color(color) {}
 
     Color Color::read(std::vector<uint8_t> data) {
         io::BinaryIO io((data.data()));

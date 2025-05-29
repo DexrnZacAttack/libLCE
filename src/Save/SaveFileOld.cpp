@@ -2,13 +2,12 @@
 // Created by DexrnZacAttack on 12/21/2024.
 //
 
-#include "SaveFileOld.h"
+#include <Save/SaveFileOld.h>
+#include <Save/SaveFile.h>
+#include <IO/BinaryIO.h>
 
 #include <chrono>
-#include "SaveFile.h"
-#include "../IO/BinaryIO.h"
 #include <stack>
-
 
 namespace lce::save {
     SaveFileOld::SaveFileOld(ByteOrder endian) {

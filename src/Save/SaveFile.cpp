@@ -2,13 +2,12 @@
 // Created by DexrnZacAttack on 12/19/2024.
 //
 
-#include "SaveFile.h"
-
 #include <chrono>
 #include <stack>
 #include <vector>
 
-#include "../IO/BinaryIO.h"
+#include <IO/BinaryIO.h>
+#include <Save/SaveFile.h>
 
 namespace lce::save {
     SaveFile::SaveFile(uint32_t indexFileCount, uint16_t origVersion, uint16_t version) {

@@ -2,8 +2,8 @@
 // Created by DexrnZacAttack on 12/19/2024.
 //
 
-#include "Archive.h"
-#include "../IO/BinaryIO.h"
+#include <Archive/Archive.h>
+#include <IO/BinaryIO.h>
 #include <iostream>
 #include <stack>
 

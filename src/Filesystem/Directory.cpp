@@ -2,9 +2,8 @@
 // Created by DexrnZacAttack on 5/27/2025 (ZPC-I1)
 //
 
-#include "Directory.h"
-
-#include "File.h"
+#include <Filesystem/Directory.h>
+#include <Filesystem/File.h>
 
 namespace lce::fs {
     File *Directory::createFile(const std::wstring& name, std::vector<uint8_t> data) {

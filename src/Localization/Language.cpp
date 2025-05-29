@@ -2,7 +2,7 @@
 // Created by Boreal on 05/15/2025.
 //
 
-#include "Language.h"
+#include <Localization/Language.h>
 
 namespace lce::loc {
 	

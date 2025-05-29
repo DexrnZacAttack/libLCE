@@ -2,9 +2,8 @@
 // Created by DexrnZacAttack on 3/15/2025.
 //
 
-#include "Thumb.h"
-
-#include "../../external/lodepng/lodepng.h"
+#include <Save/Thumb.h>
+#include <lodepng/lodepng.h>
 
 namespace lce::save {
     Thumb::Thumb(std::vector<uint8_t> data, ByteOrder endian, int headerSize, bool use4ByteWideChar) {

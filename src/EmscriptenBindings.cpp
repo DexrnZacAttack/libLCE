@@ -4,7 +4,7 @@
 // "JavascriptHellUtility.cpp"
 
 
-#include "libLCEExports.h"
+#include "../include/libLCEExports.h"
 #ifdef __EMSCRIPTEN__
 
 #include <emscripten/bind.h>

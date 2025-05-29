@@ -2,12 +2,10 @@
 // Created by Boreal on 05/20/2025.
 //
 
-#include "Soundbank.h"
+#include <IO/BinaryIO.h>
+#include <Soundbank/Soundbank.h>
 
 #include <filesystem>
-
-#include "../IO/BinaryIO.h"
-
 #include <utility>
 
 namespace lce::msscmp {
@@ -15,7 +13,7 @@ namespace lce::msscmp {
 	Soundbank::Soundbank(uint8_t* data) {
 		io::BinaryIO io(data);
 
-		std::string magic = io.readUtf8(4);
+		const std::string magic = io.readUtf8(4);
 		
 		byteOrder = magic == "BANK" ? BIG : LITTLE;
 

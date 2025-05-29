@@ -6,15 +6,15 @@
 #include <filesystem>
 #include <stack>
 
-#include "src/Archive/Archive.h"
-#include "src/Color/ColorFile.h"
-#include "src/Save/SaveFileOld.h"
-#include "src/Save/Thumb.h"
-#include "src/World/Region.h"
-#include "src/libLCEExports.h"
+#include "include/Archive/Archive.h"
+#include "include/Color/ColorFile.h"
+#include "include/Save/SaveFileOld.h"
+#include "include/Save/Thumb.h"
+#include "include/World/Region.h"
+#include "include/libLCEExports.h"
 
-#include "src/Localization/LocalizationFile.h"
-#include "src/Soundbank/Soundbank.h"
+#include "include/Localization/LocalizationFile.h"
+#include "include/Soundbank/Soundbank.h"
 
 namespace lce::tests {
     void arcTest() {

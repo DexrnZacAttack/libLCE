@@ -2,7 +2,7 @@
 // Created by DexrnZacAttack on 1/2/2025.
 //
 
-#include "ColorCommons.h"
+#include <Color/Colors/ColorCommons.h>
 
 namespace lce::color {
     ColorCommons::ColorCommons() {}

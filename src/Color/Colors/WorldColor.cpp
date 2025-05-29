@@ -2,7 +2,7 @@
 // Created by DexrnZacAttack on 1/2/2025.
 //
 
-#include "WorldColor.h"
+#include <Color/Colors/WorldColor.h>
 
 namespace lce::color {
     WorldColor::WorldColor(std::string name, ARGB waterColor, ARGB underwaterColor, ARGB fogColor): ColorCommons(name), waterColor(waterColor), underwaterColor(underwaterColor), fogColor(fogColor) {}

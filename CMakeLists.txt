@@ -9,6 +9,8 @@ add_definitions(-DPLATFORM_ARCH="${CMAKE_SYSTEM_PROCESSOR}")
 
 message(STATUS "${CMAKE_SYSTEM_PROCESSOR}")
 
+include_directories(include external)
+
 # because _DEBUG is not universal
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_definitions(-DCMAKE_BUILD_DEBUG)
@@ -37,73 +39,76 @@ set(ZLIB_FILES
 	external/zlib/inftrees.c
 )
 
+set(HEADERS
+		include/libLCE.h
+		include/libLCEExports.h
+		include/World/Region.h
+		include/World/Chunk.h
+		include/Save/SaveFile.h
+		include/IO/BinaryIO.h
+		include/Filesystem/Filesystem.h
+		include/Filesystem/File.h
+		include/Archive/Archive.h
+		include/Color/Colors/Color.h
+		include/Color/ColorFileOld.h
+		include/Color/ColorFileCommons.h
+		include/Color/ColorFile.h
+		include/Color/Colors/ColorCommons.h
+		include/Color/Colors/WorldColor.h
+		include/Localization/LocalizationFile.h
+		include/Localization/Language.h
+		include/Soundbank/Soundbank.h
+		include/Save/SaveFileOld.h
+		include/Save/SaveFileCommons.h
+		include/Compression/Compression.h
+		include/IO/ByteEnums.h
+		include/Save/Thumb.h
+		include/World/SplitSave.h
+		include/World/Block.h
+		include/Filesystem/FSObject.h
+		include/Filesystem/Directory.h
+)
+
 set(FILES
-	src/libLCE.h
-	src/libLCEExports.h
 	src/libLCEExports.cpp
 	src/EmscriptenBindings.cpp
 	src/World/Region.cpp
-	src/World/Region.h
 	src/World/Chunk.cpp
-	src/World/Chunk.h
 	src/Save/SaveFile.cpp
-	src/Save/SaveFile.h
 	src/IO/BinaryIO.cpp
-	src/IO/BinaryIO.h
 	src/Filesystem/Filesystem.cpp
-	src/Filesystem/Filesystem.h
-	src/Filesystem/File.h
 	src/Archive/Archive.cpp
-	src/Archive/Archive.h
-		src/Color/Colors/Color.cpp
-		src/Color/Colors/Color.h
-		src/Color/ColorFileOld.cpp
-		src/Color/ColorFileOld.h
-		src/Color/ColorFileCommons.cpp
-		src/Color/ColorFileCommons.h
-		src/Color/ColorFile.cpp
-		src/Color/ColorFile.h
-		src/Color/Colors/ColorCommons.cpp
-		src/Color/Colors/ColorCommons.h
-		src/Color/Colors/WorldColor.cpp
-		src/Color/Colors/WorldColor.h
+	src/Color/Colors/Color.cpp
+	src/Color/ColorFileOld.cpp
+	src/Color/ColorFileCommons.cpp
+	src/Color/ColorFile.cpp
+	src/Color/Colors/ColorCommons.cpp
+	src/Color/Colors/WorldColor.cpp
 	src/Localization/LocalizationFile.cpp
-	src/Localization/LocalizationFile.h
 	src/Localization/Language.cpp
-	src/Localization/Language.h
 	src/Soundbank/Soundbank.cpp
-	src/Soundbank/Soundbank.h
 	src/Save/SaveFileOld.cpp
-	src/Save/SaveFileOld.h
 	src/Save/SaveFileCommons.cpp
-	src/Save/SaveFileCommons.h
 	src/IO/BinaryString.cpp
 	src/Compression/Compression.cpp
-	src/Compression/Compression.h
-	src/IO/ByteEnums.h
 	src/Save/Thumb.cpp
-	src/Save/Thumb.h
 	src/World/SplitSave.cpp
-	src/World/SplitSave.h
 	src/World/Block.cpp
-	src/World/Block.h
 	src/World/Chunk/V12.cpp
 	src/Filesystem/FSObject.cpp
-	src/Filesystem/FSObject.h
 	src/Filesystem/Directory.cpp
-	src/Filesystem/Directory.h
 )
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
     set(ENVIRONMENT_TYPE "Emscripten")
     # weird?
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -sNO_DISABLE_EXCEPTION_CATCHING -s USE_ZLIB=1 -s WASM_BIGINT -s MODULARIZE=1 -sEXPORT_ES6=1 -s EXPORT_ALL=1 -s EXPORTED_RUNTIME_METHODS=['ccall','cwrap','getValue','setValue'] -s EXPORTED_FUNCTIONS=['_malloc'] -s ALLOW_MEMORY_GROWTH=1")
-    add_executable(libLCE ${FILES} ${LODEPNG_FILES})
+    add_executable(libLCE ${HEADERS} ${FILES} ${LODEPNG_FILES})
 #    target_link_options(libLCE PRIVATE --emit-tsd libLCE.d.ts)
 else ()
     set(ENVIRONMENT_TYPE "Native")
     set(LIB_TYPE SHARED)
-    add_library(libLCE ${LIB_TYPE} ${FILES} ${LODEPNG_FILES} ${ZLIB_FILES})
+    add_library(libLCE ${LIB_TYPE} ${HEADERS} ${FILES} ${LODEPNG_FILES} ${ZLIB_FILES})
 
     target_compile_definitions(libLCE PRIVATE LIBLCE_EXPORTS)
 

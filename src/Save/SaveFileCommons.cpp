@@ -2,16 +2,13 @@
 // Created by DexrnZacAttack on 12/21/2024.
 //
 
-#include "SaveFileCommons.h"
+#include <Save/SaveFileCommons.h>
+#include <IO/BinaryIO.h>
 
 #include <codecvt>
 #include <cstdint>
 #include <variant>
 #include <algorithm>
-
-#include "SaveFileOld.h"
-#include "SaveFile.h"
-#include "../IO/BinaryIO.h"
 
 #include <stdexcept> //Remove when implemented
 

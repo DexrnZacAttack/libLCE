@@ -2,15 +2,13 @@
 // Created by DexrnZacAttack on 12/28/2024.
 //
 
-#include "Chunk.h"
-#include "../Compression/Compression.h"
+#include <World/Chunk.h>
+#include <Compression/Compression.h>
+#include <IO/BinaryIO.h>
 
 #include <fstream>
 #include <sstream>
 #include <utility>
-
-#include "../Compression/Compression.h"
-#include "../IO/BinaryIO.h"
 
 namespace lce::world {
     Chunk::Section::Section() {}

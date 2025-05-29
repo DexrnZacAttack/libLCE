@@ -2,7 +2,7 @@
 // Created by (Person who prefers not to be named) and DexrnZacAttack on 20/12/2024.
 //
 
-#include "BinaryIO.h"
+#include <IO/BinaryIO.h>
 
 #include <vector>
 #include <cstring>
@@ -39,12 +39,13 @@ namespace lce::io {
     }
 
     uint32_t BinaryIO::readUint24(ByteOrder endian) {
-        uint8_t b0 = readByte();
-        uint8_t b1 = readByte();
-        uint8_t b2 = readByte();
+        const uint8_t b0 = readByte();
+        const uint8_t b1 = readByte();
+        const uint8_t b2 = readByte();
 
         if (endian == ByteOrder::LITTLE) return static_cast<uint32_t>(b0) | (static_cast<uint32_t>(b1) << 8) | (static_cast<uint32_t>(b2) << 16);
-        else  return (static_cast<uint32_t>(b0) << 16) | (static_cast<uint32_t>(b1) << 8) | static_cast<uint32_t>(b2);
+
+        return (static_cast<uint32_t>(b0) << 16) | (static_cast<uint32_t>(b1) << 8) | static_cast<uint32_t>(b2);
     }
 
 

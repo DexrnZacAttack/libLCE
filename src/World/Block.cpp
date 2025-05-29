@@ -2,7 +2,7 @@
 // Created by DexrnZacAttack on 3/27/2025.
 //
 
-#include "Block.h"
+#include <World/Block.h>
 
 namespace lce::world {
     Block::Block(uint16_t id, uint8_t data, bool waterlogged): id(id), data(data), waterlogged(waterlogged) {

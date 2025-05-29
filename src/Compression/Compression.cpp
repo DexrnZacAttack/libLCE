@@ -2,13 +2,12 @@
 // Created by DexrnZacAttack on 12/28/2024.
 //
 
-#include "Compression.h"
+#include <Compression/Compression.h>
+#include <zlib/zlib.h>
+#include <IO/BinaryIO.h>
 
 #include <iostream>
 #include <fstream>
-
-#include "../../external/zlib/zlib.h"
-#include "../IO/BinaryIO.h"
 
 namespace lce::compression {
 bool Compression::decompressZlib(std::vector<uint8_t>& in, std::vector<uint8_t>& out) {
