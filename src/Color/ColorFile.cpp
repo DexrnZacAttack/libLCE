@@ -33,7 +33,7 @@ namespace lce::color {
     }
 
     uint64_t ColorFile::getSize() const {
-        uint32_t size = 12; // 4 for version 4 for count 4 for biome count
+        uint32_t size = 12; // 4 for version, 4 for count, and 4 for biome count
         for (auto color : colors) {
             size += 2;
             size += (color.name).size();
