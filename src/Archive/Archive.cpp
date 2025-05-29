@@ -73,7 +73,7 @@ namespace lce::arc {
                 const fs::File *f = static_cast<const fs::File*>(child.get());
                 io.writeBE<uint16_t>(path.length());
                 io.writeUtf8(io::BinaryIO::wstringToString(path));
-                // this stores the area where the file offset is written.
+                // This stores the area where the file offset is written.
                 offsetPositions[i] = io.getPosition();
                 io.writeBE<uint32_t>(0);
                 io.writeBE<uint32_t>(f->getSize());
@@ -100,18 +100,18 @@ namespace lce::arc {
                 }
 
                 const fs::File *f = static_cast<const fs::File*>(child.get());
-                // get current position (this is the position of the file)
+                // Get current position (this is the position of the file)
                 uint32_t pos = io.getPosition();
-                // write the file
+                // Write the file
                 io.writeBytes(f->getData().data(), f->getSize());
-                // get the position after the file was written (we return here to write the next one)
+                // Get the position after the file was written (we return here to write the next one)
                 uint32_t pos2 = io.getPosition();
-                // go to the offset offset (lol) and write the actual offset.
+                // Go to the offset offset (lol) and write the actual offset.
                 io.seek(offsetPositions[j]);
                 io.writeBE<uint32_t>(pos);
-                // seek back over to the next file's position.
+                // Seek back over to the next file's position.
                 io.seek(pos2);
-                // and then we increment this.
+                // Then we increment this.
                 j++;
             }
         }
@@ -147,5 +147,4 @@ namespace lce::arc {
 
         return size;
     }
-
 }
