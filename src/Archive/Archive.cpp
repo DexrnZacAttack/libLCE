@@ -37,7 +37,6 @@ namespace lce::arc {
 
             this->createFileRecursive(wname, d);
         }
-        __debugbreak();
     }
 
     uint8_t* Archive::toData() const {
