@@ -66,6 +66,9 @@ namespace lce::fs {
         /// Because this is a Directory, it will always return false
         bool isFile() const override { return false; }
 
+        // thanks MSVC
+        Directory(const Directory&) = delete;
+        Directory& operator=(const Directory&) = delete;
     private:
         std::unordered_map<std::wstring, std::unique_ptr<FSObject>> children;
     };

@@ -14,7 +14,7 @@
 #define BUILD_TYPE "Release"
 #endif
 
-#define VERSION "1.1.1"
+#define VERSION "1.1.2"
 #define LIBRARY_STRING                                                                                                 \
     "libLCE v" VERSION " (" COMPILER_NAME " / " BUILD_TYPE " | " PLATFORM_NAME " " PLATFORM_ARCH                       \
     ") | https://github.com/DexrnZacAttack/libLCE"
