@@ -27,7 +27,7 @@ namespace lce::world {
     public:
         class LIBLCE_API Section {
         public:
-            std::array<uint16_t, 16 * 256 * 16> blocks; // blocks
+            std::array<uint16_t, 16 * 16 * 16> blocks; // blocks
 
             Section();
         };

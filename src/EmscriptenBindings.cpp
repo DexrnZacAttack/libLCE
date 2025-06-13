@@ -51,7 +51,7 @@ EMSCRIPTEN_BINDINGS(libLCE) {
     emscripten::function("VectorFromUInt8Array", &VectorFromUInt8Array);
     emscripten::function("VectorToUInt8Array", &VectorToUInt8Array);
 
-    emscripten::enum_<ByteOrder>("ByteOrder").value("LITTLE", io::ByteOrder::LITTLE).value("BIG", io::ByteOrder::BIG);
+    emscripten::enum_<lce::io::ByteOrder>("ByteOrder").value("LITTLE", lce::io::ByteOrder::LITTLE).value("BIG", lce::io::ByteOrder::BIG);
 
     emscripten::enum_<lce::compression::CompressionType>("CompressionType")
         .value("ZLIB", lce::compression::CompressionType::ZLIB)
@@ -143,14 +143,14 @@ EMSCRIPTEN_BINDINGS(libLCE) {
 
     emscripten::class_<lce::save::SaveFile, emscripten::base<lce::save::SaveFileCommons>>("SaveFile")
         .constructor<uint32_t, uint16_t, uint16_t>()
-        .constructor<ByteOrder>()
-        .constructor<std::vector<uint8_t>, io::ByteOrder>()
+        .constructor<lce::io::ByteOrder>()
+        .constructor<std::vector<uint8_t>, lce::io::ByteOrder>()
         .constructor()
         .function("toData", &lce::save::SaveFile::toData, emscripten::allow_raw_pointer<const uint8_t*>());
 
     emscripten::class_<lce::save::SaveFileOld, emscripten::base<lce::save::SaveFileCommons>>("SaveFileOld")
-        .constructor<ByteOrder>()
-        .constructor<std::vector<uint8_t>, io::ByteOrder>()
+        .constructor<lce::io::ByteOrder>()
+        .constructor<std::vector<uint8_t>, lce::io::ByteOrder>()
         .function("toData", &lce::save::SaveFileOld::toData, emscripten::allow_raw_pointer<const uint8_t*>())
         .function("upgrade", &lce::save::SaveFileOld::upgrade, emscripten::allow_raw_pointer<lce::save::SaveFile*>());
 
@@ -172,13 +172,13 @@ EMSCRIPTEN_BINDINGS(libLCE) {
         .property("size", &lce::loc::LocalizationFile::getSize);
 
     emscripten::class_<lce::save::Thumb>("Thumb")
-        .constructor<std::vector<uint8_t>, io::ByteOrder, int, bool>()
+        .constructor<std::vector<uint8_t>, lce::io::ByteOrder, int, bool>()
         .property("worldName", &lce::save::Thumb::getWorldName, &lce::save::Thumb::setWorldName)
         .property("image", &lce::save::Thumb::getImage, &lce::save::Thumb::setImage)
         .property("properties", &lce::save::Thumb::getProperties, &lce::save::Thumb::setProperties);
 
     emscripten::class_<lce::world::Region>("Region")
-        .constructor<std::vector<uint8_t>, std::wstring, lce::compression::CompressionType, io::ByteOrder>()
+        .constructor<std::vector<uint8_t>, std::wstring, lce::compression::CompressionType, lce::io::ByteOrder>()
         .property("x", &lce::world::Region::getX, &lce::world::Region::setX)
         .property("z", &lce::world::Region::getZ, &lce::world::Region::setZ)
         .property("dim", &lce::world::Region::getDim, &lce::world::Region::setDim)
