@@ -3,6 +3,9 @@
 
 Downloads for Linux, Windows, and Emscripten are available at https://nightly.link/DexrnZacAttack/libLCE/workflows/cmake-multi-platform/main?preview
 
+NOTE: Some of this project's work will go towards [Project Lodestone](https://github.com/Team-Lodestone) and [libLodestone](https://github.com/Team-Lodestone/libLodestone).   
+Project Lodestone is an in-progress universal world converter, [check them out](https://team-lodestone.github.io)!
+
 ## Progress
 
 - [x] Savegame
