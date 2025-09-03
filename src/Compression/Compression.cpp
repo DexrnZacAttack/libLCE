@@ -9,6 +9,8 @@
 #include <fstream>
 #include <iostream>
 
+// TODO: we should be taking in pointer to return output size and allocating specific amount instead I think
+
 namespace lce::compression {
     bool Compression::decompressZlib(std::vector<uint8_t>& in, std::vector<uint8_t>& out) {
         if (in.size() < 2) {

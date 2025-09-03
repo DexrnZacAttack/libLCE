@@ -5,3 +5,4 @@
 *.geany
 /.idea
 .idea/editor.xml
+/tests/output
