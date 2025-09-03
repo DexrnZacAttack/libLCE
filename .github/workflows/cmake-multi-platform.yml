@@ -38,7 +38,7 @@ jobs:
             c_compiler: emcc
             cpp_compiler: em++
             build_settings: >
-              --target libLCE
+              --target LCE
             settings: >
               -DCMAKE_EXE_LINKER_FLAGS="--bind"
               -DEMSCRIPTEN_DIR="$/home/runner/work/libLCE/libLCE/external/emsdk/upstream/emscripten"
