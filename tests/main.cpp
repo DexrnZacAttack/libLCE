@@ -18,7 +18,7 @@
 
 namespace lce::tests {
     void arcTest() {
-        FILE* f = fopen("../tests/examples/example.arc", "rb");
+        FILE* f = fopen("../../tests/examples/example.arc", "rb");
         if (f == nullptr) {
             DebugErrLog("Failed to open file.");
             return;
@@ -40,7 +40,7 @@ namespace lce::tests {
 
         const uint8_t* file2 = file.toData();
 
-        std::ofstream outFile("../tests/examples/example_out.arc", std::ios::binary);
+        std::ofstream outFile("../../tests/examples/example_out.arc", std::ios::binary);
         if (!outFile) {
             throw std::ios_base::failure("Failed to open file");
         }
@@ -54,7 +54,7 @@ namespace lce::tests {
     }
 
     void locTest() {
-        FILE* f = fopen("../tests/examples/example.loc", "rb");
+        FILE* f = fopen("../../tests/examples/example.loc", "rb");
         if (f == nullptr) {
             DebugErrLog("Failed to open file.");
             return;
@@ -74,7 +74,7 @@ namespace lce::tests {
 
         const uint8_t* file2 = file.toData();
 
-        std::ofstream outFile("../tests/examples/example_copy.loc", std::ios::binary);
+        std::ofstream outFile("../../tests/examples/example_copy.loc", std::ios::binary);
         if (!outFile) {
             throw std::ios_base::failure("Failed to open file");
         }
@@ -92,7 +92,7 @@ namespace lce::tests {
     void msscmpTest(io::ByteOrder endian) {
         std::string order = endian == io::ByteOrder::LITTLE ? "le" : "be";
 
-        FILE* f = fopen(("../tests/examples/msscmp-" + order + ".msscmp").c_str(), "rb");
+        FILE* f = fopen(("../../tests/examples/msscmp-" + order + ".msscmp").c_str(), "rb");
         if (f == nullptr) {
             DebugErrLog("Failed to open file.");
             return;
@@ -124,7 +124,7 @@ namespace lce::tests {
                 }
 
                 fs::File* innerFile = dynamic_cast<fs::File*>(child.get());
-                std::filesystem::path innerFilePath = std::filesystem::path(L"../tests/examples/msscmp") /
+                std::filesystem::path innerFilePath = std::filesystem::path(L"../../tests/examples/msscmp") /
                                                       (L"msscmp-" + lce::io::BinaryIO::stringToWString(order)) /
                                                       innerFile->getPath().substr(1);
                 std::filesystem::create_directories(innerFilePath.parent_path());
@@ -142,7 +142,7 @@ namespace lce::tests {
     }
 
     void oldSaveTest() {
-        FILE* f = fopen("../tests/examples/savegame_pr.dat", "rb");
+        FILE* f = fopen("../../tests/examples/savegame_pr.dat", "rb");
         if (f == nullptr) {
             DebugErrLog("Failed to open file.");
             return;
@@ -170,7 +170,7 @@ namespace lce::tests {
         // write the file
         const uint8_t* file2 = file.toData();
 
-        std::ofstream outFile("../tests/examples/savegame_pr-be_out.dat", std::ios::binary);
+        std::ofstream outFile("../../tests/examples/savegame_pr-be_out.dat", std::ios::binary);
         if (!outFile) {
             throw std::ios_base::failure("Failed to open file");
         }
@@ -185,7 +185,7 @@ namespace lce::tests {
         // write le file
         file.setEndian(io::ByteOrder::LITTLE);
 
-        std::ofstream outFile2("../tests/examples/savegame_pr_switch-to-le_out.dat", std::ios::binary);
+        std::ofstream outFile2("../../tests/examples/savegame_pr_switch-to-le_out.dat", std::ios::binary);
         if (!outFile2) {
             throw std::ios_base::failure("Failed to open file");
         }
@@ -201,7 +201,7 @@ namespace lce::tests {
     void saveTestEndian(io::ByteOrder endian) {
         std::string order = endian == io::ByteOrder::LITTLE ? "le" : "be";
 
-        std::ifstream f("../tests/examples/savegame-" + order + ".dat",
+        std::ifstream f("../../tests/examples/savegame-" + order + ".dat",
                         std::ios::in | std::ios::binary | std::ios::ate);
         if (!f.is_open()) {
             DebugErrLog("Failed to open file.");
@@ -229,7 +229,7 @@ namespace lce::tests {
 
         const uint8_t* file2 = file.toData();
 
-        std::ofstream outFile("../tests/examples/savegame-" + order + "_out.dat", std::ios::binary);
+        std::ofstream outFile("../../tests/examples/savegame-" + order + "_out.dat", std::ios::binary);
         if (!outFile) {
             throw std::ios_base::failure("Failed to open file");
         }
@@ -244,7 +244,7 @@ namespace lce::tests {
 
     void saveTestVita() {
 
-        std::ifstream f("../tests/examples/savegame-vita.dat", std::ios::in | std::ios::binary | std::ios::ate);
+        std::ifstream f("../../tests/examples/savegame-vita.dat", std::ios::in | std::ios::binary | std::ios::ate);
         if (!f.is_open()) {
             DebugErrLog("Failed to open file.");
             return;
@@ -269,7 +269,7 @@ namespace lce::tests {
             std::cerr << "Failed to decompress vita" << std::endl;
         }
 
-        std::ofstream outDFile("../tests/examples/savegame-vita_dc.dat", std::ios::binary);
+        std::ofstream outDFile("../../tests/examples/savegame-vita_dc.dat", std::ios::binary);
         if (!outDFile) {
             throw std::ios_base::failure("Failed to open file");
         }
@@ -283,7 +283,7 @@ namespace lce::tests {
 
         const uint8_t* file2 = file.toData();
 
-        std::ofstream outFile("../tests/examples/savegame-vita_out.dat", std::ios::binary);
+        std::ofstream outFile("../../tests/examples/savegame-vita_out.dat", std::ios::binary);
         if (!outFile) {
             throw std::ios_base::failure("Failed to open file");
         }
@@ -298,7 +298,7 @@ namespace lce::tests {
 
     void regionTest() {
 
-        std::ifstream f("../tests/examples/r.0.0.mcr", std::ios::in | std::ios::binary | std::ios::ate);
+        std::ifstream f("../../tests/examples/r.0.0.mcr", std::ios::in | std::ios::binary | std::ios::ate);
         if (!f.is_open()) {
             DebugErrLog("Failed to open file.");
             return;
@@ -321,7 +321,7 @@ namespace lce::tests {
     void saveTestSwitch(io::ByteOrder endian) {
         std::string order = endian == io::ByteOrder::LITTLE ? "le" : "be";
 
-        std::ifstream f("../tests/examples/savegame-" + std::string(endian == io::ByteOrder::LITTLE ? "be" : "le") +
+        std::ifstream f("../../tests/examples/savegame-" + std::string(endian == io::ByteOrder::LITTLE ? "be" : "le") +
                             ".dat",
                         std::ios::in | std::ios::binary | std::ios::ate);
         if (!f.is_open()) {
@@ -343,7 +343,7 @@ namespace lce::tests {
         file.setEndian(endian);
         const uint8_t* file2 = file.toData();
 
-        std::ofstream outFile("../tests/examples/savegame-" +
+        std::ofstream outFile("../../tests/examples/savegame-" +
                                   std::string(endian == io::ByteOrder::LITTLE ? "be" : "le") + "_switch-to-" + order +
                                   "_out.dat",
                               std::ios::binary);
@@ -360,7 +360,7 @@ namespace lce::tests {
     }
 
     void colorWriteTest(color::ColorFile colors) {
-        std::ofstream outFile("../tests/examples/out.col", std::ios::binary);
+        std::ofstream outFile("../../tests/examples/out.col", std::ios::binary);
         if (!outFile) {
             std::cerr << "Failed to create the file." << std::endl;
         }
@@ -371,7 +371,7 @@ namespace lce::tests {
     }
 
     void colorTest() {
-        std::ifstream fin("../tests/examples/colours.col", std::ios::binary);
+        std::ifstream fin("../../tests/examples/colours.col", std::ios::binary);
         if (!fin.is_open()) {
             DebugErrLog("Failed to open file.");
             return;
@@ -391,7 +391,7 @@ namespace lce::tests {
     void thumbTest(const io::ByteOrder endian, int headerSize, bool use4Byte = false) {
         const std::string order = endian == io::ByteOrder::LITTLE ? "le" : "be";
 
-        std::ifstream f("../tests/examples/THUMB-" + order + (use4Byte ? "_switch" : ""),
+        std::ifstream f("../../tests/examples/THUMB-" + order + (use4Byte ? "_switch" : ""),
                         std::ios::in | std::ios::binary | std::ios::ate);
         if (!f.is_open()) {
             DebugErrLog("Failed to open file.");
@@ -423,7 +423,7 @@ namespace lce::tests {
         fin.close();
 
         std::cout << "Write time!" << std::endl;
-        std::ifstream find("../tests/examples/rle_chunk.dat");
+        std::ifstream find("../../tests/examples/rle_chunk.dat");
 
         std::vector<uint8_t> vd;
 
