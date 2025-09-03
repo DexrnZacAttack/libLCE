@@ -4,6 +4,7 @@
 
 #ifndef DIRECTORY_H
 #define DIRECTORY_H
+#include <filesystem>
 #include <memory>
 #include <unordered_map>
 
@@ -65,6 +66,17 @@ namespace lce::fs {
         ///
         /// Because this is a Directory, it will always return false
         bool isFile() const override { return false; }
+
+        /// Writes the entire directory out to the given path on the user's physical filesystem
+        void writeOut(std::filesystem::path path) const;
+
+        /// Writes the entire directory out to the given path on the user's physical filesystem
+        void writeOut(const std::wstring& path) const;
+
+        std::wostringstream& operator<<(std::wostringstream& wos) const override {
+            wos << L"Directory [name=" << getName() << L", fileCount=" << getFileCount() << L", directoryCount=" << getDirectoryCount() << L", childCount=" << getFileCount() + getDirectoryCount() << L", creationTime=" << getCreationTimestamp() << L", modifiedTime=" << getModifiedTimestamp() << L"]";
+            return wos;
+        }
 
         // thanks MSVC
         Directory(const Directory&) = delete;

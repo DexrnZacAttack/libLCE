@@ -16,19 +16,18 @@
 #include <Localization/LocalizationFile.h>
 #include <Soundbank/Soundbank.h>
 
-const std::filesystem::path examples = std::filesystem::weakly_canonical("../../tests/examples");
-const std::filesystem::path output = std::filesystem::weakly_canonical("../../tests/output");
+#include "util.h"
 
 #define _OPEN_FILE(path, out, name) \
-    std::ifstream name(examples / path, std::ifstream::binary); \
+    std::ifstream name(util::examples / path, std::ifstream::binary); \
     \
-    if (!name.is_open()) throw std::ios_base::failure(std::string("Failed to open file ") + (examples / path).string()); \
+    if (!name.is_open()) throw std::ios_base::failure(std::string("Failed to open file ") + (util::examples / path).string()); \
     \
-    std::vector<uint8_t> out(std::filesystem::file_size(examples / path)); \
+    std::vector<uint8_t> out(std::filesystem::file_size(util::examples / path)); \
     name.read(reinterpret_cast<char *>(out.data()), out.size())
 
 #define _WRITE_FILE(path, data, size, name) \
-    std::ofstream name(output / path, std::ios::binary); \
+    std::ofstream name(util::output / path, std::ios::binary); \
     \
     if (!name) throw std::ios_base::failure("Failed to open file"); \
     \
@@ -46,6 +45,10 @@ namespace lce::tests {
         OPEN_FILE("example.arc", f);
 
         arc::Archive file = arc::Archive(f.data());
+
+#ifdef WRITE_FS
+        file.getRoot()->writeOut(util::output / "arc");
+#endif
 
         WRITE_FILE("output.arc", reinterpret_cast<char*>(file.toData()), file.getSize());
     }
@@ -66,33 +69,9 @@ namespace lce::tests {
 
         msscmp::Soundbank file = msscmp::Soundbank(f.data());
 
-        std::stack<const fs::Directory*> stack;
-        stack.push(file.getRoot());
-
-        while (!stack.empty()) {
-            const fs::Directory* d = stack.top();
-            stack.pop();
-
-            for (const auto& [n, child] : d->getChildren()) {
-                if (!child->isFile()) {
-                    stack.push(dynamic_cast<const fs::Directory*>(child.get()));
-                    continue;
-                }
-
-                fs::File* innerFile = dynamic_cast<fs::File*>(child.get());
-                std::filesystem::path innerFilePath = std::filesystem::path(L"../../tests/examples/msscmp") /
-                                                      (L"msscmp-" + io::BinaryIO::stringToWString(order)) /
-                                                      innerFile->getPath().substr(1);
-                std::filesystem::create_directories(innerFilePath.parent_path());
-
-                std::ofstream outFile(innerFilePath, std::ios::binary | std::ios::trunc);
-                if (!outFile) {
-                    throw std::ios_base::failure("Failed to open file");
-                }
-
-                outFile.write(reinterpret_cast<const char*>(innerFile->getData().data()), innerFile->getSize());
-            }
-        }
+#ifdef WRITE_FS
+        file.getRoot()->writeOut(util::output / "msscmp");
+#endif
     }
 
     void oldSaveTest() {
@@ -107,6 +86,10 @@ namespace lce::tests {
         for (const auto& [name, child] : file.getRoot()->getChildren()) {
             DebugLogW(name);
         }
+#endif
+
+#ifdef WRITE_FS
+        file.getRoot()->writeOut(util::output / "savegame_pr");
 #endif
 
         WRITE_FILE("savegame_pr-be_out.dat", reinterpret_cast<char*>(file.toData()), file.getSize());
@@ -135,6 +118,10 @@ namespace lce::tests {
         }
 #endif
 
+#ifdef WRITE_FS
+        file.getRoot()->writeOut(util::output / ("savegame-" + order));
+#endif
+
         WRITE_FILE(outName, reinterpret_cast<char*>(file.toData()), file.getSize());
     }
 
@@ -150,6 +137,10 @@ namespace lce::tests {
         WRITE_FILE("savegame-vita_dc.dat", reinterpret_cast<char*>(fd.data()), fd.size());
 
         save::SaveFile file = save::SaveFile(fd, io::ByteOrder::LITTLE);
+
+#ifdef WRITE_FS
+        file.getRoot()->writeOut(util::output / "savegame-vita");
+#endif
 
         _WRITE_FILE("savegame-vita_out.dat", reinterpret_cast<char*>(file.toData()), file.getSize(), outVita);
     }
@@ -173,6 +164,10 @@ namespace lce::tests {
 
         save::SaveFile file =
             save::SaveFile(f, endian == io::ByteOrder::LITTLE ? io::ByteOrder::BIG : io::ByteOrder::LITTLE);
+
+#ifdef WRITE_FS
+        file.getRoot()->writeOut(util::output / ("savegame-endian_switch-to-" + rOrder + "_orig-" + order));
+#endif
 
         file.setEndian(endian);
 
@@ -217,31 +212,6 @@ namespace lce::tests {
 
         WRITE_FILE("decompressed_chunk.dat", reinterpret_cast<char*>(dc.data()), dc.size());
     }
-
-    template <class... Args>
-    void runTest(void (*test)(Args...), const std::string name, Args... args) {
-        // TODO: this counts ifstream r/w time as well, which isn't a good thing
-        std::cout << "Running test \"" << name << "\"" << std::endl;
-
-        auto startTime = std::chrono::high_resolution_clock::now();
-
-        try {
-            // reset clock since inside try block
-            startTime = std::chrono::high_resolution_clock::now();
-
-            test(args...);
-
-            const std::chrono::duration<double, std::milli> duration =
-            std::chrono::high_resolution_clock::now() - startTime;
-
-            std::cout << "\"" << name << "\" finished after " << duration.count() << "ms" << std::endl;
-        } catch (const std::exception &e) {
-            const std::chrono::duration<double, std::milli> duration =
-            std::chrono::high_resolution_clock::now() - startTime;
-
-            std::cerr << "\"" << name << "\" failed after " << duration.count() << "ms" << " due to " << e.what() << std::endl;
-        }
-    }
 } // namespace lce::tests
 
 #define ADD_TEST(testName, func)                                                                                       \
@@ -251,41 +221,39 @@ namespace lce::tests {
 int main(int argc, char** argv) {
     printLibraryInfo();
 
-    std::cout << examples.string() << std::endl;
-
     try {
-        std::filesystem::create_directories(examples);
-        std::filesystem::create_directories(output);
+        std::filesystem::create_directories(lce::tests::util::examples); // input
+        std::filesystem::create_directories(lce::tests::util::output); // output
     } catch (const std::filesystem::filesystem_error& e) {
-        std::cerr << "Couldn't create test dirs: " << e.what() << std::endl;
+        std::cerr << "Couldn't create i/o dirs: " << e.what() << std::endl;
     }
 
-    ADD_TEST(BE_SAVEGAME, lce::tests::runTest(lce::tests::saveTestEndian, "Read & Write Big Endian savegame.dat",
+    ADD_TEST(BE_SAVEGAME, lce::tests::util::runTest(lce::tests::saveTestEndian, "Read & Write Big Endian savegame.dat",
                                               lce::io::ByteOrder::BIG))
-    ADD_TEST(LE_SAVEGAME, lce::tests::runTest(lce::tests::saveTestEndian, "Read & Write Little Endian savegame.dat",
+    ADD_TEST(LE_SAVEGAME, lce::tests::util::runTest(lce::tests::saveTestEndian, "Read & Write Little Endian savegame.dat",
                                               lce::io::ByteOrder::LITTLE))
     ADD_TEST(BE_TO_LE_SAVEGAME,
-             lce::tests::runTest(lce::tests::saveTestSwitch, "Switch Big Endian to Little Endian savegame.dat",
+             lce::tests::util::runTest(lce::tests::saveTestSwitch, "Switch Big Endian to Little Endian savegame.dat",
                                  lce::io::ByteOrder::LITTLE))
     ADD_TEST(LE_TO_BE_SAVEGAME,
-             lce::tests::runTest(lce::tests::saveTestSwitch, "Switch Little Endian to Big Endian savegame.dat",
+             lce::tests::util::runTest(lce::tests::saveTestSwitch, "Switch Little Endian to Big Endian savegame.dat",
                                  lce::io::ByteOrder::BIG))
-    ADD_TEST(PRERELEASE_SAVEGAME, lce::tests::runTest(lce::tests::oldSaveTest, "Read & Write PR savegame.dat"))
-    ADD_TEST(PSVITA_SAVEGAME, lce::tests::runTest(lce::tests::saveTestVita, "Read & Write PSVita savegame.dat"))
-    ADD_TEST(ARC, lce::tests::runTest(lce::tests::arcTest, "Read example.arc"))
-    ADD_TEST(LOC, lce::tests::runTest(lce::tests::locTest, "Read example.loc"))
-    ADD_TEST(COL, lce::tests::runTest(lce::tests::colorTest, "Read COL file"))
+    ADD_TEST(PRERELEASE_SAVEGAME, lce::tests::util::runTest(lce::tests::oldSaveTest, "Read & Write PR savegame.dat"))
+    ADD_TEST(PSVITA_SAVEGAME, lce::tests::util::runTest(lce::tests::saveTestVita, "Read & Write PSVita savegame.dat"))
+    ADD_TEST(ARC, lce::tests::util::runTest(lce::tests::arcTest, "Read example.arc"))
+    ADD_TEST(LOC, lce::tests::util::runTest(lce::tests::locTest, "Read example.loc"))
+    ADD_TEST(COL, lce::tests::util::runTest(lce::tests::colorTest, "Read COL file"))
     ADD_TEST(BE_THUMB,
-             lce::tests::runTest(lce::tests::thumbTest, "Read Big Endian THUMB", lce::io::ByteOrder::BIG, 0x100, false))
-    ADD_TEST(LE_THUMB, lce::tests::runTest(lce::tests::thumbTest, "Read Little Endian THUMB",
+             lce::tests::util::runTest(lce::tests::thumbTest, "Read Big Endian THUMB", lce::io::ByteOrder::BIG, 0x100, false))
+    ADD_TEST(LE_THUMB, lce::tests::util::runTest(lce::tests::thumbTest, "Read Little Endian THUMB",
                                            lce::io::ByteOrder::LITTLE, 0x100, false))
     ADD_TEST(SWITCH_4B_WCHAR_THUMB,
-             lce::tests::runTest(lce::tests::thumbTest, "Read Switch THUMB", lce::io::ByteOrder::LITTLE, 0x208, true))
-    ADD_TEST(READ_COMPRESSED_CHUNK, lce::tests::runTest(lce::tests::compressedChunkTest, "Read compressed chunk"))
-    ADD_TEST(READ_REGION, lce::tests::runTest(lce::tests::regionTest, "Read region"))
+             lce::tests::util::runTest(lce::tests::thumbTest, "Read Switch THUMB", lce::io::ByteOrder::LITTLE, 0x208, true))
+    ADD_TEST(READ_COMPRESSED_CHUNK, lce::tests::util::runTest(lce::tests::compressedChunkTest, "Read compressed chunk"))
+    ADD_TEST(READ_REGION, lce::tests::util::runTest(lce::tests::regionTest, "Read region"))
     ADD_TEST(NEWGEN_MSSCMP,
-             lce::tests::runTest(lce::tests::msscmpTest, "Read newgen MSSCMP", lce::io::ByteOrder::LITTLE))
-    ADD_TEST(OLDGENMSSCMP, lce::tests::runTest(lce::tests::msscmpTest, "Read oldgen MSSCMP", lce::io::ByteOrder::BIG))
+             lce::tests::util::runTest(lce::tests::msscmpTest, "Read newgen MSSCMP", lce::io::ByteOrder::LITTLE))
+    ADD_TEST(OLDGENMSSCMP, lce::tests::util::runTest(lce::tests::msscmpTest, "Read oldgen MSSCMP", lce::io::ByteOrder::BIG))
 
     return 0;
 }

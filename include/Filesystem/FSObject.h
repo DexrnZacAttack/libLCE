@@ -7,7 +7,8 @@
 #include <utility>
 
 #include <libLCE.h>
-#include "string"
+#include <string>
+#include <sstream>
 
 namespace lce::fs {
     class Directory;
@@ -15,13 +16,6 @@ namespace lce::fs {
     class LIBLCE_API FSObject {
         friend class Directory;
         friend class File;
-
-    private:
-        std::wstring name;
-        std::uint64_t modifiedTime;
-        std::uint64_t creationTime;
-        Directory* parent;
-
     protected:
         explicit FSObject(std::wstring name) : name(std::move(name)) {
             const uint64_t ms = lce::system::getTimestamp();
@@ -38,11 +32,15 @@ namespace lce::fs {
         }
 
         /// Set's the object's modified timestamp
-        void setModifiedTimestamp(uint64_t n) { this->modifiedTime = n; }
+        void setModifiedTimestamp(const uint64_t n) { this->modifiedTime = n; }
 
         /// Set's the object's creation timestamp
-        void setCreationTimestamp(uint64_t n) { this->creationTime = n; }
+        void setCreationTimestamp(const uint64_t n) { this->creationTime = n; }
 
+        virtual std::wostringstream& operator<<(std::wostringstream& wos) const {
+            wos << L"FSObject [name=" << getName() << L", creationTime=" << getCreationTimestamp() << L", modifiedTime=" << getModifiedTimestamp() << L"]";
+            return wos;
+        }
     public:
         virtual ~FSObject() = default;
 
@@ -56,6 +54,12 @@ namespace lce::fs {
         [[nodiscard]] std::uint64_t getCreationTimestamp() const { return this->creationTime; };
         /// Gets the path of the object
         [[nodiscard]] std::wstring getPath() const;
+
+    private:
+        std::wstring name;
+        std::uint64_t modifiedTime;
+        std::uint64_t creationTime;
+        Directory* parent;
     };
 
 } // namespace lce::fs

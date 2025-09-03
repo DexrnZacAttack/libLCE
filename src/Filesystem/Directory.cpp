@@ -4,6 +4,9 @@
 
 #include <Filesystem/Directory.h>
 #include <Filesystem/File.h>
+#include <filesystem>
+#include <fstream>
+#include <stack>
 
 namespace lce::fs {
     File* Directory::createFile(const std::wstring& name, std::vector<uint8_t> data) {
@@ -145,6 +148,29 @@ namespace lce::fs {
             }
         }
         return i;
+    }
+
+    void Directory::writeOut(std::filesystem::path path) const {
+        std::stack<const Directory*> stack;
+        stack.push(this);
+
+        while (!stack.empty()) {
+            const Directory* d = stack.top();
+            stack.pop();
+
+            for (const auto& [n, child] : d->getChildren()) {
+                if (!child->isFile()) {
+                    stack.push(dynamic_cast<const Directory*>(child.get()));
+                    continue;
+                }
+
+                const File *f = dynamic_cast<fs::File*>(child.get());
+                f->writeOutWithDirs(path, f->getName());
+            }
+        }
+    }
+    void Directory::writeOut(const std::wstring& path) const {
+        this->writeOut(std::filesystem::path(path));
     }
 
 } // namespace lce::fs

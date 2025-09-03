@@ -9,6 +9,10 @@ add_executable(libLCE.Tests main.cpp)
 
 target_link_libraries(libLCE.Tests PRIVATE LCE)
 
+# Should we write the entire filesystem to the drive
+target_compile_definitions(libLCE.Tests PRIVATE
+    WRITE_FS=true)
+
 # ENABLE/DISABLE TESTS HERE
 target_compile_definitions(libLCE.Tests PRIVATE
     BE_SAVEGAME=true
