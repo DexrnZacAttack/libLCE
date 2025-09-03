@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.26)
-project(LCE VERSION 1.1.4)
+project(LCE VERSION 1.1.5)
 
 set(CMAKE_CXX_STANDARD 17)
 

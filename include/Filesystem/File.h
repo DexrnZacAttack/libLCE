@@ -93,8 +93,14 @@ namespace lce::fs {
         [[nodiscard]] size_t getSize() const { return data.size(); }
 
         /// Output file data
-        std::ostream& operator<<(std::ostream& os) const {
-            os.write(reinterpret_cast<const char*>(data.data()), data.size());
+        friend std::ostream& operator<<(std::ostream& os, const File &f) {
+            os.write(reinterpret_cast<const char*>(f.data.data()), f.data.size());
+            return os;
+        }
+
+        /// Output file data
+        friend std::ostream& operator<<(std::ostream& os, const File *f) {
+            os.write(reinterpret_cast<const char*>(f->data.data()), f->data.size());
             return os;
         }
 
