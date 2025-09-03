@@ -37,9 +37,7 @@ namespace lce::save {
         [[nodiscard]] virtual uint8_t* toData() const = 0;
 
         // TODO: this could probably be added to emscripten now
-#ifndef __EMSCRIPTEN__
         static SaveFileCommons *readAuto(std::vector<uint8_t> data);
-#endif
         static uint16_t getVersionFromData(std::vector<uint8_t> data, io::ByteOrder endian = io::ByteOrder::LITTLE);
         uint16_t getOriginalVersion() const;
         uint16_t getVersion() const;
