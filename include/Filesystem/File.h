@@ -105,8 +105,14 @@ namespace lce::fs {
         }
 
         /// Output file info as string
-        std::wostringstream& operator<<(std::wostringstream& wos) const override {
-            wos << L"File [name=" << getName() << L", size=" << getSize() << ", creationTime=" << getCreationTimestamp() << ", modifiedTime=" << getModifiedTimestamp() << L"]";
+        friend std::wostream& operator<<(std::wostream& wos, const File &f) {
+            wos << L"File [name=" << f.getName() << L", size=" << f.getSize() << ", creationTime=" << f.getCreationTimestamp() << ", modifiedTime=" << f.getModifiedTimestamp() << L"]";
+            return wos;
+        }
+
+        /// Output file info as string
+        friend std::wostream& operator<<(std::wostream& wos, const File *f) {
+            wos << L"File [name=" << f->getName() << L", size=" << f->getSize() << ", creationTime=" << f->getCreationTimestamp() << ", modifiedTime=" << f->getModifiedTimestamp() << L"]";
             return wos;
         }
 

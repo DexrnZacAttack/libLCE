@@ -60,8 +60,6 @@ namespace lce::save {
             uint32_t offset = io.read<uint32_t>(this->endian);
             uint64_t modifiedTimestamp = io.read<uint64_t>(this->endian); // unused for now
 
-            DebugLogW(name);
-
             // read the data, maybe should be changed
             io.seek(offset);
 

@@ -73,8 +73,8 @@ namespace lce::fs {
         /// Writes the entire directory out to the given path on the user's physical filesystem
         void writeOut(const std::wstring& path) const;
 
-        std::wostringstream& operator<<(std::wostringstream& wos) const override {
-            wos << L"Directory [name=" << getName() << L", fileCount=" << getFileCount() << L", directoryCount=" << getDirectoryCount() << L", childCount=" << getFileCount() + getDirectoryCount() << L", creationTime=" << getCreationTimestamp() << L", modifiedTime=" << getModifiedTimestamp() << L"]";
+        friend std::wostringstream& operator<<(std::wostringstream& wos, const Directory &d) {
+            wos << L"Directory [name=" << d.getName() << L", fileCount=" << d.getFileCount() << L", directoryCount=" << d.getDirectoryCount() << L", childCount=" << d.getFileCount() + d.getDirectoryCount() << L", creationTime=" << d.getCreationTimestamp() << L", modifiedTime=" << d.getModifiedTimestamp() << L"]";
             return wos;
         }
 

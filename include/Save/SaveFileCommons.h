@@ -50,6 +50,11 @@ namespace lce::save {
 
         static io::ByteOrder detectEndian(std::vector<uint8_t> data);
 
+        friend std::wostream& operator<<(std::wostream& wos, const SaveFileCommons &f) {
+            wos << L"SaveFileCommons [" << L"indexOffset=" << f.calculateIndexOffset() << L", fileCount=" << f.getRoot()->getFileCount() << L", version=" << f.getVersion() << L", originalVersion=" << f.getOriginalVersion() << L"]";
+            return wos;
+        }
+
     protected:
         /**
          * Gets the size of an index entry based on the save file class type.

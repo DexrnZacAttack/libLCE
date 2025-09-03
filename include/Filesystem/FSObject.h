@@ -37,8 +37,8 @@ namespace lce::fs {
         /// Set's the object's creation timestamp
         void setCreationTimestamp(const uint64_t n) { this->creationTime = n; }
 
-        virtual std::wostringstream& operator<<(std::wostringstream& wos) const {
-            wos << L"FSObject [name=" << getName() << L", creationTime=" << getCreationTimestamp() << L", modifiedTime=" << getModifiedTimestamp() << L"]";
+        friend std::wostringstream& operator<<(std::wostringstream& wos, const FSObject& f) {
+            wos << L"FSObject [name=" << f.getName() << L", creationTime=" << f.getCreationTimestamp() << L", modifiedTime=" << f.getModifiedTimestamp() << L"]";
             return wos;
         }
     public:
