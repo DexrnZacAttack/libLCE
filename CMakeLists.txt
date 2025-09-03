@@ -98,16 +98,15 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
 #    target_link_options(libLCE PRIVATE --emit-tsd libLCE.d.ts)
 else ()
     set(ENVIRONMENT_TYPE "Native")
-    set(LIB_TYPE SHARED
-			include/Color/Color.h)
+    set(LIB_TYPE SHARED)
     add_library(libLCE ${LIB_TYPE} ${HEADERS} ${FILES} ${LODEPNG_FILES} ${ZLIB_FILES})
 
+	target_include_directories(libLCE PUBLIC "include" "src")
     target_compile_definitions(libLCE PRIVATE LIBLCE_EXPORTS)
 
     add_executable(tests tests.cpp)
 
     target_link_libraries(tests PRIVATE libLCE)
-
 endif ()
 
 # me: "why don't we use c++20 for std::endian?"
