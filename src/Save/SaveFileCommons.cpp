@@ -10,12 +10,10 @@
 #include <cstdint>
 #include <variant>
 
-#include <stdexcept> //Remove when implemented
+#include "Save/SaveFile.h"
+#include "Save/SaveFileOld.h"
 
 namespace lce::save {
-    class SaveFileOld;
-    class SaveFile;
-
     uint64_t SaveFileCommons::getSize() const {
         uint64_t size =
             HEADER_SIZE +
@@ -27,6 +25,15 @@ namespace lce::save {
     }
 
     uint32_t SaveFileCommons::calculateIndexOffset() const { return HEADER_SIZE + this->getRoot()->getSize(); }
+
+    SaveFileCommons *SaveFileCommons::readAuto(std::vector<uint8_t> data) {
+        const io::ByteOrder e = detectEndian(data);
+
+        if (const uint16_t v = getVersionFromData(data, e); v > PR)
+            return new SaveFile(data, e);
+
+        return new SaveFileOld(data, e);
+    }
 
     uint16_t SaveFileCommons::getVersionFromData(std::vector<uint8_t> data, io::ByteOrder endian) {
         io::BinaryIO io(data.data());
@@ -45,4 +52,14 @@ namespace lce::save {
     void SaveFileCommons::setVersion(uint16_t version) { this->version = version; }
 
     void SaveFileCommons::setEndian(io::ByteOrder endian) { this->endian = endian; }
+
+    io::ByteOrder SaveFileCommons::detectEndian(std::vector<uint8_t> data) {
+        io::BinaryIO io(data.data());
+
+        io.seek(4 + 4 + 2);
+
+        const uint8_t *s = io.getDataRelative();
+
+        return *s != 0x00 ? io::ByteOrder::LITTLE : io::ByteOrder::BIG;
+    }
 } // namespace lce::save

@@ -57,7 +57,7 @@ namespace lce::world {
         // int32_t z = chunkIO.readBE<int32_t>();
 
         // std::ostringstream ss;
-        // ss << "../testFiles/decompressed/chunk_";
+        // ss << "../examples/decompressed/chunk_";
         // ss << x << ".";
         // ss << z << ".dat";
         //

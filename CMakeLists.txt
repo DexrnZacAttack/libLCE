@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.26)
-project(libLCE)
+project(LCE VERSION 1.1.4)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -18,9 +18,6 @@ endif()
 
 include_directories(external/emsdk/upstream/emscripten/system/include)
 link_directories(external/emsdk/upstream/emscripten/system/lib)
-
-#set(ZLIB_LIBRARY ${CMAKE_CURRENT_BINARY_DIR}/external/zlib)
-#set(ZLIB_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external/zlib)
 
 set(LODEPNG_FILES
     external/lodepng/lodepng.h
@@ -94,19 +91,17 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
     set(ENVIRONMENT_TYPE "Emscripten")
     # weird?
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -sNO_DISABLE_EXCEPTION_CATCHING -s USE_ZLIB=1 -s WASM_BIGINT -s MODULARIZE=1 -sEXPORT_ES6=1 -s EXPORT_ALL=1 -s EXPORTED_RUNTIME_METHODS=['ccall','cwrap','getValue','setValue'] -s EXPORTED_FUNCTIONS=['_malloc'] -s ALLOW_MEMORY_GROWTH=1")
-    add_executable(libLCE ${HEADERS} ${FILES} ${LODEPNG_FILES})
-#    target_link_options(libLCE PRIVATE --emit-tsd libLCE.d.ts)
+    add_executable(LCE ${HEADERS} ${FILES} ${LODEPNG_FILES})
+#    target_link_options(LCE PRIVATE --emit-tsd libLCE.d.ts)
 else ()
     set(ENVIRONMENT_TYPE "Native")
     set(LIB_TYPE SHARED)
-    add_library(libLCE ${LIB_TYPE} ${HEADERS} ${FILES} ${LODEPNG_FILES} ${ZLIB_FILES})
+    add_library(LCE ${LIB_TYPE} ${HEADERS} ${FILES} ${LODEPNG_FILES} ${ZLIB_FILES})
 
-	target_include_directories(libLCE PUBLIC "include" "src")
-    target_compile_definitions(libLCE PRIVATE LIBLCE_EXPORTS)
+	target_include_directories(LCE PUBLIC "include" "src")
+    target_compile_definitions(LCE PRIVATE LIBLCE_EXPORTS)
 
-    add_executable(tests tests.cpp)
-
-    target_link_libraries(tests PRIVATE libLCE)
+	add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/tests EXCLUDE_FROM_ALL)
 endif ()
 
 # me: "why don't we use c++20 for std::endian?"
@@ -114,5 +109,7 @@ endif ()
 
 #set endianness define
 if (CMAKE_CXX_BYTE_ORDER EQUAL BIG_ENDIAN)
-    target_compile_definitions(libLCE PRIVATE BR_BIG_ENDIAN)
+    target_compile_definitions(LCE PRIVATE BR_BIG_ENDIAN)
 endif ()
+
+target_compile_definitions(LCE PRIVATE LIBLCE_VERSION="${PROJECT_VERSION}")

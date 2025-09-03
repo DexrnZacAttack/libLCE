@@ -36,8 +36,9 @@ namespace lce::save {
 
         [[nodiscard]] virtual uint8_t* toData() const = 0;
 
+        // TODO: this could probably be added to emscripten now
 #ifndef __EMSCRIPTEN__
-        static std::variant<SaveFile, SaveFileOld> readAuto(std::vector<uint8_t> data, io::ByteOrder endian = io::ByteOrder::LITTLE);
+        static SaveFileCommons *readAuto(std::vector<uint8_t> data);
 #endif
         static uint16_t getVersionFromData(std::vector<uint8_t> data, io::ByteOrder endian = io::ByteOrder::LITTLE);
         uint16_t getOriginalVersion() const;
@@ -46,6 +47,8 @@ namespace lce::save {
         void setOriginalVersion(uint16_t version);
         void setVersion(uint16_t version);
         void setEndian(io::ByteOrder endian);
+
+        static io::ByteOrder detectEndian(std::vector<uint8_t> data);
 
     protected:
         /**

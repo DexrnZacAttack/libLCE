@@ -1,6 +1,7 @@
 /cmake-*
 /CMakeFiles
-/testFiles
+/tests/examples
 /build
 *.geany
 /.idea
+.idea/editor.xml

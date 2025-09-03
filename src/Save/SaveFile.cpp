@@ -40,6 +40,10 @@ namespace lce::save {
         this->originalVersion = io.read<uint16_t>(this->endian);
         this->version = io.read<uint16_t>(this->endian);
 
+        if (this->version <= PR) {
+            throw std::runtime_error("Version mismatch, got version " + std::to_string(this->version) + ".");
+        }
+
         DebugLog("Index offset: " << indexOffset);
         DebugLog("Index file count: " << fileCount);
         DebugLog("Version: " << this->version);
