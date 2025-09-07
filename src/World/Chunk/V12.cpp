@@ -8,38 +8,38 @@
 
 namespace lce::world {
 
-    void Chunk::readV12(std::vector<uint8_t> data, io::ByteOrder endian) {
+    void Chunk::readV12(std::vector<uint8_t> data, io::ByteOrder byteOrder) {
         io::BinaryIO io(data.data());
 
-        this->version = io.read<uint16_t>(endian);
-        this->x = io.read<int32_t>(endian);
-        this->z = io.read<int32_t>(endian);
+        this->version = io.read<uint16_t>(byteOrder);
+        this->x = io.read<int32_t>(byteOrder);
+        this->z = io.read<int32_t>(byteOrder);
 
         DebugLog("x: " << this->x << ", z: " << this->z);
 
-        this->lastUpdate = io.read<uint64_t>(endian);
-        this->inhabitedTime = io.read<uint64_t>(endian);
+        this->lastUpdate = io.read<uint64_t>(byteOrder);
+        this->inhabitedTime = io.read<uint64_t>(byteOrder);
 
-        uint16_t sectionsSize = io.read<uint16_t>(endian);
+        const uint16_t sectionsSize = io.read<uint16_t>(byteOrder);
         uint16_t sectionsSizeInBytes = sectionsSize * 0x100;
 
         std::vector<int16_t> jumps(16);
         std::vector<int8_t> sizes(16);
 
         for (int16_t i = 0; i < 16; i++) {
-            jumps[i] = io.read<int16_t>(endian);
+            jumps[i] = io.read<int16_t>(byteOrder);
         }
 
         for (int8_t i = 0; i < 16; i++) {
-            sizes[i] = io.read<int8_t>(endian);
+            sizes[i] = io.read<int8_t>(byteOrder);
         }
 
-        // literally we have been working on this shit for hours and can't figure it out... Below is what was kept of
-        // PhoenixVX's work (as we should *probably* start fresh tomorrow).
-        // Read each section
+        // literally we have been working on this shit for hours and can't
+        // figure it out... Below is what was kept of PhoenixVX's work (as we
+        // should *probably* start fresh tomorrow). Read each section
         for (int i = 0; i < 16; i++) {
-            int jump = jumps[i];
-            int size = sizes[i] * 0x100;
+            const int jump = jumps[i];
+            const int size = sizes[i] * 0x100;
 
             if (size == 0)
                 continue;

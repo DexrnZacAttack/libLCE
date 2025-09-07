@@ -5,11 +5,6 @@
 #include <IO/BinaryIO.h>
 #include <Save/SaveFileCommons.h>
 
-#include <algorithm>
-#include <codecvt>
-#include <cstdint>
-#include <variant>
-
 #include "Save/SaveFile.h"
 #include "Save/SaveFileOld.h"
 
@@ -18,16 +13,20 @@ namespace lce::save {
         uint64_t size =
             HEADER_SIZE +
             (getRoot()->getFileCount() *
-             getIndexEntrySize()); // for each index entry there is 144 bytes (136 bytes with old save file format)
+             getIndexEntrySize()); // for each index entry there is 144 bytes
+                                   // (136 bytes with old save file format)
         size += this->getRoot()->getSize();
 
         return size;
     }
 
-    uint32_t SaveFileCommons::calculateIndexOffset() const { return HEADER_SIZE + this->getRoot()->getSize(); }
+    uint32_t SaveFileCommons::calculateIndexOffset() const {
+        return HEADER_SIZE + this->getRoot()->getSize();
+    }
 
-    SaveFileCommons *SaveFileCommons::readAuto(std::vector<uint8_t> data) {
-        const io::ByteOrder e = detectEndian(data);
+    SaveFileCommons *
+    SaveFileCommons::deserializeAuto(const std::vector<uint8_t> &data) {
+        const io::ByteOrder e = detectByteOrder(data);
 
         if (const uint16_t v = getVersionFromData(data, e); v > PR)
             return new SaveFile(data, e);
@@ -35,25 +34,37 @@ namespace lce::save {
         return new SaveFileOld(data, e);
     }
 
-    uint16_t SaveFileCommons::getVersionFromData(std::vector<uint8_t> data, io::ByteOrder endian) {
+    uint16_t
+    SaveFileCommons::getVersionFromData(std::vector<uint8_t> data,
+                                        const io::ByteOrder byteOrder) {
         io::BinaryIO io(data.data());
         io.seek(10);
-        return io.read<uint16_t>(endian);
+        return io.read<uint16_t>(byteOrder);
     }
 
-    uint16_t SaveFileCommons::getOriginalVersion() const { return this->originalVersion; }
+    uint16_t SaveFileCommons::getOriginalVersion() const {
+        return this->mOriginalVersion;
+    }
 
-    uint16_t SaveFileCommons::getVersion() const { return this->version; }
+    uint16_t SaveFileCommons::getVersion() const { return this->mVersion; }
 
-    io::ByteOrder SaveFileCommons::getEndian() const { return this->endian; }
+    io::ByteOrder SaveFileCommons::getByteOrder() const {
+        return this->mByteOrder;
+    }
 
-    void SaveFileCommons::setOriginalVersion(uint16_t version) { this->originalVersion = version; }
+    void SaveFileCommons::setOriginalVersion(const uint16_t version) {
+        this->mOriginalVersion = version;
+    }
 
-    void SaveFileCommons::setVersion(uint16_t version) { this->version = version; }
+    void SaveFileCommons::setVersion(const uint16_t version) {
+        this->mVersion = version;
+    }
 
-    void SaveFileCommons::setEndian(io::ByteOrder endian) { this->endian = endian; }
+    void SaveFileCommons::setEndian(const io::ByteOrder byteOrder) {
+        this->mByteOrder = byteOrder;
+    }
 
-    io::ByteOrder SaveFileCommons::detectEndian(std::vector<uint8_t> data) {
+    io::ByteOrder SaveFileCommons::detectByteOrder(std::vector<uint8_t> data) {
         io::BinaryIO io(data.data());
 
         io.seek(4 + 4 + 2);

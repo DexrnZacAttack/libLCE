@@ -9,18 +9,21 @@
 
 namespace lce::msscmp {
 
-    class LIBLCE_API BinkaFile : public fs::File {
-    public:
+    class LIBLCE_API BinkaFile final : public fs::File {
+      public:
         BinkaFile() = delete;
 
-        BinkaFile(std::wstring name, std::vector<uint8_t> data, uint32_t sampleRate, fs::Directory* parent) :
-            fs::File(name, data, parent), sampleRate(sampleRate) {}
+        BinkaFile(const std::wstring &_name, const std::vector<uint8_t> &_data,
+                  const uint32_t sampleRate, fs::Directory *parent)
+            : fs::File(_name, _data, parent), mSampleRate(sampleRate) {}
 
-        uint32_t getSampleRate() const { return sampleRate; }
-        void setSampleRate(const uint32_t _sampleRate) { sampleRate = _sampleRate; }
+        [[nodiscard]] uint32_t getSampleRate() const { return mSampleRate; }
+        void setSampleRate(const uint32_t _sampleRate) {
+            mSampleRate = _sampleRate;
+        }
 
-    private:
-        uint32_t sampleRate;
+      private:
+        uint32_t mSampleRate;
     };
 
 } // namespace lce::msscmp

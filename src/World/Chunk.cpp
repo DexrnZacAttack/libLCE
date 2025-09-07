@@ -13,15 +13,17 @@
 namespace lce::world {
     Chunk::Section::Section() {}
 
-    Chunk::Chunk(std::vector<uint8_t> data, compression::CompressionType outerCompression, io::ByteOrder endian) {
+    Chunk::Chunk(std::vector<uint8_t> data,
+                 compression::CompressionType outerCompression,
+                 io::ByteOrder byteOrder) {
         io::BinaryIO io(data.data(), data.size());
 
-        const auto compressedSizeFlags = io.read<uint32_t>(endian);
-        uint32_t compressedSize = compressedSizeFlags & 0x3FFFFFFF;
+        const auto compressedSizeFlags = io.read<uint32_t>(byteOrder);
+        const uint32_t compressedSize = compressedSizeFlags & 0x3FFFFFFF;
         bool hasRle = compressedSizeFlags & 0x1;
         bool unk = compressedSizeFlags & 0x2;
 
-        uint32_t uncompressedSize = io.read<uint32_t>(endian);
+        const uint32_t uncompressedSize = io.read<uint32_t>(byteOrder);
         // ugh we have to get another size if we're on PS3
 
         DebugLog("hasRle: " << hasRle);
@@ -30,11 +32,12 @@ namespace lce::world {
 
         /// unmodified compressed chunk data
         std::vector<uint8_t> compData = io.readOfSizeVec(compressedSize);
-        /// data from first layer decompression, note that the size given does not fully reflect the decompressed size
-        /// of the first layer.
+        /// data from first layer decompression, note that the size given does
+        /// not fully reflect the decompressed size of the first layer.
         std::vector<uint8_t> uncompData(uncompressedSize);
 
-        bool err = compression::Compression::decompressZlibWithLength(compData, uncompData, uncompressedSize, 0);
+        const bool err = compression::Compression::decompressZlibWithLength(
+            compData, uncompData, uncompressedSize, 0);
         if (err)
             throw std::runtime_error("Outer chunk decompression failed");
 
@@ -43,12 +46,15 @@ namespace lce::world {
         compression::Compression::decompressChunk(uncompData, chunkData);
 
         // if (hasRle) {
-        //     chunkData = std::make_unique<std::vector<uint8_t>>(uncompressedSize);
-        //     compression::Compression::decompressChunk(uncompData, *chunkData);
+        //     chunkData =
+        //     std::make_unique<std::vector<uint8_t>>(uncompressedSize);
+        //     compression::Compression::decompressChunk(uncompData,
+        //     *chunkData);
         // } else {
-        //     chunkData = std::make_unique<std::vector<uint8_t>>(uncompData.begin(), uncompData.end());
+        //     chunkData =
+        //     std::make_unique<std::vector<uint8_t>>(uncompData.begin(),
+        //     uncompData.end());
         // }
-
 
         io::BinaryIO chunkIO(chunkData.data());
 
@@ -66,21 +72,22 @@ namespace lce::world {
         //     throw std::ios_base::failure("Failed to open file");
         // }
         //
-        // o.write(reinterpret_cast<const char*>(chunkData.data()), chunkData.size());
-        // if (!o) {
+        // o.write(reinterpret_cast<const char*>(chunkData.data()),
+        // chunkData.size()); if (!o) {
         //     throw std::ios_base::failure("Failed to write");
         // }
 
-        this->version = chunkIO.read<uint16_t>(endian);
+        this->version = chunkIO.read<uint16_t>(byteOrder);
 
         DebugLog("Version: " << this->version);
 
         switch (this->version) {
         case 12:
-            this->readV12(chunkData, endian);
+            this->readV12(chunkData, byteOrder);
             break;
         default:
-            throw std::runtime_error("Unsupported chunk version " + std::to_string(this->version));
+            throw std::runtime_error("Unsupported chunk version " +
+                                     std::to_string(this->version));
             break;
         }
     }

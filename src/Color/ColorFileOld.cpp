@@ -8,9 +8,12 @@
 namespace lce::color {
     ColorFileOld::ColorFileOld() {}
 
-    ColorFileOld::ColorFileOld(std::vector<Color> colors) : ColorFileCommons(colors, 0) {}
+    ColorFileOld::ColorFileOld(const std::vector<Color> &colors)
+        : ColorFileCommons(colors, 0) {}
 
-    ColorFileOld::ColorFileOld(std::vector<Color> colors, uint32_t version) : ColorFileCommons(colors, version) {}
+    ColorFileOld::ColorFileOld(const std::vector<Color> &colors,
+                               const uint32_t version)
+        : ColorFileCommons(colors, version) {}
 
     ColorFileOld ColorFileOld::read(std::vector<uint8_t> data) {
         lce::io::BinaryIO io(data.data());
@@ -19,15 +22,16 @@ namespace lce::color {
         cfo.version = io.readBE<uint32_t>();
         const auto colorCount = io.readBE<uint32_t>();
 
-        uint8_t* datRel = io.getDataRelative();
+        uint8_t *datRel = io.getDataRelative();
         for (uint32_t i = 0; i < colorCount; i++) {
-            cfo.colors.push_back(Color::read(std::vector(datRel, datRel + data.size() - 4)));
+            cfo.colors.push_back(
+                Color::read(std::vector(datRel, datRel + data.size() - 4)));
         }
 
         return cfo;
     }
 
-    uint8_t* ColorFileOld::create() const {
+    uint8_t *ColorFileOld::create() const {
         io::BinaryIO io(this->getSize());
 
         io.writeBE<uint32_t>(this->version);
@@ -42,7 +46,7 @@ namespace lce::color {
 
     uint64_t ColorFileOld::getSize() const {
         uint32_t size = 8; // 4 for version 4 for count
-        for (const auto& color : colors) {
+        for (const auto &color : colors) {
             size += 2;
             size += (color.name).size();
             size += 4;

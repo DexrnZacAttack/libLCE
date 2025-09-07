@@ -7,7 +7,6 @@
 
 #include <Filesystem/Filesystem.h>
 #include <IO/BinaryIO.h>
-#include <IO/BinaryIO.h>
 #include <Soundbank/BinkaFile.h>
 #include <libLCE.h>
 #include <stdexcept> //Remove when implemented
@@ -16,28 +15,30 @@
 namespace lce::msscmp {
 
     class LIBLCE_API Soundbank : public fs::Filesystem {
-    public:
-        enum Generation {
+      public:
+        enum Type {
             OLD_GEN, // read uint32_t
-            NEW_GEN // read uint64_t
+            NEW_GEN  // read uint64_t
         };
 
-        Soundbank(uint8_t* data);
+        explicit Soundbank(uint8_t *data);
 
-        uint8_t* toData() const {
-            std::logic_error("Function not yet implemented");
-            return nullptr;
+        [[nodiscard]] uint8_t *serialize() const {
+            throw std::logic_error("Function not yet implemented");
         }
 
-    private:
-        io::ByteOrder byteOrder;
-        Generation gen;
+      private:
+        io::ByteOrder mByteOrder;
+        Type mType;
 
-        static uint64_t readUintByGeneration(io::BinaryIO& io, io::ByteOrder endian, Generation gen) {
-            return gen == NEW_GEN ? io.read<uint64_t>(endian) : io.read<uint32_t>(endian);
+        static uint64_t readUintByType(io::BinaryIO &io,
+                                       const io::ByteOrder byteOrder,
+                                       const Type type) {
+            return type == NEW_GEN ? io.read<uint64_t>(byteOrder)
+                                   : io.read<uint32_t>(byteOrder);
         }
 
-        uint32_t index2Size;
+        uint32_t mIndex2Size;
     };
 } // namespace lce::msscmp
 

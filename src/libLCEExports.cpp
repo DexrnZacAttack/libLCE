@@ -3,6 +3,10 @@
 //
 #include <libLCEExports.h>
 
-const char* getLibraryVersion() { return LIBLCE_VERSION; }
+namespace lce {
+    extern "C" {
+    const char *getLibraryVersion() { return LIBLCE_VERSION; }
 
-void printLibraryInfo() { std::cout << LIBRARY_STRING << std::endl; }
+    void printLibraryInfo() { std::cout << LIBRARY_STRING << std::endl; }
+    }
+} // namespace lce

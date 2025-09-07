@@ -5,10 +5,9 @@
 #include <Color/Color.h>
 #include <Color/ColorFile.h>
 
-#include <fstream>
-
 namespace lce::color {
-    Color::Color(std::string name, ARGB color) : color::ColorCommons(name), color(color) {}
+    Color::Color(std::string name, ARGB color)
+        : color::ColorCommons(name), color(color) {}
 
     Color Color::read(std::vector<uint8_t> data) {
         io::BinaryIO io((data.data()));
@@ -21,7 +20,7 @@ namespace lce::color {
     }
 
     // ugh doing this again
-    Color Color::read(io::BinaryIO& io) {
+    Color Color::read(io::BinaryIO &io) {
         const auto strLength = io.readBE<uint16_t>();
         std::string name = io.readUtf8(strLength);
 
@@ -38,7 +37,7 @@ namespace lce::color {
         return size;
     }
 
-    uint8_t* Color::create() {
+    uint8_t *Color::create() {
         io::BinaryIO io(getSize());
 
         io.writeBE<uint16_t>(name.size());

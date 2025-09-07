@@ -10,7 +10,6 @@
 #include <IO/BinaryIO.h>
 
 namespace lce::color {
-
     struct ARGB {
         uint8_t a;
         uint8_t r;
@@ -19,7 +18,7 @@ namespace lce::color {
     };
 
     class LIBLCE_API ColorCommons {
-    public:
+      public:
         virtual ~ColorCommons() = default;
         std::string name;
 
@@ -29,29 +28,30 @@ namespace lce::color {
     };
 
     class LIBLCE_API Color final : public ColorCommons {
-    public:
+      public:
         ARGB color;
 
         Color(std::string name, ARGB color);
         static Color read(std::vector<uint8_t> data);
 
-        static Color read(io::BinaryIO& io);
-        uint8_t* create();
+        static Color read(io::BinaryIO &io);
+        uint8_t *create();
         uint32_t getSize() override;
     };
 
     class LIBLCE_API WorldColor final : public ColorCommons {
-    public:
+      public:
         ARGB waterColor;
         ARGB underwaterColor;
         ARGB fogColor;
 
-        WorldColor(std::string name, ARGB waterColor, ARGB underwaterColor, ARGB fogColor);
+        WorldColor(std::string name, ARGB waterColor, ARGB underwaterColor,
+                   ARGB fogColor);
 
         static WorldColor read(std::vector<uint8_t> data);
-        static WorldColor read(io::BinaryIO& io);
+        static WorldColor read(io::BinaryIO &io);
 
-        uint8_t* create();
+        uint8_t *create();
         uint32_t getSize() override;
     };
 

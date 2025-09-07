@@ -12,14 +12,14 @@
 namespace lce::world {
 
     class LIBLCE_API Block {
-    protected:
+      protected:
         bool waterlogged;
         uint16_t id;
         uint8_t data;
 
-    public:
+      public:
         Block(uint16_t id, uint8_t data, bool waterlogged);
-        Block(uint16_t packed, io::ByteOrder endian = io::ByteOrder::LITTLE);
+        Block(uint16_t packed, io::ByteOrder byteOrder = io::ByteOrder::LITTLE);
 
         uint16_t getPacked() const;
 

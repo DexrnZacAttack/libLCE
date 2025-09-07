@@ -14,11 +14,16 @@
 #define BUILD_TYPE "Release"
 #endif
 
-#define LIBRARY_STRING                                                                                                 \
-    "libLCE v" LIBLCE_VERSION " (" COMPILER_NAME " / " BUILD_TYPE " | " PLATFORM_NAME " " PLATFORM_ARCH                       \
+#define LIBRARY_STRING                                                         \
+    "libLCE v" LIBLCE_VERSION " (" COMPILER_NAME " / " BUILD_TYPE              \
+    " | " PLATFORM_NAME " " PLATFORM_ARCH                                      \
     ") | https://github.com/DexrnZacAttack/libLCE"
 
-LIBLCE_API NO_DISCARD const char* getLibraryVersion();
-LIBLCE_API NO_DISCARD void printLibraryInfo();
+namespace lce {
+    extern "C" {
+    LIBLCE_API NO_DISCARD const char *getLibraryVersion();
+    LIBLCE_API NO_DISCARD void printLibraryInfo();
+    }
+} // namespace lce
 
 #endif // LIBLCEEXPORTS_H

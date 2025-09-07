@@ -11,19 +11,23 @@ namespace lce::world {
     Region::Region(int16_t x, int16_t z, int16_t dim) : x(x), z(z), dim(dim) {}
 
     Region::Region(std::vector<uint8_t> data, int16_t x, int16_t z, int16_t dim,
-                   compression::CompressionType outerCompression, io::ByteOrder endian) : x(x), z(z), dim(dim) {}
+                   compression::CompressionType outerCompression,
+                   io::ByteOrder byteOrder)
+        : x(x), z(z), dim(dim) {}
 
     Region::Region(std::wstring filename) {}
 
-    Region::Region(std::vector<uint8_t> data, std::wstring filename, compression::CompressionType outerCompression,
-                   io::ByteOrder endian) {
-        std::wregex re(L"(DIM([-0-9]{1,2}))?(r)\\.([-0-9]{1,2})\\.([-0-9]{1,2}).mcr");
+    Region::Region(std::vector<uint8_t> data, std::wstring filename,
+                   compression::CompressionType outerCompression,
+                   io::ByteOrder byteOrder) {
+        const std::wregex re(
+            L"(DIM([-0-9]{1,2}))?(r)\\.([-0-9]{1,2})\\.([-0-9]{1,2}).mcr");
         std::wsmatch match;
 
         if (std::regex_match(filename, match, re)) {
             try {
                 this->dim = std::stoi(match.str(2), nullptr, 10);
-            } catch (std::exception& e) {
+            } catch (std::exception &e) {
                 this->dim = 0;
             }
             this->x = std::stoi(match.str(4), nullptr, 10);
@@ -39,12 +43,12 @@ namespace lce::world {
         for (short i = 0; i < 1024; i++) {
             ChunkLocation loc{};
 
-            if (endian == io::ByteOrder::LITTLE)
+            if (byteOrder == io::ByteOrder::LITTLE)
                 loc.size = io.readByte() * 4096;
 
-            loc.offset = io.readInt24(endian) * 4096;
+            loc.offset = io.readInt24(byteOrder) * 4096;
 
-            if (endian == io::ByteOrder::BIG)
+            if (byteOrder == io::ByteOrder::BIG)
                 loc.size = io.readByte() * 4096;
 
             // DebugLog("Chunk at " << loc.offset << ": " << loc.size);
@@ -53,7 +57,7 @@ namespace lce::world {
         }
 
         for (short i = 0; i < 1024; i++) {
-            timestamps[i] = io.read<int32_t>(endian);
+            timestamps[i] = io.read<int32_t>(byteOrder);
         }
 
         for (short c = 0; c < 1024; c++) {
@@ -71,16 +75,18 @@ namespace lce::world {
                 // std::cout << std::hex << io.getPosition() << std::endl;
                 io.readInto(chunkData.data(), chunk.location.size);
 
-                chunk.chunk = new Chunk(chunkData, outerCompression, endian);
+                chunk.chunk = new Chunk(chunkData, outerCompression, byteOrder);
             }
 
             chunks[c] = chunk;
         }
     }
 
-    std::map<int16_t, int16_t> Region::getXZFromFilename(const std::wstring& name) {
+    std::map<int16_t, int16_t>
+    Region::getXZFromFilename(const std::wstring &name) {
         std::map<int16_t, int16_t> result;
-        std::wregex re(L"(DIM([-0-9]{1,2}))?(r)\\.([-0-9]{1,2})\\.([-0-9]{1,2}).mcr");
+        const std::wregex re(
+            L"(DIM([-0-9]{1,2}))?(r)\\.([-0-9]{1,2})\\.([-0-9]{1,2}).mcr");
 
         std::wsmatch match;
 
@@ -96,7 +102,8 @@ namespace lce::world {
     }
 
     int16_t Region::getDimFromFilename(std::wstring name) {
-        std::wregex re(L"(DIM([-0-9]{1,2}))?(r)\\.([-0-9]{1,2})\\.([-0-9]{1,2}).mcr");
+        const std::wregex re(
+            L"(DIM([-0-9]{1,2}))?(r)\\.([-0-9]{1,2})\\.([-0-9]{1,2}).mcr");
         std::wsmatch match;
 
         if (std::regex_match(name, match, re)) {

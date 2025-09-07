@@ -10,53 +10,66 @@
 #include <stack>
 
 namespace lce::save {
-    SaveFileOld::SaveFileOld(io::ByteOrder endian) { this->endian = endian; }
+    SaveFileOld::SaveFileOld(const io::ByteOrder byteOrder,
+                             const uint16_t origVersion, const uint16_t version)
+        : SaveFileCommons(byteOrder, origVersion, version) {}
+
+    SaveFileOld::SaveFileOld(const Filesystem &fs,
+                             const io::ByteOrder byteOrder,
+                             const uint16_t origVersion, const uint16_t version)
+        : SaveFileCommons(fs, byteOrder, origVersion, version) {};
 
     /**
      * Reads an old-format save file from a pointer to the data
      * @param data The data you want to read (a save file)
-     * @param endian The endian/byte order of the save file (default Big)
+     * @param byteOrder The byte order/endianness of the save file (default Big)
      * @return The old-format save file.
      */
-    SaveFileOld::SaveFileOld(std::vector<uint8_t> data, io::ByteOrder endian) {
-        this->endian = endian;
+    SaveFileOld::SaveFileOld(std::vector<uint8_t> data,
+                             const io::ByteOrder byteOrder) {
+        this->mByteOrder = byteOrder;
         io::BinaryIO io(data.data());
 
-        uint32_t indexOffset = io.read<uint32_t>(this->endian);
+        const uint32_t indexOffset = io.read<uint32_t>(this->mByteOrder);
 
         if (indexOffset > data.size())
-            throw std::runtime_error("Index offset points to an area that is out of bounds of the data given.");
+            throw std::runtime_error("Index offset points to an area that is "
+                                     "out of bounds of the data given.");
 
         DebugLog("" << io.getPosition());
-        uint32_t fileCount = io.read<uint32_t>(this->endian) / this->SaveFileOld::getIndexEntrySize();
+        const uint32_t fileCount = io.read<uint32_t>(this->mByteOrder) /
+                                   this->SaveFileOld::getIndexEntrySize();
 
-        if (fileCount > (0xFFFFFFFF - HEADER_SIZE) / this->SaveFileOld::getIndexEntrySize())
-            throw std::runtime_error("File count (" + std::to_string(fileCount) +
-                                     ") makes the file too big for it's index offset to stored in a 32-bit integer.");
+        if (fileCount >
+            (0xFFFFFFFF - HEADER_SIZE) / this->SaveFileOld::getIndexEntrySize())
+            throw std::runtime_error("File count (" +
+                                     std::to_string(fileCount) +
+                                     ") makes the file too big for it's index "
+                                     "offset to stored in a 32-bit integer.");
 
-        this->originalVersion = io.read<uint16_t>(this->endian);
-        this->version = io.read<uint16_t>(this->endian);
+        this->mOriginalVersion = io.read<uint16_t>(this->mByteOrder);
+        this->mVersion = io.read<uint16_t>(this->mByteOrder);
 
-        if (this->version > PR) {
-            throw std::runtime_error("Version mismatch, got version " + std::to_string(this->version) + ".");
+        if (this->mVersion > PR) {
+            throw std::runtime_error("Version mismatch, got version " +
+                                     std::to_string(this->mVersion) + ".");
         }
 
         DebugLog("Index offset: " << indexOffset);
         DebugLog("Index file count: " << fileCount);
-        DebugLog("Version: " << this->version);
-        DebugLog("Orig version: " << this->originalVersion);
+        DebugLog("Version: " << this->mVersion);
+        DebugLog("Orig version: " << this->mOriginalVersion);
 
         for (int i = 0; i < fileCount; ++i) {
             io.seek(indexOffset + (SaveFileOld::getIndexEntrySize() * i));
             // read the index entry
 
-            std::wstring name = io.u16stringToWstring(io.readWChar2Byte(64, this->endian));
-            io.trimWString(name);
+            std::wstring name = lce::io::BinaryIO::u16stringToWstring(
+                io.readWChar2Byte(64, this->mByteOrder));
+            lce::io::BinaryIO::trimWString(name);
 
-            uint32_t size = io.read<uint32_t>(this->endian);
-            uint32_t offset = io.read<uint32_t>(this->endian);
-
-            DebugLogW(name);
+            const uint32_t size = io.read<uint32_t>(this->mByteOrder);
+            const uint32_t offset = io.read<uint32_t>(this->mByteOrder);
 
             // read the data, maybe should be changed
             io.seek(offset);
@@ -74,96 +87,78 @@ namespace lce::save {
      * Writes the save file
      * @return Pointer to the save file
      */
-    uint8_t* SaveFileOld::toData() const {
+    uint8_t *SaveFileOld::serialize() const {
         io::BinaryIO io(this->getSize());
-        fs::Directory* root = getRoot();
+        const fs::Directory *root = getRoot();
 
         uint32_t indexOffset = calculateIndexOffset();
 
         if (indexOffset > 0xFFFFFFFF - HEADER_SIZE)
-            throw std::runtime_error("Index offset is too big to be stored in a 32-bit integer.");
+            throw std::runtime_error(
+                "Index offset is too big to be stored in a 32-bit integer.");
 
-        io.write<uint32_t>(0, this->endian);
-        io.write<uint32_t>(root->getFileCount() * getIndexEntrySize(), this->endian);
-        io.write<uint16_t>(this->originalVersion, this->endian);
-        io.write<uint16_t>(this->version, this->endian);
+        io.write<uint32_t>(0, this->mByteOrder);
+        io.write<uint32_t>(root->getFileCount() * getIndexEntrySize(),
+                           this->mByteOrder);
+        io.write<uint16_t>(this->mOriginalVersion, this->mByteOrder);
+        io.write<uint16_t>(this->mVersion, this->mByteOrder);
 
         size_t i = 0;
 
-        // wtf I've never heard of this till now
-        std::stack<const fs::Directory*> stack;
-        stack.push(root);
+        root->forEachFilesRecursive([&i, &io, &indexOffset,
+                                     this](const std::wstring &name,
+                                           const fs::File &innerFile) {
+            const std::wstring path = innerFile.getPath().substr(1);
 
-        while (!stack.empty()) {
-            const fs::Directory* d = stack.top();
-            stack.pop();
+            DebugLogW(path);
 
-            for (const auto& [name, child] : d->getChildren()) {
-                if (!child->isFile()) {
-                    stack.push(dynamic_cast<const fs::Directory*>(child.get()));
-                    continue;
-                }
+            const uint32_t offset = io.getPosition();
 
-                const fs::File* innerFile = dynamic_cast<const fs::File*>(child.get());
-                if (!innerFile)
-                    continue;
+            io.writeBytes(innerFile.getData().data(), innerFile.getSize());
 
-                std::wstring path = innerFile->getPath().substr(1);
+            const size_t last = io.getPosition();
 
-                DebugLogW(path);
+            io.seek(indexOffset + (getIndexEntrySize() * i));
 
-                uint32_t offset = io.getPosition();
+            std::u16string n = io::BinaryIO::wstringToU16string(path);
 
-                io.writeBytes(innerFile->getData().data(), innerFile->getSize());
-
-                size_t last = io.getPosition();
-
-                io.seek(indexOffset + (getIndexEntrySize() * i));
-
-                std::u16string n = io.wstringToU16string(path);
-                n.resize(64);
-
-                io.writeWChar2Byte(n, this->endian, false);
-                io.write<uint32_t>(innerFile->getSize(), this->endian);
-                io.write<uint32_t>(offset, this->endian);
-
-                io.seek(last);
-                i++;
+            if (path.length() > 64) {
+                std::wcerr << L"Filename '" << path
+                           << L"' is too long. The path will be truncated, "
+                              L"however this may cause weird paths, invalid "
+                              L"paths, or other issues in the output file."
+                           << std::endl;
             }
-        }
+            n.resize(64);
+
+            io.writeWChar2Byte(n, this->mByteOrder, false);
+            io.write<uint32_t>(innerFile.getSize(), this->mByteOrder);
+            io.write<uint32_t>(offset, this->mByteOrder);
+
+            io.seek(last);
+            i++;
+        });
 
         io.seek(0);
-        io.write<uint32_t>(indexOffset, this->endian);
+        io.write<uint32_t>(indexOffset, this->mByteOrder);
 
         return io.getData();
     }
 
-    /**
-     * Migrates from SaveFileOld to SaveFile
-     * @param version The version you want to migrate to (has no effect except for changing the version in the header)
-     * @return A shared_ptr to the SaveFile
-     */
-    SaveFile* SaveFileOld::upgrade(uint16_t version = 2) {
-        if (version <= 1)
-            throw std::invalid_argument(
-                "Version must be greater than 1. (otherwise it's not really a migration now is it?)");
-
-        const uint32_t indexFileCount = getRoot()->getFileCount(); // new format
-
+    SaveFileCommons *SaveFileOld::migrateVersion(const uint16_t version) {
         uint16_t originalVersion;
         if (version > 3)
-            originalVersion = this->version;
+            originalVersion = this->mVersion;
         else
             originalVersion = 0;
 
-        SaveFile* s = new SaveFile(indexFileCount, originalVersion, version);
-
-        fs::Directory* root = getRoot();
-        for (const auto& [name, child] : root->getChildren()) {
-            root->moveChild(name, s->getRoot());
+        if (version <= PR) {
+            this->setVersion(version);
+            this->setOriginalVersion(originalVersion);
+            return this;
         }
 
-        return s;
+        return new SaveFile(*this, this->mByteOrder, originalVersion, version);
     }
 
 } // namespace lce::save

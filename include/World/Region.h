@@ -25,11 +25,11 @@ namespace lce::world {
     struct LIBLCE_API RegionChunk {
         ChunkLocation location;
         uint32_t timestamp;
-        lce::world::Chunk* chunk;
+        lce::world::Chunk *chunk;
     };
 
     class LIBLCE_API Region {
-    protected:
+      protected:
         /// X Coordinate
         int16_t x;
         /// Z Coordinate
@@ -37,23 +37,26 @@ namespace lce::world {
         /// Dimension
         int16_t dim;
 
-    public:
+      public:
         std::array<RegionChunk, 1024> chunks;
 
         // region constructors
         Region() = default;
         Region(int16_t x, int16_t z, int16_t dim);
         Region(std::vector<uint8_t> data, int16_t x, int16_t z, int16_t dim,
-               compression::CompressionType outerCompression = lce::compression::CompressionType::ZLIB,
-               io::ByteOrder endian = io::ByteOrder::LITTLE);
+               compression::CompressionType outerCompression =
+                   lce::compression::CompressionType::ZLIB,
+               io::ByteOrder byteOrder = io::ByteOrder::LITTLE);
         explicit Region(std::wstring filename);
         Region(std::vector<uint8_t> data, std::wstring filename,
-               lce::compression::CompressionType outerCompression = lce::compression::CompressionType::ZLIB,
-               io::ByteOrder endian = io::ByteOrder::LITTLE);
+               lce::compression::CompressionType outerCompression =
+                   lce::compression::CompressionType::ZLIB,
+               io::ByteOrder byteOrder = io::ByteOrder::LITTLE);
         // endregion
 
         // region helpers
-        static std::map<int16_t, int16_t> getXZFromFilename(const std::wstring& name);
+        static std::map<int16_t, int16_t>
+        getXZFromFilename(const std::wstring &name);
         static int16_t getDimFromFilename(std::wstring name);
         // endregion
 

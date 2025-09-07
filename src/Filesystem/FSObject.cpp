@@ -9,10 +9,12 @@
 
 #include <Filesystem/Directory.h>
 
+#include "Filesystem/Filesystem.h"
+
 namespace lce::fs {
     std::wstring FSObject::getPath() const {
-        std::vector<const FSObject*> objs;
-        const FSObject* c = this;
+        std::vector<const FSObject *> objs;
+        const FSObject *c = this;
 
         while (c) {
             objs.push_back(c);
@@ -22,17 +24,19 @@ namespace lce::fs {
         std::wostringstream oss;
 
         for (auto i = objs.rbegin(); i != objs.rend(); ++i) {
-            if (const FSObject* obj = *i; obj->parent == nullptr) {
-                oss << obj->getName(); // is parent is nullptr then we hit the root directory (there should not be an
-                                       // orphaned file outside the filesystem*)
+            if (const FSObject *obj = *i; obj->parent == nullptr) {
+                oss << obj->getName(); // is parent is nullptr then we hit the
+                                       // root directory
             } else {
-                std::wstring name = obj->getName();
-
-                if (name == L"/" || obj->parent->getName() == L"/")
-                    oss << name; // if parent is root or the current object is root then we don't want double path
-                                 // delimiters
-                else
-                    oss << L"/" << name;
+                if (std::wstring oName = obj->getName();
+                    oName == Filesystem::ROOT ||
+                    obj->parent->getName() == Filesystem::ROOT) {
+                    oss << oName; // if parent is root or the current object is
+                                  // root then we don't want double path
+                                  // delimiters
+                } else {
+                    oss << Filesystem::ROOT << oName;
+                }
             }
         }
 

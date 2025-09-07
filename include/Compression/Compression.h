@@ -22,20 +22,27 @@ namespace lce::compression {
     };
 
     class LIBLCE_API Compression {
-    public:
-        static bool decompressZlib(std::vector<uint8_t>& in, std::vector<uint8_t>& out);
+      public:
+        static bool decompressZlib(std::vector<uint8_t> &in,
+                                   std::vector<uint8_t> &out);
 
-        static bool decompressZlibWithLength(std::vector<uint8_t>& in, std::vector<uint8_t>& out, uint32_t bufSize,
-                                             uint32_t offset);
+        static bool decompressZlibWithLength(std::vector<uint8_t> &in,
+                                             std::vector<uint8_t> &out,
+                                             uint32_t bufSize, uint32_t offset);
 
-        static bool decompressChunk(std::vector<uint8_t>& in, std::vector<uint8_t>& out);
+        static bool decompressChunk(std::vector<uint8_t> &in,
+                                    std::vector<uint8_t> &out);
 
-        static bool decompressVita(std::vector<uint8_t>& in, std::vector<uint8_t>& out, uint32_t outBuf,
+        static bool decompressVita(std::vector<uint8_t> &in,
+                                   std::vector<uint8_t> &out, uint32_t outBuf,
                                    uint32_t offset = 0);
 
-        static bool decompress(std::vector<uint8_t>& in, std::vector<uint8_t>& out, compression::CompressionType type);
+        static bool decompress(std::vector<uint8_t> &in,
+                               std::vector<uint8_t> &out,
+                               compression::CompressionType type);
 
-        static uint32_t getSizeFromSave(std::vector<uint8_t>& in, io::ByteOrder endian);
+        static uint32_t getSizeFromSave(std::vector<uint8_t> &in,
+                                        io::ByteOrder byteOrder);
     };
 
 } // namespace lce::compression

@@ -9,18 +9,25 @@
 #include <libLCE.h>
 
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace lce::loc {
-    class LIBLCE_API Language {
-    public:
-        Language(io::BinaryIO& io);
-        Language(uint8_t _byte, uint32_t _shouldReadByte, std::string _code, uint32_t _stringCount,
-                 std::vector<std::string> _strings) :
-            byte(_byte), shouldReadByte(_shouldReadByte), code(_code), stringCount(_stringCount), strings(_strings) {}
 
-        uint32_t getSize() const;
-        uint8_t* toData() const;
+    // TODO: redo this with unordered_map with key/v for each string (it's
+    // actually hashed afaik but nobody knows the algo)
+    class LIBLCE_API Language {
+      public:
+        explicit Language(io::BinaryIO &io);
+        Language(const uint8_t _byte, const uint32_t _shouldReadByte,
+                 std::string _code, const uint32_t _stringCount,
+                 std::vector<std::string> _strings)
+            : byte(_byte), shouldReadByte(_shouldReadByte),
+              code(std::move(_code)), stringCount(_stringCount),
+              strings(std::move(_strings)) {}
+
+        [[nodiscard]] uint32_t getSize() const;
+        [[nodiscard]] uint8_t *serialize() const;
 
         uint8_t byte;
         uint32_t shouldReadByte;

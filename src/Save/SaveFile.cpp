@@ -2,6 +2,8 @@
 // Created by DexrnZacAttack on 12/19/2024.
 //
 
+#include "Save/SaveFileOld.h"
+
 #include <chrono>
 #include <stack>
 #include <vector>
@@ -10,55 +12,65 @@
 #include <Save/SaveFile.h>
 
 namespace lce::save {
-    SaveFile::SaveFile(uint32_t indexFileCount, uint16_t origVersion, uint16_t version) {}
+    SaveFile::SaveFile(const io::ByteOrder byteOrder,
+                       const uint16_t origVersion, const uint16_t version)
+        : SaveFileCommons(byteOrder, origVersion, version) {}
 
-    SaveFile::SaveFile() = default;
-
-    SaveFile::SaveFile(io::ByteOrder endian) { this->endian = endian; }
+    SaveFile::SaveFile(const Filesystem &fs, const io::ByteOrder byteOrder,
+                       const uint16_t origVersion, const uint16_t version)
+        : SaveFileCommons(fs, byteOrder, origVersion, version) {};
 
     /**
      * Reads a save file from a pointer to the data
      * @param data The data you want to read (a save file)
+     * @param byteOrder The endianness of the data being read
      * @return The save file.
      */
-    SaveFile::SaveFile(std::vector<uint8_t> data, io::ByteOrder endian) {
-        this->endian = endian;
+    SaveFile::SaveFile(std::vector<uint8_t> data, io::ByteOrder byteOrder) {
+        this->mByteOrder = byteOrder;
         io::BinaryIO io(data.data());
 
-        uint32_t indexOffset = io.read<uint32_t>(this->endian);
+        const uint32_t indexOffset = io.read<uint32_t>(this->mByteOrder);
 
         if (indexOffset > data.size())
-            throw std::runtime_error("Index offset points to an area that is out of bounds of the data given.");
+            throw std::runtime_error("Index offset points to an area that is "
+                                     "out of bounds of the data given.");
 
         DebugLog("" << io.getPosition());
-        uint32_t fileCount = io.read<uint32_t>(this->endian);
+        const uint32_t fileCount = io.read<uint32_t>(this->mByteOrder);
 
-        if (fileCount > (0xFFFFFFFF - HEADER_SIZE) / this->SaveFile::getIndexEntrySize())
-            throw std::runtime_error("File count (" + std::to_string(fileCount) +
-                                     ") makes the file too big for it's index offset to stored in a 32-bit integer.");
+        if (fileCount >
+            (0xFFFFFFFF - HEADER_SIZE) / this->SaveFile::getIndexEntrySize())
+            throw std::runtime_error("File count (" +
+                                     std::to_string(fileCount) +
+                                     ") makes the file too big for it's index "
+                                     "offset to stored in a 32-bit integer.");
 
-        this->originalVersion = io.read<uint16_t>(this->endian);
-        this->version = io.read<uint16_t>(this->endian);
+        this->mOriginalVersion = io.read<uint16_t>(this->mByteOrder);
+        this->mVersion = io.read<uint16_t>(this->mByteOrder);
 
-        if (this->version <= PR) {
-            throw std::runtime_error("Version mismatch, got version " + std::to_string(this->version) + ".");
+        if (this->mVersion <= PR) {
+            throw std::runtime_error("Version mismatch, got version " +
+                                     std::to_string(this->mVersion) + ".");
         }
 
         DebugLog("Index offset: " << indexOffset);
         DebugLog("Index file count: " << fileCount);
-        DebugLog("Version: " << this->version);
-        DebugLog("Orig version: " << this->originalVersion);
+        DebugLog("Version: " << this->mVersion);
+        DebugLog("Orig version: " << this->mOriginalVersion);
 
         for (int i = 0; i < fileCount; ++i) {
             io.seek(indexOffset + (SaveFile::getIndexEntrySize() * i));
             // read the index entry
 
-            std::wstring name = io.u16stringToWstring(io.readWChar2Byte(64, this->endian));
-            io.trimWString(name);
+            std::wstring name = lce::io::BinaryIO::u16stringToWstring(
+                io.readWChar2Byte(64, this->mByteOrder));
+            lce::io::BinaryIO::trimWString(name);
 
-            uint32_t size = io.read<uint32_t>(this->endian);
-            uint32_t offset = io.read<uint32_t>(this->endian);
-            uint64_t modifiedTimestamp = io.read<uint64_t>(this->endian); // unused for now
+            const uint32_t size = io.read<uint32_t>(this->mByteOrder);
+            const uint32_t offset = io.read<uint32_t>(this->mByteOrder);
+            const uint64_t modifiedTimestamp =
+                io.read<uint64_t>(this->mByteOrder); // unused for now
 
             // read the data, maybe should be changed
             io.seek(offset);
@@ -76,69 +88,78 @@ namespace lce::save {
      * Writes the save file
      * @return Pointer to the save file
      */
-    uint8_t* SaveFile::toData() const {
+    uint8_t *SaveFile::serialize() const {
         io::BinaryIO io(this->getSize());
-        fs::Directory* root = getRoot();
+        const fs::Directory *root = getRoot();
 
         uint32_t indexOffset = calculateIndexOffset();
 
         if (indexOffset > 0xFFFFFFFF - HEADER_SIZE)
-            throw std::runtime_error("Index offset is too big to be stored in a 32-bit integer.");
+            throw std::runtime_error(
+                "Index offset is too big to be stored in a 32-bit integer.");
 
-        io.write<uint32_t>(0, this->endian);
-        io.write<uint32_t>(root->getFileCount(), this->endian);
-        io.write<uint16_t>(this->originalVersion, this->endian);
-        io.write<uint16_t>(this->version, this->endian);
+        io.write<uint32_t>(0, this->mByteOrder);
+        io.write<uint32_t>(root->getFileCount(), this->mByteOrder);
+        io.write<uint16_t>(this->mOriginalVersion, this->mByteOrder);
+        io.write<uint16_t>(this->mVersion, this->mByteOrder);
 
         size_t i = 0;
+        root->forEachFilesRecursive([&i, &io, &indexOffset,
+                                     this](const std::wstring &name,
+                                           const fs::File &innerFile) {
+            const std::wstring path = innerFile.getPath().substr(1);
 
-        // wtf I've never heard of this till now
-        std::stack<const fs::Directory*> stack;
-        stack.push(root);
+            const uint32_t offset = io.getPosition();
 
-        while (!stack.empty()) {
-            const fs::Directory* d = stack.top();
-            stack.pop();
+            io.writeBytes(innerFile.getData().data(), innerFile.getSize());
 
-            for (const auto& [name, child] : d->getChildren()) {
-                if (!child->isFile()) {
-                    stack.push(dynamic_cast<const fs::Directory*>(child.get()));
-                    continue;
-                }
+            const size_t last = io.getPosition();
 
-                const fs::File* innerFile = dynamic_cast<const fs::File*>(child.get());
-                if (!innerFile)
-                    continue;
+            io.seek(indexOffset + (getIndexEntrySize() * i));
 
-                std::wstring path = innerFile->getPath().substr(1);
+            std::u16string n = io::BinaryIO::wstringToU16string(path);
 
-                DebugLogW(path);
-
-                uint32_t offset = io.getPosition();
-
-                io.writeBytes(innerFile->getData().data(), innerFile->getSize());
-
-                size_t last = io.getPosition();
-
-                io.seek(indexOffset + (getIndexEntrySize() * i));
-
-                std::u16string n = io.wstringToU16string(path);
-                n.resize(64);
-
-                io.writeWChar2Byte(n, this->endian, false);
-                io.write<uint32_t>(innerFile->getSize(), this->endian);
-                io.write<uint32_t>(offset, this->endian);
-                io.write<uint64_t>(innerFile->getModifiedTimestamp(), this->endian);
-
-                io.seek(last);
-                i++;
+            if (path.length() > 64) {
+                std::wcerr << L"Filename '" << path
+                           << L"' is too long. The path will be truncated, "
+                              L"however this may cause weird paths, invalid "
+                              L"names, or other issues in the output file."
+                           << std::endl;
             }
-        }
+            n.resize(64);
+
+            io.writeWChar2Byte(n, this->mByteOrder, false);
+            io.write<uint32_t>(innerFile.getSize(), this->mByteOrder);
+            io.write<uint32_t>(offset, this->mByteOrder);
+            io.write<uint64_t>(innerFile.getModifiedTimestamp(),
+                               this->mByteOrder);
+
+            io.seek(last);
+            i++;
+        });
 
         io.seek(0);
-        io.write<uint32_t>(indexOffset, this->endian);
+        io.write<uint32_t>(indexOffset, this->mByteOrder);
 
         return io.getData();
+    }
+
+    SaveFileCommons *SaveFile::migrateVersion(const uint16_t version) {
+        uint16_t originalVersion;
+        if (version > TU5)
+            originalVersion = this->mVersion;
+        else
+            originalVersion = 0;
+
+        if (version != PR) {
+            this->setVersion(version);
+            this->setOriginalVersion(originalVersion);
+
+            return this;
+        }
+
+        return new SaveFileOld(*this, this->mByteOrder, originalVersion,
+                               version);
     }
 
 } // namespace lce::save

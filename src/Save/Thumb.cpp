@@ -8,20 +8,22 @@
 #include <utility>
 
 namespace lce::save {
-    Thumb::Thumb(std::vector<uint8_t> data, const io::ByteOrder endian, const int headerSize,
-                 const bool use4ByteWideChar) {
-        this->name = L"New World"; // default name
+    Thumb::Thumb(std::vector<uint8_t> data, const io::ByteOrder byteOrder,
+                 const int headerSize, const bool use4ByteWideChar) {
+        this->mName = L"New World"; // default name
 
         if (headerSize != 0) {
             io::BinaryIO io((data.data()));
             if (!use4ByteWideChar) {
-                this->name = io::BinaryIO::u16stringToWstring(io.readWChar2ByteNT(endian));
+                this->mName = io::BinaryIO::u16stringToWstring(
+                    io.readWChar2ByteNT(byteOrder));
             } else {
-                this->name = io::BinaryIO::u32stringToWstring(io.readWChar4ByteNT(endian));
+                this->mName = io::BinaryIO::u32stringToWstring(
+                    io.readWChar4ByteNT(byteOrder));
             }
         }
 
-        std::vector<uint8_t>& image_data = data;
+        std::vector<uint8_t> &image_data = data;
 
         if (headerSize != 0)
             image_data = {data.begin() + headerSize, data.end()};
@@ -30,27 +32,35 @@ namespace lce::save {
         unsigned width, height = 64;
         lodepng::State state;
 
-        if (const unsigned err = lodepng::decode(pixels, width, height, state, image_data))
-            std::cout << "decode error: " << err << ": " << lodepng_error_text(err) << std::endl;
+        if (const unsigned err =
+                lodepng::decode(pixels, width, height, state, image_data))
+            std::cout << "decode error: " << err << ": "
+                      << lodepng_error_text(err) << std::endl;
 
-        this->image = pixels;
+        this->mImage = pixels;
 
         for (int t = 0; t < state.info_png.text_num; t++) {
-            this->properties.emplace_back(state.info_png.text_keys[t], state.info_png.text_strings[t]);
+            this->mProperties.emplace(state.info_png.text_keys[t],
+                                      state.info_png.text_strings[t]);
         }
     }
 
-    std::wstring Thumb::getWorldName() const { return this->name; }
+    std::wstring Thumb::getWorldName() const { return this->mName; }
 
-    void Thumb::setWorldName(const std::wstring& name) { this->name = name; }
+    void Thumb::setWorldName(const std::wstring &name) { this->mName = name; }
 
-    std::vector<std::pair<std::string, std::string>> Thumb::getProperties() const { return this->properties; }
-
-    void Thumb::setProperties(std::vector<std::pair<std::string, std::string>> properties) {
-        this->properties = std::move(properties);
+    std::unordered_map<std::string, std::string> Thumb::getProperties() const {
+        return this->mProperties;
     }
 
-    std::vector<uint8_t> Thumb::getImage() const { return this->image; }
+    void Thumb::setProperties(
+        std::unordered_map<std::string, std::string> properties) {
+        this->mProperties = std::move(properties);
+    }
 
-    void Thumb::setImage(std::vector<uint8_t> image) { this->image = std::move(image); }
+    std::vector<uint8_t> Thumb::getImage() const { return this->mImage; }
+
+    void Thumb::setImage(std::vector<uint8_t> image) {
+        this->mImage = std::move(image);
+    }
 } // namespace lce::save

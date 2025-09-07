@@ -17,16 +17,16 @@
 namespace lce::world {
     // TODO: chunk as base with subclasses for each version
     class LIBLCE_API Chunk {
-    protected:
+      protected:
         uint16_t version;
         int32_t x;
         int32_t z;
         uint64_t lastUpdate;
         uint64_t inhabitedTime;
 
-    public:
+      public:
         class LIBLCE_API Section {
-        public:
+          public:
             std::array<uint16_t, 16 * 16 * 16> blocks; // blocks
 
             Section();
@@ -34,14 +34,16 @@ namespace lce::world {
 
         Chunk();
 
-        Chunk(std::vector<uint8_t> data, compression::CompressionType outerCompression,
-              io::ByteOrder endian = io::ByteOrder::LITTLE);
+        Chunk(std::vector<uint8_t> data,
+              compression::CompressionType outerCompression,
+              io::ByteOrder byteOrder = io::ByteOrder::LITTLE);
 
-        Chunk(uint8_t* data, compression::CompressionType outerCompression, io::ByteOrder endian);
+        Chunk(uint8_t *data, compression::CompressionType outerCompression,
+              io::ByteOrder byteOrder);
 
         // region Readers
 
-        void readV12(std::vector<uint8_t> data, io::ByteOrder endian);
+        void readV12(std::vector<uint8_t> data, io::ByteOrder byteOrder);
 
         // endregion
 

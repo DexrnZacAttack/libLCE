@@ -1,5 +1,6 @@
 //
-// Created by (Person who prefers not to be named) and DexrnZacAttack on 20/12/2024.
+// Created by (Person who prefers not to be named) and DexrnZacAttack on
+// 20/12/2024.
 //
 
 #ifndef BINARYIO_H
@@ -15,11 +16,10 @@
 namespace lce::io {
     enum class ByteOrder { BIG, LITTLE };
 
-    template <typename T>
-    constexpr T swapOrder_f(const T input) {
+    template <typename T> constexpr T swapOrder_f(const T input) {
         uint8_t resultBytes[sizeof(T)];
-        const uint8_t* ib = reinterpret_cast<const uint8_t*>(&input);
-        uint8_t* r = resultBytes + (sizeof(T) - 1);
+        const uint8_t *ib = reinterpret_cast<const uint8_t *>(&input);
+        uint8_t *r = resultBytes + (sizeof(T) - 1);
 
         for (size_t i = 0; i < sizeof(T); ++i) {
             *r-- = *ib++;
@@ -30,31 +30,37 @@ namespace lce::io {
         return result;
     }
 
-    // this is a mess but theoretically will actually use the byteswap instruction
-    template <typename T>
-    constexpr T swapOrder(const T input) {
+    // this is a mess but theoretically will actually use the byteswap
+    // instruction
+    template <typename T> constexpr T swapOrder(const T input) {
         if constexpr (std::is_integral_v<T>) {
             if constexpr (sizeof(T) == 2) {
 #if defined(__clang__) || defined(__GNUC__)
-                return static_cast<T>(__builtin_bswap16(static_cast<uint16_t>(input)));
+                return static_cast<T>(
+                    __builtin_bswap16(static_cast<uint16_t>(input)));
 #elif defined(_MSC_VER)
-                return static_cast<T>(_byteswap_ushort(static_cast<unsigned short>(input)));
+                return static_cast<T>(
+                    _byteswap_ushort(static_cast<unsigned short>(input)));
 #else
                 return swapOrder_f(input);
 #endif
             } else if constexpr (sizeof(T) == 4) {
 #if defined(__clang__) || defined(__GNUC__)
-                return static_cast<T>(__builtin_bswap32(static_cast<uint32_t>(input)));
+                return static_cast<T>(
+                    __builtin_bswap32(static_cast<uint32_t>(input)));
 #elif defined(_MSC_VER)
-                return static_cast<T>(_byteswap_ulong(static_cast<unsigned long>(input)));
+                return static_cast<T>(
+                    _byteswap_ulong(static_cast<unsigned long>(input)));
 #else
                 return swapOrder_f(input);
 #endif
             } else if constexpr (sizeof(T) == 8) {
 #if defined(__clang__) || defined(__GNUC__)
-                return static_cast<T>(__builtin_bswap64(static_cast<uint64_t>(input)));
+                return static_cast<T>(
+                    __builtin_bswap64(static_cast<uint64_t>(input)));
 #elif defined(_MSC_VER)
-                return static_cast<T>(_byteswap_uint64(static_cast<unsigned __int64>(input)));
+                return static_cast<T>(
+                    _byteswap_uint64(static_cast<unsigned __int64>(input)));
 #else
                 return swapOrder_f(input);
 #endif
@@ -66,9 +72,7 @@ namespace lce::io {
         }
     }
 
-
-    template <typename T>
-    constexpr T big2sys(const T a) {
+    template <typename T> constexpr T big2sys(const T a) {
 #ifdef BR_BIG_ENDIAN
         return a;
 #else
@@ -87,13 +91,8 @@ namespace lce::io {
 
     // todo: implement size shits
     class BinaryIO {
-    private:
-        uint8_t* dataOrigin;
-        uint8_t* data;
-        size_t size;
-
-    public:
-        explicit BinaryIO(uint8_t* input, size_t size = 0);
+      public:
+        explicit BinaryIO(uint8_t *input, size_t size = 0);
         explicit BinaryIO(size_t size);
 
         // ~BinaryIO();
@@ -109,71 +108,66 @@ namespace lce::io {
 
         int32_t readInt24(io::ByteOrder endian);
 
-        template <typename T>
-        T readLE() {
-            const T v = little2sys(*reinterpret_cast<const T*>(this->data));
-            this->data += sizeof(T);
+        template <typename T> T readLE() {
+            const T v = little2sys(*reinterpret_cast<const T *>(this->mData));
+            this->mData += sizeof(T);
             return v;
         }
 
-        template <typename T>
-        T readBE() {
-            const T v = big2sys(*reinterpret_cast<const T*>(this->data));
-            this->data += sizeof(T);
+        template <typename T> T readBE() {
+            const T v = big2sys(*reinterpret_cast<const T *>(this->mData));
+            this->mData += sizeof(T);
             return v;
         }
 
-        template <typename T>
-        T read(const io::ByteOrder endian) {
+        template <typename T> T read(const io::ByteOrder endian) {
             T v;
             if (endian == io::ByteOrder::LITTLE)
-                v = little2sys(*reinterpret_cast<const T*>(this->data));
+                v = little2sys(*reinterpret_cast<const T *>(this->mData));
             else
-                v = big2sys(*reinterpret_cast<const T*>(this->data));
-            this->data += sizeof(T);
+                v = big2sys(*reinterpret_cast<const T *>(this->mData));
+            this->mData += sizeof(T);
             return v;
         }
 
         // writing
         void writeByte(uint8_t v);
 
-        void writeBytes(const uint8_t* v, size_t size);
+        void writeBytes(const uint8_t *v, size_t size);
 
         void writeSignedByte(int8_t v);
         template <typename T>
         void write(const T v, const io::ByteOrder endian) {
             if (endian == io::ByteOrder::LITTLE)
-                *reinterpret_cast<T*>(this->data) = little2sys(v);
+                *reinterpret_cast<T *>(this->mData) = little2sys(v);
             else
-                *reinterpret_cast<T*>(this->data) = big2sys(v);
-            this->data += sizeof(T);
+                *reinterpret_cast<T *>(this->mData) = big2sys(v);
+            this->mData += sizeof(T);
         }
 
-        template <typename T>
-        void writeLE(const T v) {
-            *reinterpret_cast<T*>(this->data) = little2sys(v);
-            this->data += sizeof(T);
+        template <typename T> void writeLE(const T v) {
+            *reinterpret_cast<T *>(this->mData) = little2sys(v);
+            this->mData += sizeof(T);
         }
 
-        template <typename T>
-        void writeBE(const T v) {
-            *reinterpret_cast<T*>(this->data) = big2sys(v);
-            this->data += sizeof(T);
+        template <typename T> void writeBE(const T v) {
+            *reinterpret_cast<T *>(this->mData) = big2sys(v);
+            this->mData += sizeof(T);
         }
 
-        uint8_t* getData();
+        [[nodiscard]] uint8_t *getData() const;
 
-        uint8_t* getDataRelative() const;
+        [[nodiscard]] uint8_t *getDataRelative() const;
 
-        uint8_t*& getDataRef();
+        uint8_t *&getDataRef();
 
-        uint8_t*& getDataRefRelative();
+        uint8_t *&getDataRefRelative();
 
-        uint8_t* readOfSize(size_t size);
+        uint8_t *readOfSize(size_t sz);
 
-        std::vector<uint8_t> readOfSizeVec(size_t size);
+        std::vector<uint8_t> readOfSizeVec(size_t sz);
 
-        void readInto(uint8_t* into, size_t size);
+        void readInto(uint8_t *into, size_t sz);
 
         [[nodiscard]] size_t getPosition() const;
 
@@ -181,33 +175,45 @@ namespace lce::io {
 
         std::string readUtf8NullTerminated();
 
-        void writeUtf8(const std::string& input);
+        void writeUtf8(const std::string &input);
 
-        static void trimWString(std::wstring& input);
+        static void trimWString(std::wstring &input);
 
         std::u16string readWChar2Byte(size_t size, io::ByteOrder endian);
 
         std::u16string readWChar2ByteNT(io::ByteOrder endian);
 
-        void writeWChar2Byte(const std::u16string& input, io::ByteOrder endian, bool nullTerminate);
+        void writeWChar2Byte(const std::u16string &input, io::ByteOrder endian,
+                             bool nullTerminate);
 
         std::u32string readWChar4Byte(size_t size, io::ByteOrder endian);
 
         std::u32string readWChar4ByteNT(io::ByteOrder endian);
 
-        void writeWChar4Byte(const std::u32string& input, io::ByteOrder endian, bool nullTerminate);
+        void writeWChar4Byte(const std::u32string &input, io::ByteOrder endian,
+                             bool nullTerminate);
 
-        static LIBLCE_API std::wstring u16stringToWstring(const std::u16string& str);
+        static LIBLCE_API std::wstring
+        u16stringToWstring(const std::u16string &str);
 
-        static LIBLCE_API std::u16string wstringToU16string(const std::wstring& str);
+        static LIBLCE_API std::u16string
+        wstringToU16string(const std::wstring &str);
 
-        static LIBLCE_API std::wstring u32stringToWstring(const std::u32string& str);
+        static LIBLCE_API std::wstring
+        u32stringToWstring(const std::u32string &str);
 
-        static LIBLCE_API std::string u16stringToString(const std::u16string& str);
+        static LIBLCE_API std::string
+        u16stringToString(const std::u16string &str);
 
-        static LIBLCE_API std::u16string stringToU16String(const std::string& str);
-        static LIBLCE_API std::string wstringToString(const std::wstring& str);
-        static LIBLCE_API std::wstring stringToWString(const std::string& str);
+        static LIBLCE_API std::u16string
+        stringToU16String(const std::string &str);
+        static LIBLCE_API std::string wstringToString(const std::wstring &str);
+        static LIBLCE_API std::wstring stringToWString(const std::string &str);
+
+      private:
+        uint8_t *mOrigin;
+        uint8_t *mData;
+        size_t mSize;
     };
 } // namespace lce::io
 

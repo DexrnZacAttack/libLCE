@@ -13,23 +13,24 @@
 namespace lce::save {
 
     class LIBLCE_API Thumb {
-    protected:
-        std::wstring name;
-        std::vector<std::pair<std::string, std::string>> properties;
-        std::vector<uint8_t> image;
-
-    public:
-        explicit Thumb(std::vector<uint8_t> data, io::ByteOrder endian = io::ByteOrder::LITTLE, int headerSize = 0x100,
-                       bool use4ByteWideChar = false);
-
-        std::vector<uint8_t> create();
+      public:
+        explicit Thumb(std::vector<uint8_t> data,
+                       io::ByteOrder byteOrder = io::ByteOrder::LITTLE,
+                       int headerSize = 0x100, bool use4ByteWideChar = false);
 
         [[nodiscard]] std::wstring getWorldName() const;
-        void setWorldName(const std::wstring& name);
-        [[nodiscard]] std::vector<std::pair<std::string, std::string>> getProperties() const;
-        void setProperties(std::vector<std::pair<std::string, std::string>> properties);
+        void setWorldName(const std::wstring &name);
+        [[nodiscard]] std::unordered_map<std::string, std::string>
+        getProperties() const;
+        void
+        setProperties(std::unordered_map<std::string, std::string> properties);
         [[nodiscard]] std::vector<uint8_t> getImage() const;
         void setImage(std::vector<uint8_t> image);
+
+      protected:
+        std::wstring mName;
+        std::unordered_map<std::string, std::string> mProperties;
+        std::vector<uint8_t> mImage;
     };
 
 } // namespace lce::save

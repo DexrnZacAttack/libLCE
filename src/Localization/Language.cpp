@@ -6,7 +6,7 @@
 
 namespace lce::loc {
 
-    Language::Language(io::BinaryIO& io) {
+    Language::Language(io::BinaryIO &io) {
         shouldReadByte = io.readBE<uint32_t>();
 
         if (shouldReadByte > 0)
@@ -16,7 +16,7 @@ namespace lce::loc {
         stringCount = io.readBE<uint32_t>();
 
         for (int s = 0; s < stringCount; s++) {
-            uint32_t stringSize = io.readBE<uint16_t>();
+            const uint32_t stringSize = io.readBE<uint16_t>();
             strings.push_back(io.readUtf8(stringSize));
         }
     }
@@ -30,16 +30,16 @@ namespace lce::loc {
         size += sizeof(uint16_t) + code.size();
         size += sizeof(stringCount);
 
-        for (const auto& string : this->strings) {
+        for (const auto &string : this->strings) {
             size += sizeof(uint16_t) + string.size();
         }
 
         return size;
     }
 
-    uint8_t* Language::toData() const {
+    uint8_t *Language::serialize() const {
         const uint32_t fileSize = this->getSize();
-        uint8_t* data = new uint8_t[fileSize];
+        uint8_t *data = new uint8_t[fileSize];
         io::BinaryIO io(data);
 
         io.writeBE<uint32_t>(shouldReadByte);
@@ -51,7 +51,7 @@ namespace lce::loc {
 
         io.writeBE<uint32_t>(stringCount);
 
-        for (const auto& string : this->strings) {
+        for (const auto &string : this->strings) {
             io.writeBE<uint16_t>(string.size());
             io.writeUtf8(string);
         }
