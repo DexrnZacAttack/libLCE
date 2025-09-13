@@ -22,6 +22,9 @@ namespace lce::msscmp {
         };
 
         explicit Soundbank(uint8_t *data);
+        explicit Soundbank(std::vector<uint8_t> data);
+
+        static bool isSoundbank(uint8_t *data);
 
         [[nodiscard]] uint8_t *serialize() const {
             throw std::logic_error("Function not yet implemented");

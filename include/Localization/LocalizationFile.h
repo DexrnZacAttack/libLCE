@@ -36,7 +36,8 @@ namespace lce::loc {
         bool useUniqueIds;
         uint32_t keyCount;
 
-        std::vector<uint32_t> keys; // should be in with the strings themselves in unordered_map, see Language.h
+        std::vector<uint32_t> keys; // should be in with the strings themselves
+                                    // in unordered_map, see Language.h
         std::unordered_map<uint32_t, std::string> langIds;
         std::vector<Language> languages;
     };

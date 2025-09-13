@@ -5,6 +5,8 @@
 
 #include <filesystem>
 
+#include "Filesystem/Directory.h"
+
 namespace lce::fs {
     void File::writeOut(const std::filesystem::path &path,
                         const std::wstring &name) const {
@@ -23,6 +25,16 @@ namespace lce::fs {
 
     void File::writeOut(const std::wstring &path) const {
         writeOut(path, getName());
+    };
+
+    void File::writeOutFullPath(const std::wstring &path) const {
+        const std::filesystem::path p(path);
+
+        writeOut(p.parent_path(), p.filename().wstring());
+    };
+
+    void File::writeOutFullPath(const std::filesystem::path &path) const {
+        writeOut(path.parent_path(), path.filename().wstring());
     };
 
     void File::writeOut(const std::filesystem::path &path) const {

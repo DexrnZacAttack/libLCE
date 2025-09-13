@@ -18,6 +18,9 @@ namespace lce::arc {
         Archive();
 
         /** Creates an archive file from serialized data */
+        explicit Archive(std::vector<uint8_t> data);
+
+        /** Creates an archive file from serialized data */
         explicit Archive(uint8_t *data);
 
         /** Calculates the total size of the archive file in bytes

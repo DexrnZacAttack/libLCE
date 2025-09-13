@@ -74,6 +74,12 @@ namespace lce::fs {
         /// Writes the file to the physical filesystem into the given path
         void writeOut(const std::filesystem::path &path) const;
 
+        /// Writes the file to the physical filesystem into the given path (using end of path as filename)
+        void writeOutFullPath(const std::wstring &path) const;
+
+        /// Writes the file to the physical filesystem into the given path (using end of path as filename)
+        void writeOutFullPath(const std::filesystem::path &path) const;
+
         /// Writes the file to the physical filesystem to the current dir
         void writeOut() const;
 
@@ -109,7 +115,7 @@ namespace lce::fs {
             return data;
         }
         /// Gets the file's size (equiv. getData().size())
-        [[nodiscard]] size_t getSize() const { return data.size(); }
+        size_t getSize() const override { return data.size(); }
 
         [[nodiscard]] std::wstring toString() const override {
             return L"File[name=" + this->getName() + L", size=" +

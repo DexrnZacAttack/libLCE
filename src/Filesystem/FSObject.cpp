@@ -12,12 +12,25 @@
 #include "Filesystem/Filesystem.h"
 
 namespace lce::fs {
+    void FSObject::remove() {
+        if (!parent)
+            return;
+
+        // I should probably find a better way of doing this
+        this->parent->removeChild(name);
+        this->parent = nullptr;
+    }
+
     std::wstring FSObject::getPath() const {
         std::vector<const FSObject *> objs;
         const FSObject *c = this;
 
         while (c) {
             objs.push_back(c);
+
+            if (!c->parent)
+                break;
+
             c = c->parent;
         }
 

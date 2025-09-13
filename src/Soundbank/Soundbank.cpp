@@ -9,7 +9,6 @@
 #include <utility>
 
 namespace lce::msscmp {
-
     Soundbank::Soundbank(uint8_t *data) {
         io::BinaryIO io(data);
 
@@ -108,5 +107,15 @@ namespace lce::msscmp {
 
             dir->addChild(std::move(f));
         }
+    }
+
+    Soundbank::Soundbank(std::vector<uint8_t> data) : Soundbank(data.data()) {
+    }
+
+    bool Soundbank::isSoundbank(uint8_t *data) {
+        io::BinaryIO io(data);
+        const std::string magic = io.readUtf8(4);
+
+        return magic == "BANK" || magic == "KNAB";
     }
 } // namespace lce::msscmp

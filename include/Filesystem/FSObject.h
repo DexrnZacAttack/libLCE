@@ -83,6 +83,12 @@ namespace lce::fs {
                    std::to_wstring(this->getModifiedTimestamp()) + L"]";
         }
 
+        /// Deletes/Removes an object from its parent
+        virtual void remove();
+
+        /** Gets the size of the object */
+        virtual size_t getSize() const = 0;
+
         virtual ~FSObject() = default;
 
         /** @returns \c true if the object is a file.
@@ -103,6 +109,10 @@ namespace lce::fs {
         };
         /** @returns The object's full path */
         [[nodiscard]] std::wstring getPath() const;
+
+        [[nodiscard]] Directory *getParent() const {
+            return this->parent;
+        };
 
       private:
         std::wstring name;

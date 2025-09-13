@@ -9,6 +9,9 @@ namespace lce::arc {
     Archive::Archive(const Filesystem &fs) : Filesystem(fs) {};
     Archive::Archive() = default;
 
+    Archive::Archive(std::vector<uint8_t> data) : Archive(data.data()) {
+    }
+
     Archive::Archive(uint8_t *data) {
         io::BinaryIO io(data);
         const uint32_t fileCount = io.readBE<uint32_t>();

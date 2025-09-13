@@ -33,6 +33,10 @@ namespace lce::fs {
             this->parent = parent;
         }
 
+        bool contains(const std::wstring &name) const {
+            return this->children.count(name);
+        }
+
         /** Creates a Directory with the contents of a physical directory path
          *
          * @param path The path to read all files into the directory from
@@ -115,11 +119,13 @@ namespace lce::fs {
          * @param child The child FSObject you would like too add
          */
         bool addChild(std::unique_ptr<FSObject> child);
+
         /** Removes/Deletes a child from the directory
          *
          * @param name The name of the child you would like to remove
          */
         bool removeChild(const std::wstring &name);
+
         /** Takes a child, which removes it and returns the unique ptr
          *
          * NOTE: This will unset the parent
@@ -143,7 +149,7 @@ namespace lce::fs {
         bool moveChild(const std::wstring &name, Directory *to);
 
         /** Gets the size of the directory and all files under it (recursive) */
-        [[nodiscard]] size_t getSize() const;
+        size_t getSize() const override;
 
         /** Returns the map of FSObjects under this directory */
         const std::unordered_map<std::wstring, std::unique_ptr<FSObject>> &
