@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.26)
-project(LCE VERSION 1.2.1)
+project(LCE VERSION 1.2.2)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -37,6 +37,9 @@ set(ZLIB_FILES
 )
 
 set(HEADERS
+        include/Resources/resource.h
+        include/Resources/resource.rc
+
         include/libLCE.h
         include/libLCEExports.h
         include/World/Region.h
@@ -123,4 +126,7 @@ if (CMAKE_CXX_BYTE_ORDER EQUAL BIG_ENDIAN)
     target_compile_definitions(LCE PRIVATE BR_BIG_ENDIAN)
 endif ()
 
-target_compile_definitions(LCE PRIVATE LIBLCE_VERSION="${PROJECT_VERSION}")
+target_compile_definitions(LCE PRIVATE
+        LIBLCE_VERSION="${PROJECT_VERSION}"
+        LIBLCE_RC_VERSION=${PROJECT_VERSION_MAJOR},${PROJECT_VERSION_MINOR},${PROJECT_VERSION_PATCH}
+)
