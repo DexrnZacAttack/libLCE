@@ -23,7 +23,7 @@ jobs:
       #
       # To add more build types (Release, Debug, RelWithDebInfo, etc.) customize the build_type list.
       matrix:
-        os: [ ubuntu-latest, windows-latest, macos-latest, macos-13, win-arm64 ]
+        os: [ ubuntu-latest, windows-latest, macos-latest, macos-13, windows-11-arm ]
         build_type: [ Release, Debug ]
         c_compiler: [ gcc, clang, cl, emcc ]
         include:
@@ -32,7 +32,7 @@ jobs:
             compiler_name: MSVC
             c_compiler: cl
             cpp_compiler: cl
-          - os: windows-arm64
+          - os: windows-11-arm
             platform_name: Windows AArch64
             compiler_name: MSVC
             c_compiler: cl
@@ -85,11 +85,11 @@ jobs:
             c_compiler: clang
           - os: windows-latest
             c_compiler: emcc
-          - os: windows-arm64
+          - os: windows-11-arm
             c_compiler: gcc
-          - os: windows-arm64
+          - os: windows-11-arm
             c_compiler: clang
-          - os: windows-arm64
+          - os: windows-11-arm
             c_compiler: emcc
           - os: ubuntu-latest
             c_compiler: cl
@@ -159,7 +159,7 @@ jobs:
 
       - name: Upload Artifact (Windows)
         uses: actions/upload-artifact@v4
-        if: matrix.os == 'windows-latest' || matrix.os == 'windows-arm64'
+        if: matrix.os == 'windows-latest' || matrix.os == 'windows-11-arm'
         with:
           name: ${{ matrix.platform_name }}-${{ matrix.compiler_name }}_${{ matrix.build_type }}
           path: ${{ github.workspace }}/cmake-build-${{ matrix.build_type }}-${{ matrix.c_compiler }}/${{ matrix.build_type }}
