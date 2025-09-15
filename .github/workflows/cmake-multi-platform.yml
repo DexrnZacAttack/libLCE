@@ -63,12 +63,12 @@ jobs:
             compiler_name: GCC
             c_compiler: gcc
             cpp_compiler: g++
-          - os: macos-latest-large
+          - os: macos-13
             platform_name: macOS-x64
             compiler_name: Clang
             c_compiler: clang
             cpp_compiler: clang++
-          - os: macos-latest-large
+          - os: macos-13
             platform_name: macOS-x64
             compiler_name: GCC
             c_compiler: gcc
@@ -86,9 +86,9 @@ jobs:
             c_compiler: emcc
           - os: macos-latest
             c_compiler: cl
-          - os: macos-latest-large
+          - os: macos-13
             c_compiler: emcc
-          - os: macos-latest-large
+          - os: macos-13
             c_compiler: cl
 
     steps:
@@ -139,7 +139,7 @@ jobs:
 
       - name: Upload Artifact (macOS)
         uses: actions/upload-artifact@v4
-        if: matrix.os == 'macos-latest' || matrix.os == 'macos-latest-large'
+        if: matrix.os == 'macos-latest' || matrix.os == 'macos-13'
         with:
           name: ${{ matrix.platform_name }}-${{ matrix.compiler_name }}_${{ matrix.build_type }}
           path: |
@@ -148,7 +148,7 @@ jobs:
 
       - name: Upload Artifact (Windows)
         uses: actions/upload-artifact@v4
-        if: matrix.os != 'ubuntu-latest'
+        if: matrix.os == 'windows-latest'
         with:
           name: ${{ matrix.platform_name }}-${{ matrix.compiler_name }}_${{ matrix.build_type }}
           path: ${{ github.workspace }}/cmake-build-${{ matrix.build_type }}-${{ matrix.c_compiler }}/${{ matrix.build_type }}
