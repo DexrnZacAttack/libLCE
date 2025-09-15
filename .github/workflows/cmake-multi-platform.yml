@@ -23,7 +23,7 @@ jobs:
       #
       # To add more build types (Release, Debug, RelWithDebInfo, etc.) customize the build_type list.
       matrix:
-        os: [ ubuntu-latest, windows-latest ]
+        os: [ ubuntu-latest, windows-latest, macos-latest, macos-latest-large ]
         build_type: [ Release, Debug ]
         c_compiler: [ gcc, clang, cl, emcc ]
         include:
@@ -53,6 +53,26 @@ jobs:
             compiler_name: Clang
             c_compiler: clang
             cpp_compiler: clang++
+          - os: macos-latest
+            platform_name: macOS-AArch64
+            compiler_name: Clang
+            c_compiler: clang
+            cpp_compiler: clang++
+          - os: macos-latest
+            platform_name: macOS-AArch64
+            compiler_name: GCC
+            c_compiler: gcc
+            cpp_compiler: g++
+          - os: macos-latest-large
+            platform_name: macOS-x64
+            compiler_name: Clang
+            c_compiler: clang
+            cpp_compiler: clang++
+          - os: macos-latest-large
+            platform_name: macOS-x64
+            compiler_name: GCC
+            c_compiler: gcc
+            cpp_compiler: g++
         exclude:
           - os: windows-latest
             c_compiler: gcc
@@ -62,6 +82,14 @@ jobs:
             c_compiler: cl
           - os: windows-latest
             c_compiler: emcc
+          - os: macos-latest
+            c_compiler: emcc
+          - os: macos-latest
+            c_compiler: cl
+          - os: macos-latest-large
+            c_compiler: emcc
+          - os: macos-latest-large
+            c_compiler: cl
 
     steps:
       - uses: actions/checkout@v4
@@ -107,6 +135,15 @@ jobs:
             ${{ github.workspace }}/cmake-build-${{ matrix.build_type }}-${{ matrix.c_compiler }}/*.so
             ${{ github.workspace }}/cmake-build-${{ matrix.build_type }}-${{ matrix.c_compiler }}/*.js
             ${{ github.workspace }}/cmake-build-${{ matrix.build_type }}-${{ matrix.c_compiler }}/*.wasm
+            ${{ github.workspace }}/cmake-build-${{ matrix.build_type }}-${{ matrix.c_compiler }}/tests
+
+      - name: Upload Artifact (macOS)
+        uses: actions/upload-artifact@v4
+        if: matrix.os == 'macos-latest' || matrix.os == 'macos-latest-large'
+        with:
+          name: ${{ matrix.platform_name }}-${{ matrix.compiler_name }}_${{ matrix.build_type }}
+          path: |
+            ${{ github.workspace }}/cmake-build-${{ matrix.build_type }}-${{ matrix.c_compiler }}/*.dylib
             ${{ github.workspace }}/cmake-build-${{ matrix.build_type }}-${{ matrix.c_compiler }}/tests
 
       - name: Upload Artifact (Windows)
