@@ -23,12 +23,17 @@ jobs:
       #
       # To add more build types (Release, Debug, RelWithDebInfo, etc.) customize the build_type list.
       matrix:
-        os: [ ubuntu-latest, windows-latest, macos-latest, macos-13 ]
+        os: [ ubuntu-latest, windows-latest, macos-latest, macos-13, win-arm64 ]
         build_type: [ Release, Debug ]
         c_compiler: [ gcc, clang, cl, emcc ]
         include:
           - os: windows-latest
-            platform_name: Windows
+            platform_name: Windows x86_64
+            compiler_name: MSVC
+            c_compiler: cl
+            cpp_compiler: cl
+          - os: windows-arm64
+            platform_name: Windows AArch64
             compiler_name: MSVC
             c_compiler: cl
             cpp_compiler: cl
@@ -44,32 +49,32 @@ jobs:
               -DEMSCRIPTEN_DIR="$/home/runner/work/libLCE/libLCE/external/emsdk/upstream/emscripten"
               -DCMAKE_TOOLCHAIN_FILE=/home/runner/work/libLCE/libLCE/external/emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake
           - os: ubuntu-latest
-            platform_name: Linux
+            platform_name: Linux x86_64
             compiler_name: GCC
             c_compiler: gcc
             cpp_compiler: g++
           - os: ubuntu-latest
-            platform_name: Linux
+            platform_name: Linux x86_64
             compiler_name: Clang
             c_compiler: clang
             cpp_compiler: clang++
           - os: macos-latest
-            platform_name: macOS-AArch64
+            platform_name: macOS AArch64
             compiler_name: Clang
             c_compiler: clang
             cpp_compiler: clang++
           - os: macos-latest
-            platform_name: macOS-AArch64
+            platform_name: macOS AArch64
             compiler_name: GCC
             c_compiler: gcc
             cpp_compiler: g++
           - os: macos-13
-            platform_name: macOS-x64
+            platform_name: macOS x86_64
             compiler_name: Clang
             c_compiler: clang
             cpp_compiler: clang++
           - os: macos-13
-            platform_name: macOS-x64
+            platform_name: macOS x86_64
             compiler_name: GCC
             c_compiler: gcc
             cpp_compiler: g++
@@ -78,10 +83,16 @@ jobs:
             c_compiler: gcc
           - os: windows-latest
             c_compiler: clang
-          - os: ubuntu-latest
-            c_compiler: cl
           - os: windows-latest
             c_compiler: emcc
+          - os: windows-arm64
+            c_compiler: gcc
+          - os: windows-arm64
+            c_compiler: clang
+          - os: windows-arm64
+            c_compiler: emcc
+          - os: ubuntu-latest
+            c_compiler: cl
           - os: macos-latest
             c_compiler: emcc
           - os: macos-latest
@@ -148,7 +159,7 @@ jobs:
 
       - name: Upload Artifact (Windows)
         uses: actions/upload-artifact@v4
-        if: matrix.os == 'windows-latest'
+        if: matrix.os == 'windows-latest' || matrix.os == 'windows-arm64'
         with:
           name: ${{ matrix.platform_name }}-${{ matrix.compiler_name }}_${{ matrix.build_type }}
           path: ${{ github.workspace }}/cmake-build-${{ matrix.build_type }}-${{ matrix.c_compiler }}/${{ matrix.build_type }}
