@@ -23,7 +23,7 @@ jobs:
       #
       # To add more build types (Release, Debug, RelWithDebInfo, etc.) customize the build_type list.
       matrix:
-        os: [ ubuntu-latest, windows-latest, macos-latest, macos-13, windows-11-arm ]
+        os: [ ubuntu-latest, ubuntu-24.04-arm, windows-latest, macos-latest, macos-13, windows-11-arm ]
         build_type: [ Release, Debug ]
         c_compiler: [ gcc, clang, cl, emcc ]
         include:
@@ -55,6 +55,16 @@ jobs:
             cpp_compiler: g++
           - os: ubuntu-latest
             platform_name: Linux x86_64
+            compiler_name: Clang
+            c_compiler: clang
+            cpp_compiler: clang++
+          - os: ubuntu-24.04-arm
+            platform_name: Linux AArch64
+            compiler_name: GCC
+            c_compiler: gcc
+            cpp_compiler: g++
+          - os: ubuntu-24.04-arm
+            platform_name: Linux AArch64
             compiler_name: Clang
             c_compiler: clang
             cpp_compiler: clang++
@@ -93,6 +103,10 @@ jobs:
             c_compiler: emcc
           - os: ubuntu-latest
             c_compiler: cl
+          - os: ubuntu-24.04-arm
+            c_compiler: cl
+          - os: ubuntu-24.04-arm
+            c_compiler: emcc
           - os: macos-latest
             c_compiler: emcc
           - os: macos-latest
@@ -139,7 +153,7 @@ jobs:
 
       - name: Upload Artifact (Linux)
         uses: actions/upload-artifact@v4
-        if: matrix.os == 'ubuntu-latest'
+        if: matrix.os == 'ubuntu-latest' || matrix.os == 'ubuntu-24.04-arm'
         with:
           name: ${{ matrix.platform_name }}-${{ matrix.compiler_name }}_${{ matrix.build_type }}
           path: |
