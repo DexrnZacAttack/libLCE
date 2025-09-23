@@ -5,6 +5,8 @@
 #ifndef LOCALIZATIONFILE_H
 #define LOCALIZATIONFILE_H
 
+#include "IO/Serializable.h"
+
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -15,7 +17,7 @@
 
 namespace lce::loc {
 
-    class LIBLCE_API LocalizationFile {
+    class LIBLCE_API LocalizationFile : public io::Serializable {
       public:
         LocalizationFile(uint8_t *data);
         LocalizationFile();
@@ -27,8 +29,8 @@ namespace lce::loc {
                          std::unordered_map<uint32_t, std::string> langIds,
                          std::vector<Language> languages);
 
-        uint64_t getSize() const;
-        uint8_t *serialize() const;
+        size_t getSize() const override;
+        uint8_t *serialize() const override;
 
         uint32_t version;
         uint32_t languageCount;

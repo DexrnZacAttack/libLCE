@@ -4,6 +4,8 @@
 
 #ifndef SAVEFILECOMMONS_H
 #define SAVEFILECOMMONS_H
+#include "IO/Serializable.h"
+
 #include <Filesystem/Filesystem.h>
 #include <IO/BinaryIO.h>
 #include <libLCE.h>
@@ -19,21 +21,34 @@ namespace lce::save {
     class SaveFileOld;
     class SaveFile;
 
+    /** Save file versions, each value's name denotes the first TU it was used
+     * in
+     *
+     * @see
+     * https://team-lodestone.github.io/Documentation/LCE/Saving/LCE%20Save%20File%20Versions
+     * for more info
+     */
     enum SaveFileVersion : uint16_t {
-        PR = 1,
-        TU0054,
-        TU5,
-        TU9,
-        TU14,
-        TU17,
-        TU19,
-        TU36,
-        TU69
+        B0033 = 1, /**< Pre-release builds, Builds 0033-0035 */
+        B0054,     /**< Used between pre-release build 0054 and TU 4 */
+        TU5,       /**< Used between TUs 5-8  */
+        TU9,       /**< Used between TUs 9-13  */
+        TU14,      /**< Used between TUs 14-16  */
+        TU17,      /**< Used between TUs 17-18  */
+        TU19,      /**< Used between TUs 19-35  */
+        TU36,      /**< Used between TUs 36-68  */
+        TU69       /**< Used on TU 69 onwards  */
     };
 
-    class LIBLCE_API SaveFileCommons : public fs::Filesystem {
+    /** Base class for the 2 different Save File types
+     *
+     * @see SaveFile
+     * @see SaveFileOld
+     */
+    class LIBLCE_API SaveFileCommons : public fs::Filesystem,
+                                       public io::Serializable {
       protected:
-        // Create a save file from a root folder
+        /** Creates a save file with the contents of the given Filesystem */
         SaveFileCommons(const Filesystem &fs, const io::ByteOrder byteOrder,
                         const uint16_t origVersion = 11,
                         const uint16_t version = 11)
@@ -57,7 +72,7 @@ namespace lce::save {
          *
          * @returns The save file size in bytes
          */
-        [[nodiscard]] uint64_t getSize() const;
+        size_t getSize() const override;
 
         /** Calculates the offset where the index shall be placed, which is
          * always after the header and all the file data
@@ -66,19 +81,14 @@ namespace lce::save {
          */
         [[nodiscard]] uint32_t calculateIndexOffset() const;
 
-        /** Serializes the save file
-         *
-         * @returns The serialized save file
-         */
-        [[nodiscard]] virtual uint8_t *serialize() const = 0;
-
         /** @returns The save file without requiring endian and version */
-        static SaveFileCommons *
-        deserializeAuto(const std::vector<uint8_t> &data);
+        static SaveFileCommons *deserializeAuto(std::vector<uint8_t> &data);
+
         /** @returns The serialized save file's version */
         static uint16_t
-        getVersionFromData(std::vector<uint8_t> data,
+        getVersionFromData(std::vector<uint8_t> &data,
                            io::ByteOrder byteOrder = io::ByteOrder::LITTLE);
+
         /** @returns The save file's original version */
         [[nodiscard]] uint16_t getOriginalVersion() const;
         /** @returns The save file's version */
@@ -117,6 +127,12 @@ namespace lce::save {
         }
 
       protected:
+        /** Header size in bytes of the file once serialized
+         * - Index Offset (`uint32_t`) -> 4 bytes
+         * - File Count (`uint32_t`) -> 4 bytes
+         * - Original Version (`uint16_t`) -> 2 bytes
+         * - Version (`uint16_t`) -> 2 bytes
+         */
         static constexpr uint32_t HEADER_SIZE = 12;
         // NOTE: this could be wrong name
         uint16_t mOriginalVersion;

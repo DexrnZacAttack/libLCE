@@ -11,14 +11,14 @@ namespace lce::world {
     Region::Region(int16_t x, int16_t z, int16_t dim) : x(x), z(z), dim(dim) {}
 
     Region::Region(std::vector<uint8_t> data, int16_t x, int16_t z, int16_t dim,
-                   compression::CompressionType outerCompression,
+                   compression::Compression::Type outerCompression,
                    io::ByteOrder byteOrder)
         : x(x), z(z), dim(dim) {}
 
     Region::Region(std::wstring filename) {}
 
     Region::Region(std::vector<uint8_t> data, std::wstring filename,
-                   compression::CompressionType outerCompression,
+                   compression::Compression::Type outerCompression,
                    io::ByteOrder byteOrder) {
         const std::wregex re(
             L"(DIM([-0-9]{1,2}))?(r)\\.([-0-9]{1,2})\\.([-0-9]{1,2}).mcr");

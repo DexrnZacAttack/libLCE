@@ -33,7 +33,7 @@ namespace lce::color {
         return {name, water, underwater, fog};
     }
 
-    uint8_t *WorldColor::create() {
+    uint8_t *WorldColor::serialize() const {
         io::BinaryIO io(getSize());
 
         io.writeBE<uint16_t>(name.size());
@@ -45,13 +45,8 @@ namespace lce::color {
         return io.getData();
     }
 
-    uint32_t WorldColor::getSize() {
-        uint32_t size = 0;
-        size += sizeof(uint16_t);
-        size += name.size();
-        size += sizeof(ARGB);
-        size += sizeof(ARGB);
-        size += sizeof(ARGB);
-        return size;
+    size_t WorldColor::getSize() const {
+        return sizeof(uint16_t) + name.size() + sizeof(ARGB) + sizeof(ARGB) +
+               sizeof(ARGB);
     }
 } // namespace lce::color

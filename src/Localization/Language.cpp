@@ -21,7 +21,7 @@ namespace lce::loc {
         }
     }
 
-    uint32_t Language::getSize() const {
+    size_t Language::getSize() const {
         uint32_t size = 0;
 
         size += sizeof(shouldReadByte);

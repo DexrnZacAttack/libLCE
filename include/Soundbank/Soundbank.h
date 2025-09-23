@@ -9,7 +9,6 @@
 #include <IO/BinaryIO.h>
 #include <Soundbank/BinkaFile.h>
 #include <libLCE.h>
-#include <stdexcept> //Remove when implemented
 #include <vector>
 
 namespace lce::msscmp {
@@ -25,10 +24,6 @@ namespace lce::msscmp {
         explicit Soundbank(std::vector<uint8_t> data);
 
         static bool isSoundbank(uint8_t *data);
-
-        [[nodiscard]] uint8_t *serialize() const {
-            throw std::logic_error("Function not yet implemented");
-        }
 
       private:
         io::ByteOrder mByteOrder;

@@ -4,6 +4,9 @@
 // "JavascriptHellUtility.cpp"
 
 #include "../../include/libLCEExports.h"
+#include "Compression/Compression.h"
+
+#include <Save/SaveFileCommons.h>
 
 #ifdef __EMSCRIPTEN__
 
@@ -58,17 +61,17 @@ EMSCRIPTEN_BINDINGS(libLCE) {
         .value("LITTLE", lce::io::ByteOrder::LITTLE)
         .value("BIG", lce::io::ByteOrder::BIG);
 
-    emscripten::enum_<lce::compression::CompressionType>("CompressionType")
-        .value("ZLIB", lce::compression::CompressionType::ZLIB)
-        .value("LZX", lce::compression::CompressionType::LZX)
-        .value("SPLIT_SAVE", lce::compression::CompressionType::SPLIT_SAVE)
-        .value("CHUNK", lce::compression::CompressionType::CHUNK)
-        .value("VITA", lce::compression::CompressionType::VITA)
-        .value("DEFLATE", lce::compression::CompressionType::DEFLATE);
+    emscripten::enum_<lce::compression::Compression::Type>("CompressionType")
+        .value("ZLIB", lce::compression::Compression::Type::ZLIB)
+        .value("LZX", lce::compression::Compression::Type::LZX)
+        .value("SPLIT_SAVE", lce::compression::Compression::Type::SPLIT_SAVE)
+        .value("CHUNK", lce::compression::Compression::Type::CHUNK)
+        .value("VITA", lce::compression::Compression::Type::VITA)
+        .value("DEFLATE", lce::compression::Compression::Type::DEFLATE);
 
     emscripten::enum_<lce::save::SaveFileVersion>("SaveFileVersion")
-        .value("PR", lce::save::SaveFileVersion::PR)
-        .value("TU0054", lce::save::SaveFileVersion::TU0054)
+        .value("B0033", lce::save::SaveFileVersion::B0033)
+        .value("B0054", lce::save::SaveFileVersion::B0054)
         .value("TU5", lce::save::SaveFileVersion::TU5)
         .value("TU9", lce::save::SaveFileVersion::TU9)
         .value("TU14", lce::save::SaveFileVersion::TU14)
@@ -89,8 +92,9 @@ EMSCRIPTEN_BINDINGS(libLCE) {
             &lce::compression::Compression::decompressZlibWithLength)
         .class_function("decompressVita",
                         &lce::compression::Compression::decompressVita)
-        .class_function("getSizeFromSave",
-                        &lce::compression::Compression::getSizeFromSave);
+        .class_function(
+            "getCompressedSaveFileSize",
+            &lce::compression::Compression::getCompressedSaveFileSize);
 
     emscripten::class_<lce::fs::FSObject>("FSObject")
         .property("name", &lce::fs::FSObject::getName)
@@ -236,7 +240,7 @@ EMSCRIPTEN_BINDINGS(libLCE) {
 
     emscripten::class_<lce::world::Region>("Region")
         .constructor<std::vector<uint8_t>, std::wstring,
-                     lce::compression::CompressionType, lce::io::ByteOrder>()
+                     lce::compression::Compression::Type, lce::io::ByteOrder>()
         .property("x", &lce::world::Region::getX, &lce::world::Region::setX)
         .property("z", &lce::world::Region::getZ, &lce::world::Region::setZ)
         .property("dim", &lce::world::Region::getDim,

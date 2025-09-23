@@ -35,10 +35,10 @@ namespace lce::world {
         Chunk();
 
         Chunk(std::vector<uint8_t> data,
-              compression::CompressionType outerCompression,
+              compression::Compression::Type outerCompression,
               io::ByteOrder byteOrder = io::ByteOrder::LITTLE);
 
-        Chunk(uint8_t *data, compression::CompressionType outerCompression,
+        Chunk(uint8_t *data, compression::Compression::Type outerCompression,
               io::ByteOrder byteOrder);
 
         // region Readers

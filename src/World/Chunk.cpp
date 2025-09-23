@@ -14,7 +14,7 @@ namespace lce::world {
     Chunk::Section::Section() {}
 
     Chunk::Chunk(std::vector<uint8_t> data,
-                 compression::CompressionType outerCompression,
+                 compression::Compression::Type outerCompression,
                  io::ByteOrder byteOrder) {
         io::BinaryIO io(data.data(), data.size());
 

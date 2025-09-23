@@ -65,21 +65,21 @@ namespace lce::compression {
     /** Decompresses ("inflates") zlib-compressed data
      * @param in Input data
      * @param out Where to output to
-     * @param bufSize The size of the output buffer
+     * @param outSize The size of the output buffer
      * @param offset The offset we want to read from
      *
      * @returns false — If there is no error
      */
     bool Compression::decompressZlibWithLength(std::vector<uint8_t> &in,
                                                std::vector<uint8_t> &out,
-                                               const uint32_t bufSize,
+                                               const uint32_t outSize,
                                                const uint32_t offset = 0) {
         if (in.size() < 2) {
             std::cerr << "Input is too small" << std::endl;
             return true;
         }
 
-        if (bufSize == 0) {
+        if (outSize == 0) {
             std::cerr << "Cannot decompress into buffer with no size"
                       << std::endl;
             return true;
@@ -95,9 +95,9 @@ namespace lce::compression {
         stream.avail_in = in.size() - offset;
         stream.next_in = &in[offset];
 
-        out.resize(bufSize);
+        out.resize(outSize);
 
-        stream.avail_out = bufSize;
+        stream.avail_out = outSize;
         stream.next_out = out.data();
 
         res = inflate(&stream, Z_NO_FLUSH);
@@ -166,13 +166,13 @@ namespace lce::compression {
      */
     bool Compression::decompressVita(std::vector<uint8_t> &in,
                                      std::vector<uint8_t> &out,
-                                     const uint32_t outBuf,
+                                     const uint32_t outSize,
                                      const uint32_t offset) {
         // todo: could make it auto allocate out to 0x40000 like LCE does
         io::BinaryIO io(in.data());
         io.seek(offset);
 
-        out.reserve(outBuf);
+        out.reserve(outSize);
 
         while (io.getPosition() < in.size()) {
             // read a byte, if it's 0x00, then it needs to be decoded...
@@ -196,19 +196,20 @@ namespace lce::compression {
 
     bool Compression::decompress(std::vector<uint8_t> &in,
                                  std::vector<uint8_t> &out,
-                                 const compression::CompressionType type) {
+                                 const Compression::Type type) {
         switch (type) {
-        case ZLIB:
+        case Type::ZLIB:
             return decompressZlib(in, out);
-        case VITA:
+        case Type::VITA:
             return decompressVita(in, out, 0);
         default:
             throw std::runtime_error("Invalid compression type");
         }
     }
 
-    uint32_t Compression::getSizeFromSave(std::vector<uint8_t> &in,
-                                          const io::ByteOrder byteOrder) {
+    uint32_t
+    Compression::getCompressedSaveFileSize(std::vector<uint8_t> &in,
+                                           const io::ByteOrder byteOrder) {
         io::BinaryIO io(in.data());
         io.seek(4);
 

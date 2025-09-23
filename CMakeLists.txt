@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.26)
-project(LCE VERSION 1.2.2)
+project(LCE VERSION 1.2.3)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -45,6 +45,8 @@ set(HEADERS
         include/World/Region.h
         include/World/Chunk.h
         include/Save/SaveFile.h
+        include/Save/SaveFileOld.h
+        include/Save/SaveFileCommons.h
         include/IO/BinaryIO.h
         include/Filesystem/Filesystem.h
         include/Filesystem/File.h
@@ -54,6 +56,7 @@ set(HEADERS
         include/Localization/LocalizationFile.h
         include/Localization/Language.h
         include/Soundbank/Soundbank.h
+        include/Soundbank/BinkaFile.h
         include/Compression/Compression.h
         include/Save/Thumb.h
         include/World/SplitSave.h
@@ -61,6 +64,7 @@ set(HEADERS
         include/Filesystem/FSObject.h
         include/Filesystem/Directory.h
         include/Bindings/EmscriptenBindings.h
+        include/IO/Serializable.h
 )
 
 set(FILES
@@ -90,6 +94,7 @@ set(FILES
         src/Filesystem/FSObject.cpp
         src/Filesystem/File.cpp
         src/Filesystem/Directory.cpp
+        src/IO/Serializable.cpp
 )
 
 option(ENABLE_OPTIMIZATIONS "Enable compiler optimizations" OFF)
@@ -130,3 +135,27 @@ target_compile_definitions(LCE PRIVATE
         LIBLCE_VERSION="${PROJECT_VERSION}"
         LIBLCE_RC_VERSION=${PROJECT_VERSION_MAJOR},${PROJECT_VERSION_MINOR},${PROJECT_VERSION_PATCH}
 )
+
+# https://github.com/jothepro/doxygen-awesome-css?tab=readme-ov-file#cmake-with-fetchcontent
+include(FetchContent)
+FetchContent_Declare(
+        doxygen-awesome-css
+        URL https://github.com/jothepro/doxygen-awesome-css/archive/refs/heads/main.zip
+)
+FetchContent_MakeAvailable(doxygen-awesome-css)
+
+FetchContent_GetProperties(doxygen-awesome-css SOURCE_DIR AWESOME_CSS_DIR)
+
+FIND_PACKAGE(Doxygen)
+IF (DOXYGEN_FOUND)
+    set(DOXYFILE_IN ${CMAKE_CURRENT_SOURCE_DIR}/docs/Doxyfile.in)
+    set(DOXYFILE_OUT ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
+
+    CONFIGURE_FILE(${DOXYFILE_IN} ${DOXYFILE_OUT} @ONLY)
+
+    ADD_CUSTOM_TARGET(docs
+            COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
+            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+            VERBATIM
+    )
+ENDIF ()

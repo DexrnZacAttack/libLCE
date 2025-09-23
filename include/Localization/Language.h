@@ -5,6 +5,8 @@
 #ifndef LANGUAGE_H
 #define LANGUAGE_H
 
+#include "IO/Serializable.h"
+
 #include <IO/BinaryIO.h>
 #include <libLCE.h>
 
@@ -16,7 +18,7 @@ namespace lce::loc {
 
     // TODO: redo this with unordered_map with key/v for each string (it's
     // actually hashed afaik but nobody knows the algo)
-    class LIBLCE_API Language {
+    class LIBLCE_API Language : public io::Serializable {
       public:
         explicit Language(io::BinaryIO &io);
         Language(const uint8_t _byte, const uint32_t _shouldReadByte,
@@ -26,8 +28,8 @@ namespace lce::loc {
               code(std::move(_code)), stringCount(_stringCount),
               strings(std::move(_strings)) {}
 
-        [[nodiscard]] uint32_t getSize() const;
-        [[nodiscard]] uint8_t *serialize() const;
+        size_t getSize() const override;
+        uint8_t *serialize() const override;
 
         uint8_t byte;
         uint32_t shouldReadByte;

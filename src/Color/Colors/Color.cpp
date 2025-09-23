@@ -7,7 +7,7 @@
 
 namespace lce::color {
     Color::Color(std::string name, ARGB color)
-        : color::ColorCommons(name), color(color) {}
+        : ColorCommons(name), color(color) {}
 
     Color Color::read(std::vector<uint8_t> data) {
         io::BinaryIO io((data.data()));
@@ -29,15 +29,11 @@ namespace lce::color {
         return {name, color};
     }
 
-    uint32_t Color::getSize() {
-        uint32_t size = 0;
-        size += sizeof(uint16_t);
-        size += name.size();
-        size += sizeof(ARGB);
-        return size;
+    size_t Color::getSize() const {
+        return sizeof(uint16_t) + name.size() + sizeof(ARGB);
     }
 
-    uint8_t *Color::create() {
+    uint8_t *Color::serialize() const {
         io::BinaryIO io(getSize());
 
         io.writeBE<uint16_t>(name.size());
@@ -50,6 +46,4 @@ namespace lce::color {
     ColorCommons::ColorCommons() {}
 
     ColorCommons::ColorCommons(std::string name) : name(name) {}
-
-    uint32_t ColorCommons::getSize() { return sizeof(uint16_t); }
 } // namespace lce::color

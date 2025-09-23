@@ -155,7 +155,7 @@ namespace lce::tests::formats {
         OPEN_FILE("regions/r.0.0.mcr", f);
 
         const world::Region file =
-            world::Region(f, L"r.0.0.mcr", compression::CompressionType::ZLIB,
+            world::Region(f, L"r.0.0.mcr", compression::Compression::Type::ZLIB,
                           io::ByteOrder::BIG);
         std::cout << "regionTest: " << "X: " << file.getX()
                   << ", Z: " << file.getZ() << ", DIM: " << file.getDim()

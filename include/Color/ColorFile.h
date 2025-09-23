@@ -13,7 +13,7 @@
 
 namespace lce::color {
 
-    class LIBLCE_API ColorFileCommons {
+    class LIBLCE_API ColorFileCommons : public io::Serializable {
       public:
         virtual ~ColorFileCommons() = default;
         uint32_t version;
@@ -25,9 +25,6 @@ namespace lce::color {
         ColorFileCommons(const std::vector<Color> &colors, uint32_t version);
 
         void addColor(Color color);
-
-        [[nodiscard]] virtual uint8_t *create() const = 0;
-        [[nodiscard]] virtual uint64_t getSize() const = 0;
     };
 
     class LIBLCE_API ColorFile final : public ColorFileCommons {
@@ -39,9 +36,9 @@ namespace lce::color {
                   std::vector<WorldColor> worldColors);
 
         static ColorFile read(std::vector<uint8_t> data);
-        [[nodiscard]] uint64_t getSize() const override;
 
-        [[nodiscard]] uint8_t *create() const override;
+        size_t getSize() const override;
+        uint8_t *serialize() const override;
     };
 
     class LIBLCE_API ColorFileOld final : public ColorFileCommons {
@@ -52,8 +49,8 @@ namespace lce::color {
 
         static ColorFileOld read(std::vector<uint8_t> data);
 
-        [[nodiscard]] uint8_t *create() const override;
-        [[nodiscard]] uint64_t getSize() const override;
+        uint8_t *serialize() const override;
+        uint64_t getSize() const override;
     };
 
 } // namespace lce::color

@@ -25,17 +25,17 @@ namespace lce::save {
     }
 
     SaveFileCommons *
-    SaveFileCommons::deserializeAuto(const std::vector<uint8_t> &data) {
+    SaveFileCommons::deserializeAuto(std::vector<uint8_t> &data) {
         const io::ByteOrder e = detectByteOrder(data);
 
-        if (const uint16_t v = getVersionFromData(data, e); v > PR)
+        if (const uint16_t v = getVersionFromData(data, e); v > B0033)
             return new SaveFile(data, e);
 
         return new SaveFileOld(data, e);
     }
 
     uint16_t
-    SaveFileCommons::getVersionFromData(std::vector<uint8_t> data,
+    SaveFileCommons::getVersionFromData(std::vector<uint8_t> &data,
                                         const io::ByteOrder byteOrder) {
         io::BinaryIO io(data.data());
         io.seek(10);

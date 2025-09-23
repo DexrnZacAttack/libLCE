@@ -12,6 +12,16 @@
 
 namespace lce::save {
 
+    /** Stores the logoff thumbnail, world name, and various other world info
+     *
+     * Used for the world entries on the world select screen, as it is faster to
+     * store the world info in the thumbnail rather than decompressing the save
+     * file and reading level.dat.
+     *
+     * @see
+     * https://team-lodestone.github.io/Documentation/LCE/File%20Types/THUMB for
+     * more info
+     */
     class LIBLCE_API Thumb {
       public:
         explicit Thumb(std::vector<uint8_t> data,

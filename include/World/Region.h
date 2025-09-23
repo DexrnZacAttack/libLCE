@@ -25,7 +25,7 @@ namespace lce::world {
     struct LIBLCE_API RegionChunk {
         ChunkLocation location;
         uint32_t timestamp;
-        lce::world::Chunk *chunk;
+        Chunk *chunk;
     };
 
     class LIBLCE_API Region {
@@ -44,13 +44,13 @@ namespace lce::world {
         Region() = default;
         Region(int16_t x, int16_t z, int16_t dim);
         Region(std::vector<uint8_t> data, int16_t x, int16_t z, int16_t dim,
-               compression::CompressionType outerCompression =
-                   lce::compression::CompressionType::ZLIB,
+               compression::Compression::Type outerCompression =
+                   compression::Compression::Type::ZLIB,
                io::ByteOrder byteOrder = io::ByteOrder::LITTLE);
         explicit Region(std::wstring filename);
         Region(std::vector<uint8_t> data, std::wstring filename,
-               lce::compression::CompressionType outerCompression =
-                   lce::compression::CompressionType::ZLIB,
+               compression::Compression::Type outerCompression =
+                   compression::Compression::Type::ZLIB,
                io::ByteOrder byteOrder = io::ByteOrder::LITTLE);
         // endregion
 

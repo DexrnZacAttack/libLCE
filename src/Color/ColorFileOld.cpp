@@ -16,7 +16,7 @@ namespace lce::color {
         : ColorFileCommons(colors, version) {}
 
     ColorFileOld ColorFileOld::read(std::vector<uint8_t> data) {
-        lce::io::BinaryIO io(data.data());
+        io::BinaryIO io(data.data());
         ColorFileOld cfo;
 
         cfo.version = io.readBE<uint32_t>();
@@ -31,14 +31,14 @@ namespace lce::color {
         return cfo;
     }
 
-    uint8_t *ColorFileOld::create() const {
+    uint8_t *ColorFileOld::serialize() const {
         io::BinaryIO io(this->getSize());
 
         io.writeBE<uint32_t>(this->version);
         io.writeBE<uint32_t>(this->colors.size());
 
         for (auto color : colors) {
-            io.writeBytes(color.create(), color.getSize());
+            io.writeBytes(color.serialize(), color.getSize());
         }
 
         return io.getData();

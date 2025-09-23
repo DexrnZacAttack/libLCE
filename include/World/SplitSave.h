@@ -18,8 +18,8 @@ namespace lce::world {
         SplitSave(const std::wstring &filename);
         SplitSave(const std::vector<uint8_t> &data,
                   const std::wstring &filename,
-                  lce::compression::CompressionType outerCompression =
-                      lce::compression::CompressionType::ZLIB,
+                  compression::Compression::Type outerCompression =
+                      compression::Compression::Type::ZLIB,
                   io::ByteOrder byteOrder = io::ByteOrder::LITTLE);
         // endregion
 

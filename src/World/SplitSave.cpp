@@ -18,7 +18,7 @@ namespace lce::world {
 
     SplitSave::SplitSave(const std::vector<uint8_t> &data,
                          const std::wstring &filename,
-                         lce::compression::CompressionType outerCompression,
+                         lce::compression::Compression::Type outerCompression,
                          io::ByteOrder byteOrder) {
         const std::map<int16_t, int16_t> xz = getXZFromFilename(filename);
         const int16_t dim = getDimFromFilename(filename);

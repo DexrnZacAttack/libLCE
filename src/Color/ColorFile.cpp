@@ -49,20 +49,20 @@ namespace lce::color {
         return size;
     }
 
-    uint8_t *ColorFile::create() const {
+    uint8_t *ColorFile::serialize() const {
         io::BinaryIO io(this->getSize());
 
         io.writeBE<uint32_t>(this->version);
         io.writeBE<uint32_t>(this->colors.size());
 
         for (auto color : colors) {
-            io.writeBytes(color.create(), color.getSize());
+            io.writeBytes(color.serialize(), color.getSize());
         }
 
         io.writeBE<uint32_t>(this->worldColors.size());
 
         for (auto color : worldColors) {
-            io.writeBytes(color.create(), color.getSize());
+            io.writeBytes(color.serialize(), color.getSize());
         }
 
         return io.getData();
@@ -82,8 +82,4 @@ namespace lce::color {
     ColorFileCommons::ColorFileCommons(const std::vector<Color> &colors,
                                        uint32_t version)
         : colors(colors), version(version) {}
-
-    uint64_t ColorFileCommons::getSize() const {
-        return 4; // atleast 4
-    }
 } // namespace lce::color

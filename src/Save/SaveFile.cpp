@@ -24,7 +24,6 @@ namespace lce::save {
      * Reads a save file from a pointer to the data
      * @param data The data you want to read (a save file)
      * @param byteOrder The endianness of the data being read
-     * @return The save file.
      */
     SaveFile::SaveFile(std::vector<uint8_t> data, io::ByteOrder byteOrder) {
         this->mByteOrder = byteOrder;
@@ -49,7 +48,7 @@ namespace lce::save {
         this->mOriginalVersion = io.read<uint16_t>(this->mByteOrder);
         this->mVersion = io.read<uint16_t>(this->mByteOrder);
 
-        if (this->mVersion <= PR) {
+        if (this->mVersion <= B0033) {
             throw std::runtime_error("Version mismatch, got version " +
                                      std::to_string(this->mVersion) + ".");
         }
@@ -151,7 +150,7 @@ namespace lce::save {
         else
             originalVersion = 0;
 
-        if (version != PR) {
+        if (version != B0033) {
             this->setVersion(version);
             this->setOriginalVersion(originalVersion);
 

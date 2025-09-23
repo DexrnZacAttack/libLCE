@@ -4,13 +4,35 @@
 
 #ifndef ARCHIVE_H
 #define ARCHIVE_H
+#include "IO/Serializable.h"
+
 #include <Filesystem/Filesystem.h>
 #include <libLCE.h>
 #include <vector>
 
 namespace lce::arc {
-
-    class LIBLCE_API Archive final : public fs::Filesystem {
+    /**
+     * LCE Archive (.ARC) File
+     * \brief A standard archive that can store files,
+     * commonly used for storing game assets.
+     *
+     * ## Header
+     * - File Count (`uint32_t`)
+     *
+     * ## File Index
+     * For each file,
+     * - Name Size (`uint16_t`)
+     * - Name (`Name Size` bytes)
+     * - File Offset (`uint32_t`)
+     *   - Offset to the file data
+     * - File Size (`uint32_t`)
+     *
+     * ## File Data
+     * For each file,
+     * - File Data (`File Size` bytes)
+     */
+    class LIBLCE_API Archive final : public fs::Filesystem,
+                                     public io::Serializable {
       public:
         /** Creates an archive file with the contents of a physical folder */
         explicit Archive(const Filesystem &fs);
@@ -27,13 +49,13 @@ namespace lce::arc {
          *
          * @returns The archive file size in bytes
          */
-        [[nodiscard]] uint64_t getSize() const;
+        size_t getSize() const override;
 
         /** Serializes the archive file
          *
          * @returns The serialized archive file
          */
-        [[nodiscard]] uint8_t *serialize() const;
+        uint8_t *serialize() const override;
 
         friend std::wostream &operator<<(std::wostream &wos, const Archive &a) {
             wos << L"Archive[" << L"fileCount=" << a.getRoot()->getFileCount()
