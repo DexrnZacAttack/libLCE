@@ -9,8 +9,7 @@ namespace lce::arc {
     Archive::Archive(const Filesystem &fs) : Filesystem(fs) {};
     Archive::Archive() = default;
 
-    Archive::Archive(std::vector<uint8_t> data) : Archive(data.data()) {
-    }
+    Archive::Archive(std::vector<uint8_t> data) : Archive(data.data()) {}
 
     Archive::Archive(uint8_t *data) {
         io::BinaryIO io(data);
@@ -90,7 +89,7 @@ namespace lce::arc {
         return io.getData();
     }
 
-    uint64_t Archive::getSize() const {
+    size_t Archive::getSize() const {
         uint32_t size = 4; // file count
 
         getRoot()->forEachFilesRecursive(

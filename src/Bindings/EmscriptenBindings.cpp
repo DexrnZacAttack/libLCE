@@ -160,10 +160,8 @@ EMSCRIPTEN_BINDINGS(libLCE) {
                   &lce::msscmp::BinkaFile::setSampleRate);
 
     emscripten::class_<lce::msscmp::Soundbank,
-                       emscripten::base<lce::fs::Filesystem>>("Soundbank")
-        // .constructor<uint8_t*>(emscripten::allow_raw_pointers()) // error
-        .function("serialize", &lce::msscmp::Soundbank::serialize,
-                  emscripten::allow_raw_pointers());
+                       emscripten::base<lce::fs::Filesystem>>("Soundbank");
+    // .constructor<uint8_t*>(emscripten::allow_raw_pointers()) // error
 
     emscripten::class_<lce::save::SaveFileCommons,
                        emscripten::base<lce::fs::Filesystem>>("SaveFileCommons")

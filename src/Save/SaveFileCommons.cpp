@@ -9,7 +9,7 @@
 #include "Save/SaveFileOld.h"
 
 namespace lce::save {
-    uint64_t SaveFileCommons::getSize() const {
+    size_t SaveFileCommons::getSize() const {
         uint64_t size =
             HEADER_SIZE +
             (getRoot()->getFileCount() *

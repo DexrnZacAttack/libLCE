@@ -56,7 +56,7 @@ namespace lce::loc {
         }
     }
 
-    uint64_t LocalizationFile::getSize() const {
+    size_t LocalizationFile::getSize() const {
         uint32_t size = 0;
 
         size += sizeof(version);

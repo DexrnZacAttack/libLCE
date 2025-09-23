@@ -50,7 +50,7 @@ namespace lce::color {
         static ColorFileOld read(std::vector<uint8_t> data);
 
         uint8_t *serialize() const override;
-        uint64_t getSize() const override;
+        size_t getSize() const override;
     };
 
 } // namespace lce::color
