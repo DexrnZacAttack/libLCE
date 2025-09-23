@@ -33,12 +33,11 @@ jobs:
           -DCMAKE_CXX_COMPILER=clang++
           -DCMAKE_C_COMPILER=clang
           -DCMAKE_BUILD_TYPE=Debug
-          ${{ matrix.settings }}
 
       - name: Generate docs
         # Build your program with the given configuration. Note that --config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
         run: >
-          cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }} ${{ matrix.build_settings }} --target docs
+          cmake --build ${{ steps.strings.outputs.build-output-dir }} --config Debug --target docs
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
