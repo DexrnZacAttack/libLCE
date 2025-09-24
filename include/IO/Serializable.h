@@ -10,6 +10,7 @@ namespace lce::io {
      */
     class Serializable {
       public:
+        // TODO: allow for serializing into existing
         virtual ~Serializable() = default;
 
         /** Serializes the object

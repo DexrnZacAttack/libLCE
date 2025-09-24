@@ -62,7 +62,9 @@ namespace lce::tests::util {
 
         auto startTime = std::chrono::high_resolution_clock::now();
 
+#if ALLOW_THROW != true
         try {
+#endif
             // reset clock since inside try block
             startTime = std::chrono::high_resolution_clock::now();
 
@@ -73,6 +75,7 @@ namespace lce::tests::util {
 
             std::cout << "[" << type << "] \"" << name << "\" finished after "
                       << duration.count() << "ms" << std::endl;
+#if ALLOW_THROW != true
         } catch (const std::exception &e) {
             const std::chrono::duration<double, std::milli> duration =
                 std::chrono::high_resolution_clock::now() - startTime;
@@ -81,5 +84,6 @@ namespace lce::tests::util {
                       << duration.count() << "ms" << " due to " << e.what()
                       << std::endl;
         }
+#endif
     }
 } // namespace lce::tests::util

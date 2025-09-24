@@ -20,9 +20,14 @@ target_link_libraries(libLCE.Tests PRIVATE LCE)
 
 target_include_directories(libLCE.Tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
+# Should we allow for exceptions to throw for debugging
+target_compile_definitions(libLCE.Tests PRIVATE
+        ALLOW_THROW=true)
+
 # Should we write the entire filesystem to the drive
 target_compile_definitions(libLCE.Tests PRIVATE
-        WRITE_FS=false)
+        WRITE_FS=true
+        WRITE_LOC=true)
 
 # ENABLE/DISABLE TESTS HERE
 target_compile_definitions(libLCE.Tests PRIVATE

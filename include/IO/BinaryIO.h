@@ -14,85 +14,16 @@
 #include <libLCE.h>
 
 namespace lce::io {
-    enum class ByteOrder { BIG, LITTLE };
+    /** Byte Order/Endian dictates which way bytes are written */
+    enum class ByteOrder {
+        BIG,   /**< Big Endian | Writes 0xA1B2C3D4 */
+        LITTLE /**< Little Endian | Writes 0xD4C3B2A1 */
+    };
 
-    template <typename T> constexpr T swapOrder_f(const T input) {
-        uint8_t resultBytes[sizeof(T)];
-        const uint8_t *ib = reinterpret_cast<const uint8_t *>(&input);
-        uint8_t *r = resultBytes + (sizeof(T) - 1);
-
-        for (size_t i = 0; i < sizeof(T); ++i) {
-            *r-- = *ib++;
-        }
-
-        T result;
-        memcpy(&result, resultBytes, sizeof(T));
-        return result;
-    }
-
-    // this is a mess but theoretically will actually use the byteswap
-    // instruction
-    template <typename T> constexpr T swapOrder(const T input) {
-        if constexpr (std::is_integral_v<T>) {
-            if constexpr (sizeof(T) == 2) {
-#if defined(__clang__) || defined(__GNUC__)
-                return static_cast<T>(
-                    __builtin_bswap16(static_cast<uint16_t>(input)));
-#elif defined(_MSC_VER)
-                return static_cast<T>(
-                    _byteswap_ushort(static_cast<unsigned short>(input)));
-#else
-                return swapOrder_f(input);
-#endif
-            } else if constexpr (sizeof(T) == 4) {
-#if defined(__clang__) || defined(__GNUC__)
-                return static_cast<T>(
-                    __builtin_bswap32(static_cast<uint32_t>(input)));
-#elif defined(_MSC_VER)
-                return static_cast<T>(
-                    _byteswap_ulong(static_cast<unsigned long>(input)));
-#else
-                return swapOrder_f(input);
-#endif
-            } else if constexpr (sizeof(T) == 8) {
-#if defined(__clang__) || defined(__GNUC__)
-                return static_cast<T>(
-                    __builtin_bswap64(static_cast<uint64_t>(input)));
-#elif defined(_MSC_VER)
-                return static_cast<T>(
-                    _byteswap_uint64(static_cast<unsigned __int64>(input)));
-#else
-                return swapOrder_f(input);
-#endif
-            } else {
-                return swapOrder_f(input);
-            }
-        } else {
-            return swapOrder_f(input);
-        }
-    }
-
-    template <typename T> constexpr T big2sys(const T a) {
-#ifdef BR_BIG_ENDIAN
-        return a;
-#else
-        return swapOrder(a);
-#endif
-    }
-
-    template <typename T>
-    constexpr T little2sys(const T a) { // also is working as sys2little
-#ifdef BR_BIG_ENDIAN
-        return swapOrder(a);
-#else
-        return a;
-#endif
-    }
-
-    // todo: implement size shits
+    /** Unsized reader/writer for a byte array */
     class BinaryIO {
       public:
-        explicit BinaryIO(uint8_t *input, size_t size = 0);
+        explicit BinaryIO(uint8_t *input);
         explicit BinaryIO(size_t size);
 
         // ~BinaryIO();
@@ -101,25 +32,70 @@ namespace lce::io {
         void seekRelative(size_t offset);
 
         // reading
+        /** Reads an unsigned byte (uint8_t)
+         *
+         * @returns The byte
+         *
+         * @see readSignedByte() for reading a signed byte
+         */
         uint8_t readByte();
+        /** Reads a signed byte (int8_t)
+         *
+         * @returns The signed byte
+         *
+         * @see readByte() for reading an unsigned byte
+         */
         int8_t readSignedByte();
 
+        /** Reads an unsigned 24-bit integer
+         *
+         * @returns The unsigned 24-bit integer
+         *
+         * @see readInt24() for reading a signed 24-bit integer
+         */
         uint32_t readUint24(io::ByteOrder endian);
 
-        int32_t readInt24(io::ByteOrder endian);
+        /** Reads a signed 24-bit integer
+         *
+         * @returns The signed 24-bit integer
+         *
+         * @see readInt24() for reading an unsigned 24-bit integer
+         */
+        int32_t readInt24(ByteOrder endian);
 
+        /** Reads a value the size of the given type as Little Endian
+         *
+         * @returns The value
+         *
+         * @see readBE() for reading a Big Endian value
+         */
         template <typename T> T readLE() {
             const T v = little2sys(*reinterpret_cast<const T *>(this->mData));
             this->mData += sizeof(T);
             return v;
         }
 
+        /** Reads a value the size of the given type as Big Endian
+         *
+         * @returns The value
+         *
+         * @see readLE() for reading a Little Endian value
+         */
         template <typename T> T readBE() {
             const T v = big2sys(*reinterpret_cast<const T *>(this->mData));
             this->mData += sizeof(T);
             return v;
         }
 
+        /** Reads a value the size of the given type using the given endian/byte
+         * order
+         *
+         * @param endian The byte order to read as
+         * @returns The value
+         *
+         * @see readBE() for reading a Big Endian value
+         * @see readLE() for reading a Little Endian value
+         */
         template <typename T> T read(const io::ByteOrder endian) {
             T v;
             if (endian == io::ByteOrder::LITTLE)
@@ -210,10 +186,82 @@ namespace lce::io {
         static LIBLCE_API std::string wstringToString(const std::wstring &str);
         static LIBLCE_API std::wstring stringToWString(const std::string &str);
 
+        template <typename T> constexpr T swapOrder_f(const T input) {
+            uint8_t resultBytes[sizeof(T)];
+            const uint8_t *ib = reinterpret_cast<const uint8_t *>(&input);
+            uint8_t *r = resultBytes + (sizeof(T) - 1);
+
+            for (size_t i = 0; i < sizeof(T); ++i) {
+                *r-- = *ib++;
+            }
+
+            T result;
+            memcpy(&result, resultBytes, sizeof(T));
+            return result;
+        }
+
+        // this is a mess but theoretically will actually use the byteswap
+        // instruction
+        template <typename T> constexpr T swapOrder(const T input) {
+            if constexpr (std::is_integral_v<T>) {
+                if constexpr (sizeof(T) == 2) {
+#if defined(__clang__) || defined(__GNUC__)
+                    return static_cast<T>(
+                        __builtin_bswap16(static_cast<uint16_t>(input)));
+#elif defined(_MSC_VER)
+                    return static_cast<T>(
+                        _byteswap_ushort(static_cast<unsigned short>(input)));
+#else
+                    return swapOrder_f(input);
+#endif
+                } else if constexpr (sizeof(T) == 4) {
+#if defined(__clang__) || defined(__GNUC__)
+                    return static_cast<T>(
+                        __builtin_bswap32(static_cast<uint32_t>(input)));
+#elif defined(_MSC_VER)
+                    return static_cast<T>(
+                        _byteswap_ulong(static_cast<unsigned long>(input)));
+#else
+                    return swapOrder_f(input);
+#endif
+                } else if constexpr (sizeof(T) == 8) {
+#if defined(__clang__) || defined(__GNUC__)
+                    return static_cast<T>(
+                        __builtin_bswap64(static_cast<uint64_t>(input)));
+#elif defined(_MSC_VER)
+                    return static_cast<T>(
+                        _byteswap_uint64(static_cast<unsigned __int64>(input)));
+#else
+                    return swapOrder_f(input);
+#endif
+                } else {
+                    return swapOrder_f(input);
+                }
+            } else {
+                return swapOrder_f(input);
+            }
+        }
+
+        template <typename T> constexpr T big2sys(const T a) {
+#ifdef BR_BIG_ENDIAN
+            return a;
+#else
+            return swapOrder(a);
+#endif
+        }
+
+        template <typename T>
+        constexpr T little2sys(const T a) { // also is working as sys2little
+#ifdef BR_BIG_ENDIAN
+            return swapOrder(a);
+#else
+            return a;
+#endif
+        }
+
       private:
-        uint8_t *mOrigin;
-        uint8_t *mData;
-        size_t mSize;
+        uint8_t *mOrigin; /**< Data origin */
+        uint8_t *mData;   /**< Data pointer, holds where we are in the array */
     };
 } // namespace lce::io
 

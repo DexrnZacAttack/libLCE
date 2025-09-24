@@ -27,9 +27,30 @@ namespace lce::tests::formats {
     }
 
     void locTest() {
-        OPEN_FILE("example.loc", f);
+        std::string n = "example.loc";
+        std::filesystem::create_directories(util::output / (n + ".dir"));
+
+        OPEN_FILE(n, f);
 
         loc::LocalizationFile file = loc::LocalizationFile(f.data());
+
+#if WRITE_LOC
+        for (auto &[i, l] : file.getLanguages()) {
+            std::ofstream o(util::output / (n + ".dir") /
+                            (i.getName() + ".txt"));
+
+            for (const auto &[id, str] : l.getStrings()) {
+                o << "[0x" << std::hex << id.get() << "] " << str << std::endl;
+            }
+
+            o.close();
+        }
+
+#endif
+
+        file.setString("en-EN", "test.hello", "Hello!");
+
+        std::cout << file.getString("en-EN", "test.hello") << std::endl;
 
         WRITE_FILE("output.loc", reinterpret_cast<char *>(file.serialize()),
                    file.getSize());

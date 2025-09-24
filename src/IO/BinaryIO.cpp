@@ -9,14 +9,12 @@
 #include <vector>
 
 namespace lce::io {
-    BinaryIO::BinaryIO(uint8_t *input, const size_t size)
-        : mOrigin(input), mData(input), mSize(size) {}
+    BinaryIO::BinaryIO(uint8_t *input) : mOrigin(input), mData(input) {}
 
     BinaryIO::BinaryIO(const size_t size) {
         uint8_t *data = new uint8_t[size]{};
         this->mOrigin = data;
         this->mData = data;
-        this->mSize = size;
     }
 
     void BinaryIO::seek(const size_t offset) {

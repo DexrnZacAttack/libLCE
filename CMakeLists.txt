@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.26)
 project(LCE VERSION 1.2.4)
 
+set(VERSION_SUFFIX "-dev.0") # used for non-stable versions
 set(CMAKE_CXX_STANDARD 17)
 
 add_definitions(-DCOMPILER_NAME="${CMAKE_CXX_COMPILER_ID}")
@@ -110,6 +111,12 @@ else ()
         add_compile_options(
                 "$<$<COMPILE_LANGUAGE:CXX>:-O3;-ffast-math;-march=native;-fpic;-ftree-vectorize>"
         )
+
+        if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+            add_compile_options(
+                    "-D_GLIBCXX_DEBUG"
+            )
+        endif ()
     endif ()
     unset(ENABLE_OPTIMIZATIONS CACHE)
 
@@ -132,7 +139,7 @@ if (CMAKE_CXX_BYTE_ORDER EQUAL BIG_ENDIAN)
 endif ()
 
 target_compile_definitions(LCE PRIVATE
-        LIBLCE_VERSION="${PROJECT_VERSION}"
+        LIBLCE_VERSION="${PROJECT_VERSION}${VERSION_SUFFIX}"
         LIBLCE_RC_VERSION=${PROJECT_VERSION_MAJOR},${PROJECT_VERSION_MINOR},${PROJECT_VERSION_PATCH}
 )
 

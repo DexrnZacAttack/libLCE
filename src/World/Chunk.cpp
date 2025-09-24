@@ -16,7 +16,7 @@ namespace lce::world {
     Chunk::Chunk(std::vector<uint8_t> data,
                  compression::Compression::Type outerCompression,
                  io::ByteOrder byteOrder) {
-        io::BinaryIO io(data.data(), data.size());
+        io::BinaryIO io(data.data());
 
         const auto compressedSizeFlags = io.read<uint32_t>(byteOrder);
         const uint32_t compressedSize = compressedSizeFlags & 0x3FFFFFFF;

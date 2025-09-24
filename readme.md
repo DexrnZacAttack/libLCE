@@ -1,8 +1,11 @@
 # LibLCE
 
+[![Docs](https://img.shields.io/badge/Read%20Documentation-4e5151?logo=gitbook)](https://dexrnzacattack.github.io/libLCE)
+![GitHub Downloads](https://img.shields.io/github/downloads/dexrnzacattack/libLCE/total)
+
 C++ Library for Minecraft: Legacy Console Edition file formats
 
-Downloads for Linux, Windows, and Emscripten are available
+Downloads for Linux, macOS, Windows, and Emscripten (incomplete) are available
 at https://nightly.link/DexrnZacAttack/libLCE/workflows/cmake-multi-platform/main?preview
 
 NOTE: Some of this project's work will go towards [Project Lodestone](https://github.com/Team-Lodestone)
