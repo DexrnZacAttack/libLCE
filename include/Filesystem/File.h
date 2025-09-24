@@ -15,6 +15,11 @@
 #include <Filesystem/FSObject.h>
 
 namespace lce::fs {
+    /** Holds data
+     *
+     * @see Directory
+     * @see FSObject
+     */
     class LIBLCE_API File : public FSObject {
       protected:
         friend class Directory;
@@ -74,10 +79,12 @@ namespace lce::fs {
         /// Writes the file to the physical filesystem into the given path
         void writeOut(const std::filesystem::path &path) const;
 
-        /// Writes the file to the physical filesystem into the given path (using end of path as filename)
+        /// Writes the file to the physical filesystem into the given path
+        /// (using end of path as filename)
         void writeOutFullPath(const std::wstring &path) const;
 
-        /// Writes the file to the physical filesystem into the given path (using end of path as filename)
+        /// Writes the file to the physical filesystem into the given path
+        /// (using end of path as filename)
         void writeOutFullPath(const std::filesystem::path &path) const;
 
         /// Writes the file to the physical filesystem to the current dir

@@ -13,6 +13,11 @@
 namespace lce::fs {
     class Directory;
 
+    /** A base Filesystem Object
+     *
+     * @see File
+     * @see Directory
+     */
     class LIBLCE_API FSObject {
         friend class Filesystem;
         friend class Directory;
@@ -110,9 +115,7 @@ namespace lce::fs {
         /** @returns The object's full path */
         [[nodiscard]] std::wstring getPath() const;
 
-        [[nodiscard]] Directory *getParent() const {
-            return this->parent;
-        };
+        [[nodiscard]] Directory *getParent() const { return this->parent; };
 
       private:
         std::wstring name;

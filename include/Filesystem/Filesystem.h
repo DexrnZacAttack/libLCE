@@ -15,9 +15,14 @@
 
 namespace lce::fs {
 
+    /** Contains a root folder and helper methods for traversing the filesystem
+     *
+     * Can be extended to make custom filesystem types
+     */
     class LIBLCE_API Filesystem {
       public:
         // const const constexpr const const const
+        /** Root directory path */
         static constexpr const wchar_t *const ROOT = L"/";
 
         // hope I did this right
@@ -69,6 +74,7 @@ namespace lce::fs {
         virtual ~Filesystem() = default;
 
       private:
+        /** The root directory of the filesystem */
         std::unique_ptr<Directory> root;
     };
 } // namespace lce::fs

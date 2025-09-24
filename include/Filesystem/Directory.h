@@ -17,12 +17,20 @@
 
 namespace lce::fs {
 
+    /** Contains other `FSObject`s inside it.
+     *
+     * Can be used as the root of a Filesystem
+     *
+     * @see File
+     * @see Filesystem
+     * @see FSObject
+     */
     class LIBLCE_API Directory : public FSObject {
       public:
         Directory(Directory &&) = default;
         Directory &operator=(Directory &&) = default;
 
-        /**
+        /** Creates a Directory
          *
          * @param name The name of the directory (if root, specify
          * Filesystem::ROOT)
@@ -230,6 +238,7 @@ namespace lce::fs {
         };
 
       private:
+        /** Child objects inside the Directory */
         std::unordered_map<std::wstring, std::unique_ptr<FSObject>> children;
     };
 
