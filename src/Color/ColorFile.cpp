@@ -6,45 +6,56 @@
 #include <IO/BinaryIO.h>
 
 namespace lce::color {
-    ColorFile::ColorFile() {}
+    ColorFile::ColorFile(io::BinaryIO &io) {
+        this->version = io.readBE<uint32_t>();
 
-    ColorFile::ColorFile(std::vector<Color> colors,
-                         std::vector<WorldColor> worldColors)
-        : ColorFileCommons(colors, 4), worldColors(worldColors) {}
-
-    ColorFile ColorFile::read(std::vector<uint8_t> data) {
-        lce::io::BinaryIO io(data.data());
-        ColorFile cfo;
-
-        cfo.version = io.readBE<uint32_t>();
-        auto colorCount = io.readBE<uint32_t>();
-
+        const uint32_t colorCount = io.readBE<uint32_t>();
         for (uint32_t i = 0; i < colorCount; i++) {
-            cfo.colors.push_back(Color::read(io));
+            const uint16_t l = io.readBE<uint16_t>();
+            std::string name = io.readString(l);
+
+            this->colors.emplace(name, Color(io));
         }
 
-        auto worldColorCount = io.readBE<uint32_t>();
-
+        const uint32_t worldColorCount = io.readBE<uint32_t>();
         for (uint32_t i = 0; i < worldColorCount; i++) {
-            cfo.worldColors.push_back(WorldColor::read(io));
-        }
+            const uint16_t l = io.readBE<uint16_t>();
+            std::string name = io.readString(l);
 
-        return cfo;
+            this->worldColors.emplace(name, WorldColor(io));
+        }
+    }
+
+    void ColorFile::addWorldColor(const std::string &name, WorldColor color) {
+        this->worldColors.emplace(std::move(name), std::move(color));
+    }
+
+    WorldColor *ColorFile::getWorldColor(const std::string &name) {
+        if (const auto c = worldColors.find(name); c != worldColors.end())
+            return &(c->second);
+
+        return nullptr;
+    }
+
+    std::unordered_map<std::string, WorldColor> &ColorFile::getWorldColors() {
+        return this->worldColors;
     }
 
     size_t ColorFile::getSize() const {
-        uint32_t size = 12; // 4 for version 4 for count 4 for biome count
-        for (auto color : colors) {
-            size += 2;
-            size += (color.name).size();
-            size += 4;
+        uint32_t size = sizeof(uint32_t); // version
+
+        size += sizeof(uint32_t); // color count
+        for (auto [name, color] : colors) {
+            size += sizeof(uint16_t);
+            size += name.size();
+            size += color.getSize();
         }
-        for (auto color : worldColors) {
-            size += 2;
-            size += (color.name).size();
-            size += 4; // water
-            size += 4; // underwater
-            size += 4; // fog
+
+        size += sizeof(uint32_t); // world color count
+        for (auto [name, color] : worldColors) {
+            size += sizeof(uint16_t);
+            size += name.size();
+            size += color.getSize();
         }
         return size;
     }
@@ -55,31 +66,55 @@ namespace lce::color {
         io.writeBE<uint32_t>(this->version);
         io.writeBE<uint32_t>(this->colors.size());
 
-        for (auto color : colors) {
+        for (auto [name, color] : colors) {
+            io.writeBE<uint16_t>(name.size());
+            io.writeString(name);
+
             io.writeBytes(color.serialize(), color.getSize());
         }
 
         io.writeBE<uint32_t>(this->worldColors.size());
 
-        for (auto color : worldColors) {
+        for (auto [name, color] : worldColors) {
+            io.writeBE<uint16_t>(name.size());
+            io.writeString(name);
+
             io.writeBytes(color.serialize(), color.getSize());
         }
 
         return io.getData();
     }
 
-    std::optional<Color> ColorFileCommons::getColorByName(std::string name) {
-        const auto find = std::find_if(
-            colors.begin(), colors.end(),
-            [&name](const Color &color) { return color.name == name; });
+    Color *ColorFileCommons::getColor(const std::string &name) {
+        if (const auto c = colors.find(name); c != colors.end())
+            return &(c->second);
 
-        if (find != colors.end())
-            return *find;
-
-        return std::nullopt;
+        return nullptr;
     }
 
-    ColorFileCommons::ColorFileCommons(const std::vector<Color> &colors,
-                                       uint32_t version)
-        : colors(colors), version(version) {}
+    std::unordered_map<std::string, Color> &ColorFileCommons::getColors() {
+        return this->colors;
+    }
+
+    ColorFileCommons::ColorFileCommons(
+        const std::unordered_map<std::string, Color> &colors,
+        const uint32_t version)
+        : version(version), colors(colors) {}
+
+    ColorFileCommons *ColorFileCommons::deserializeAuto(uint8_t *data) {
+        io::BinaryIO io(data);
+
+        const ColorFileVersion version = io.readBE<ColorFileVersion>();
+
+        if (version == OLD)
+            return new ColorFileOld(data);
+
+        return new ColorFile(data);
+    }
+
+    void ColorFileCommons::addColor(const std::string &name, Color color) {
+        this->colors.emplace(std::move(name), std::move(color));
+    }
+
+    uint32_t ColorFileCommons::getVersion() const { return this->version; }
 } // namespace lce::color

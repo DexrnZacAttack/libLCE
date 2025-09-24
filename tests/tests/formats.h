@@ -2,6 +2,7 @@
 // Created by DexrnZacAttack on 9/3/25 using zPc-i2.
 //
 #pragma once
+#include "Color/ColorFile.h"
 #include "IO/BinaryIO.h"
 #include "util.h"
 
@@ -28,7 +29,7 @@ namespace lce {
         void arcTest();
         void locTest();
         void msscmpTest(io::ByteOrder endian);
-        void colorWriteTest(const color::ColorFile &colors);
+        void colorWriteTest(const color::ColorFileCommons &colors);
         void colorTest();
         void thumbTest(io::ByteOrder endian, int headerSize,
                        bool use4Byte = false);

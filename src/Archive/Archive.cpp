@@ -16,7 +16,7 @@ namespace lce::arc {
         const uint32_t fileCount = io.readBE<uint32_t>();
 
         for (uint32_t i = 0; i < fileCount; i++) {
-            std::string name = io.readUtf8(io.readBE<uint16_t>());
+            std::string name = io.readString(io.readBE<uint16_t>());
 
             const uint32_t offset = io.readBE<uint32_t>();
             const uint32_t size = io.readBE<uint32_t>();
@@ -53,7 +53,7 @@ namespace lce::arc {
                 unixToWindowsDelimiter(path);
 
                 io.writeBE<uint16_t>(path.length());
-                io.writeUtf8(io::BinaryIO::wstringToString(path));
+                io.writeString(io::BinaryIO::wstringToString(path));
                 // this stores the area where the file offset is written.
                 offsetPositions[i] = io.getPosition();
                 io.writeBE<uint32_t>(0);

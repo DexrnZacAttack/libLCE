@@ -12,7 +12,7 @@ namespace lce::msscmp {
     Soundbank::Soundbank(uint8_t *data) {
         io::BinaryIO io(data);
 
-        const std::string magic = io.readUtf8(4);
+        const std::string magic = io.readString(4);
 
         mByteOrder =
             magic == "BANK" ? io::ByteOrder::BIG : io::ByteOrder::LITTLE;
@@ -53,7 +53,7 @@ namespace lce::msscmp {
         const Type opposite = (mType == NEW_GEN) ? OLD_GEN : NEW_GEN;
         mIndex2Size = readUintByType(io, mByteOrder, opposite);
 
-        std::string name = io.readUtf8(12);
+        std::string name = io.readString(12);
 
         io.seek(lastEntryOffset + 4);
 
@@ -73,7 +73,7 @@ namespace lce::msscmp {
             const uint32_t currentOffset = io.getPosition();
 
             io.seek(nameOffset);
-            std::string fileName = io.readUtf8NullTerminated();
+            std::string fileName = io.readStringNullTerminated();
             io.seek(currentOffset);
 
             io.read<uint32_t>(mByteOrder);
@@ -109,12 +109,11 @@ namespace lce::msscmp {
         }
     }
 
-    Soundbank::Soundbank(std::vector<uint8_t> data) : Soundbank(data.data()) {
-    }
+    Soundbank::Soundbank(std::vector<uint8_t> data) : Soundbank(data.data()) {}
 
     bool Soundbank::isSoundbank(uint8_t *data) {
         io::BinaryIO io(data);
-        const std::string magic = io.readUtf8(4);
+        const std::string magic = io.readString(4);
 
         return magic == "BANK" || magic == "KNAB";
     }

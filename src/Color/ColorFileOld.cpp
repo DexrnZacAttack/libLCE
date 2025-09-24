@@ -6,38 +6,37 @@
 #include <IO/BinaryIO.h>
 
 namespace lce::color {
-    ColorFileOld::ColorFileOld() {}
-
-    ColorFileOld::ColorFileOld(const std::vector<Color> &colors)
+    ColorFileOld::ColorFileOld(
+        const std::unordered_map<std::string, Color> &colors)
         : ColorFileCommons(colors, 0) {}
 
-    ColorFileOld::ColorFileOld(const std::vector<Color> &colors,
-                               const uint32_t version)
+    ColorFileOld::ColorFileOld(
+        const std::unordered_map<std::string, Color> &colors,
+        const uint32_t version)
         : ColorFileCommons(colors, version) {}
 
-    ColorFileOld ColorFileOld::read(std::vector<uint8_t> data) {
-        io::BinaryIO io(data.data());
-        ColorFileOld cfo;
+    ColorFileOld::ColorFileOld(io::BinaryIO &io) {
+        this->version = io.readBE<uint32_t>();
 
-        cfo.version = io.readBE<uint32_t>();
-        const auto colorCount = io.readBE<uint32_t>();
+        const uint32_t cc = io.readBE<uint32_t>();
+        for (uint32_t i = 0; i < cc; i++) {
+            const uint16_t l = io.readBE<uint16_t>();
+            std::string name = io.readString(l);
 
-        uint8_t *datRel = io.getDataRelative();
-        for (uint32_t i = 0; i < colorCount; i++) {
-            cfo.colors.push_back(
-                Color::read(std::vector(datRel, datRel + data.size() - 4)));
+            this->colors.emplace(name, Color(io));
         }
-
-        return cfo;
     }
 
     uint8_t *ColorFileOld::serialize() const {
         io::BinaryIO io(this->getSize());
 
         io.writeBE<uint32_t>(this->version);
-        io.writeBE<uint32_t>(this->colors.size());
 
-        for (auto color : colors) {
+        io.writeBE<uint32_t>(this->colors.size());
+        for (auto [name, color] : colors) {
+            io.writeBE<uint16_t>(name.size());
+            io.writeString(name);
+
             io.writeBytes(color.serialize(), color.getSize());
         }
 
@@ -45,12 +44,15 @@ namespace lce::color {
     }
 
     size_t ColorFileOld::getSize() const {
-        uint32_t size = 8; // 4 for version 4 for count
-        for (const auto &color : colors) {
-            size += 2;
-            size += (color.name).size();
-            size += 4;
+        uint32_t size = sizeof(uint32_t); // version
+
+        size += sizeof(uint32_t); // color count
+        for (auto [name, color] : colors) {
+            size += sizeof(uint16_t);
+            size += name.size();
+            size += color.getSize();
         }
+
         return size;
     }
 } // namespace lce::color

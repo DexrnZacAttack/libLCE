@@ -171,11 +171,11 @@ namespace lce::io {
 
         [[nodiscard]] size_t getPosition() const;
 
-        std::string readUtf8(size_t size);
+        std::string readString(size_t size);
 
-        std::string readUtf8NullTerminated();
+        std::string readStringNullTerminated();
 
-        void writeUtf8(const std::string &input);
+        void writeString(const std::string &input);
 
         static void trimWString(std::wstring &input);
 

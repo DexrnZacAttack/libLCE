@@ -45,7 +45,7 @@ namespace lce::loc {
 
         for (int i = 0; i < languageCount; i++) {
             // These need to execute in this order
-            const std::string code = io.readUtf8(io.readBE<uint16_t>());
+            const std::string code = io.readString(io.readBE<uint16_t>());
             uint32_t id = io.readBE<uint32_t>();
 
             langIds[id] = code;
@@ -93,7 +93,7 @@ namespace lce::loc {
 
         for (const auto &langId : langIds) {
             io.writeBE<uint16_t>(langId.second.size());
-            io.writeUtf8(langId.second);
+            io.writeString(langId.second);
             io.writeBE<uint32_t>(langId.first);
         }
 

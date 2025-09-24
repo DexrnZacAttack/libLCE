@@ -8,14 +8,14 @@
 #include <IO/BinaryIO.h>
 
 namespace lce::io {
-    std::string BinaryIO::readUtf8(const size_t size) {
+    std::string BinaryIO::readString(const size_t size) {
         uint8_t *buf = readOfSize(size);
         std::string result(reinterpret_cast<char *>(buf), size);
         delete[] buf;
         return result;
     }
 
-    std::string BinaryIO::readUtf8NullTerminated() {
+    std::string BinaryIO::readStringNullTerminated() {
         const char *start = reinterpret_cast<const char *>(this->mData);
 
         size_t len = 0;
@@ -28,7 +28,7 @@ namespace lce::io {
         return result;
     }
 
-    void BinaryIO::writeUtf8(const std::string &input) {
+    void BinaryIO::writeString(const std::string &input) {
         writeBytes(reinterpret_cast<const uint8_t *>(input.data()),
                    input.size());
     }

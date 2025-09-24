@@ -130,8 +130,8 @@ namespace lce::tests::formats {
         OPEN_FILE("savegame-vita.dat", f);
         std::vector<uint8_t> fd;
 
-        const uint64_t s =
-            compression::Compression::getSizeFromSave(f, io::ByteOrder::LITTLE);
+        const uint64_t s = compression::Compression::getCompressedSaveFileSize(
+            f, io::ByteOrder::LITTLE);
 
         if (bool dc = compression::Compression::decompressVita(f, fd, s, 8);
             dc == false)
@@ -186,9 +186,9 @@ namespace lce::tests::formats {
                    file.getSize());
     }
 
-    void colorWriteTest(const color::ColorFile &colors) {
+    void colorWriteTest(const color::ColorFileCommons &colors) {
         WRITE_FILE("output.col",
-                   reinterpret_cast<const char *>(colors.create()),
+                   reinterpret_cast<const char *>(colors.serialize()),
                    colors.getSize());
     }
 
@@ -197,7 +197,7 @@ namespace lce::tests::formats {
 
         std::cout << "Read" << std::endl;
 
-        colorWriteTest(color::ColorFile::read(f));
+        colorWriteTest(*color::ColorFileCommons::deserializeAuto(f));
     }
 
     void thumbTest(const io::ByteOrder endian, int headerSize, bool use4Byte) {

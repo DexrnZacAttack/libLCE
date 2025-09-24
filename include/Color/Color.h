@@ -24,43 +24,45 @@ namespace lce::color {
     class LIBLCE_API ColorCommons : public io::Serializable {
       public:
         ~ColorCommons() override = default;
-        std::string name;
 
       protected:
         ColorCommons();
-        explicit ColorCommons(std::string name);
     };
 
-    /** Contains a color, used for multiple things in-game. */
+    /** Contains a color, used for coloring things in-game. */
     class LIBLCE_API Color final : public ColorCommons {
       public:
-        ARGB color;
+        explicit Color(ARGB color);
 
-        Color(std::string name, ARGB color);
-
-        static Color read(std::vector<uint8_t> data);
-        static Color read(io::BinaryIO &io);
+        explicit Color(uint8_t *data);
+        explicit Color(std::vector<uint8_t> &data);
+        explicit Color(io::BinaryIO &&io);
+        explicit Color(io::BinaryIO &io);
 
         std::uint8_t *serialize() const override;
         size_t getSize() const override;
+
+        ARGB color;
     };
 
-    /** Used for theming the world, typically applied to biomes. */
+    /** Contains 3 colors used for theming the world, typically applied to
+     * biomes. */
     class LIBLCE_API WorldColor final : public ColorCommons {
       public:
-        ARGB waterColor;      /**< Water color */
-        ARGB underwaterColor; /**< Underwater fog color */
-        ARGB fogColor;        /**< Fog color */
+        explicit WorldColor(ARGB waterColor, ARGB underwaterColor,
+                            ARGB fogColor);
 
-        WorldColor(std::string name, ARGB waterColor, ARGB underwaterColor,
-                   ARGB fogColor);
-
-        // TODO: constructor
-        static WorldColor read(std::vector<uint8_t> data);
-        static WorldColor read(io::BinaryIO &io);
+        explicit WorldColor(uint8_t *data);
+        explicit WorldColor(std::vector<uint8_t> &data);
+        explicit WorldColor(io::BinaryIO &&io);
+        explicit WorldColor(io::BinaryIO &io);
 
         uint8_t *serialize() const override;
         size_t getSize() const override;
+
+        ARGB waterColor;      /**< Water color */
+        ARGB underwaterColor; /**< Underwater fog color */
+        ARGB fogColor;        /**< Fog color */
     };
 
 } // namespace lce::color

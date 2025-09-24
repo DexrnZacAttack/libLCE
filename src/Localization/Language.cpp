@@ -12,12 +12,12 @@ namespace lce::loc {
         if (shouldReadByte > 0)
             byte = io.readByte();
 
-        code = io.readUtf8(io.readBE<uint16_t>());
+        code = io.readString(io.readBE<uint16_t>());
         stringCount = io.readBE<uint32_t>();
 
         for (int s = 0; s < stringCount; s++) {
             const uint32_t stringSize = io.readBE<uint16_t>();
-            strings.push_back(io.readUtf8(stringSize));
+            strings.push_back(io.readString(stringSize));
         }
     }
 
@@ -47,13 +47,13 @@ namespace lce::loc {
             io.writeByte(byte);
 
         io.writeBE<uint16_t>(code.size());
-        io.writeUtf8(code);
+        io.writeString(code);
 
         io.writeBE<uint32_t>(stringCount);
 
         for (const auto &string : this->strings) {
             io.writeBE<uint16_t>(string.size());
-            io.writeUtf8(string);
+            io.writeString(string);
         }
 
         return io.getData();
