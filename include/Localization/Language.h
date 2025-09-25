@@ -6,7 +6,6 @@
 #define LANGUAGE_H
 
 #include "IO/Serializable.h"
-#include "LocStringId.h"
 
 #include <IO/BinaryIO.h>
 #include <libLCE.h>
@@ -64,13 +63,22 @@ namespace lce::loc {
         };
 
         explicit Language(io::BinaryIO &io, std::vector<uint32_t> &keys);
+
+        Language(const uint8_t _byte, const uint32_t _shouldReadByte,
+                 std::string _code, std::vector<uint32_t> &keys)
+            : mUnk(_byte), mShouldReadByte(_shouldReadByte), mKeys(&keys),
+              mName(std::move(_code)) {
+            for (auto &key : keys) {
+                mStrings.emplace(key, "");
+            }
+        }
+
         Language(const uint8_t _byte, const uint32_t _shouldReadByte,
                  std::string _code)
             : mUnk(_byte), mShouldReadByte(_shouldReadByte),
               mKeys(new std::vector<uint32_t>()), mName(std::move(_code)) {}
 
-        std::unordered_map<LocStringId, std::string, LocIdHash, LocIdKeyEqual> &
-        getStrings();
+        std::unordered_map<uint32_t, std::string> &getStrings();
 
         const std::string &getName() const;
 
@@ -126,8 +134,7 @@ namespace lce::loc {
                     // this is changed...
 
         std::string mName;
-        std::unordered_map<LocStringId, std::string, LocIdHash, LocIdKeyEqual>
-            mStrings;
+        std::unordered_map<uint32_t, std::string> mStrings;
     };
 } // namespace lce::loc
 

@@ -28,27 +28,33 @@ namespace lce::tests::formats {
 
     void locTest() {
         std::string n = "example.loc";
-        std::filesystem::create_directories(util::output / (n + ".dir"));
 
         OPEN_FILE(n, f);
 
         loc::LocalizationFile file = loc::LocalizationFile(f.data());
 
 #if WRITE_LOC
+        std::filesystem::create_directories(util::output / (n + ".dir"));
         for (auto &[i, l] : file.getLanguages()) {
             std::ofstream o(util::output / (n + ".dir") /
                             (i.getName() + ".txt"));
 
             for (const auto &[id, str] : l.getStrings()) {
-                o << "[0x" << std::hex << id.get() << "] " << str << std::endl;
+                o << "[0x" << std::hex << id << "] " << str << std::endl;
             }
 
             o.close();
         }
-
 #endif
 
         file.setString("en-EN", "test.hello", "Hello!");
+        file.setString("fi-FI", "test.hello", "Hei!");
+
+        if (!file.languageExists("TestLang")) {
+            file.createLanguage("TestLang");
+        }
+
+        file.setString("TestLang", "test.hello", "Hello, world!");
 
         std::cout << file.getString("en-EN", "test.hello") << std::endl;
 
@@ -99,6 +105,7 @@ namespace lce::tests::formats {
     }
 
     void saveFromFolderTest() {
+        std::filesystem::create_directories(util::examples / "FSSaveFolder");
         fs::Directory *d = new fs::Directory(util::examples / "FSSaveFolder");
         fs::Filesystem *fs = new fs::Filesystem(d);
 

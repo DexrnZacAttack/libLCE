@@ -48,6 +48,7 @@ namespace lce::tests::vfs {
             });
     }
     void runForEach() {
+        std::filesystem::create_directories(util::examples / "VFSTestFolder");
         const fs::Directory *d =
             new fs::Directory(util::examples / "VFSTestFolder");
 

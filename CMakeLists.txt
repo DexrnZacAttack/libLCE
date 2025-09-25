@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.26)
 project(LCE VERSION 1.2.4)
 
-set(VERSION_SUFFIX "-dev.0") # used for non-stable versions
+set(VERSION_SUFFIX "-dev.1") # used for non-stable versions
 set(CMAKE_CXX_STANDARD 17)
 
 add_definitions(-DCOMPILER_NAME="${CMAKE_CXX_COMPILER_ID}")
@@ -38,34 +38,47 @@ set(ZLIB_FILES
 )
 
 set(HEADERS
+        # Windows
         include/Resources/resource.h
         include/Resources/resource.rc
 
+        # libLCE
         include/libLCE.h
         include/libLCEExports.h
-        include/World/Region.h
-        include/World/Chunk.h
+        # Save
         include/Save/SaveFile.h
         include/Save/SaveFileOld.h
         include/Save/SaveFileCommons.h
+        include/Save/Thumb.h
+        # IO
+        include/IO/Serializable.h
         include/IO/BinaryIO.h
-        include/Filesystem/Filesystem.h
-        include/Filesystem/File.h
+        # ARC
         include/Archive/Archive.h
+        # COL
         include/Color/Color.h
         include/Color/ColorFile.h
+        # LOC
         include/Localization/LocalizationFile.h
         include/Localization/Language.h
+        # MSSCMP
         include/Soundbank/Soundbank.h
         include/Soundbank/BinkaFile.h
-        include/Compression/Compression.h
-        include/Save/Thumb.h
+        # World
         include/World/SplitSave.h
         include/World/Block.h
+        include/World/Region.h
+        include/World/Chunk.h
+        # Other
+        include/Compression/Compression.h
+        # Filesystem
         include/Filesystem/FSObject.h
         include/Filesystem/Directory.h
+        include/Filesystem/Filesystem.h
+        include/Filesystem/File.h
+        # Bindings
         include/Bindings/EmscriptenBindings.h
-        include/IO/Serializable.h
+        # Unsorted
 )
 
 set(FILES
@@ -111,14 +124,14 @@ else ()
         add_compile_options(
                 "$<$<COMPILE_LANGUAGE:CXX>:-O3;-ffast-math;-march=native;-fpic;-ftree-vectorize>"
         )
-
-        if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-            add_compile_options(
-                    "-D_GLIBCXX_DEBUG"
-            )
-        endif ()
     endif ()
     unset(ENABLE_OPTIMIZATIONS CACHE)
+
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+        add_compile_options(
+                "-D_GLIBCXX_DEBUG"
+        )
+    endif ()
 
     set(ENVIRONMENT_TYPE "Native")
     set(LIB_TYPE SHARED)

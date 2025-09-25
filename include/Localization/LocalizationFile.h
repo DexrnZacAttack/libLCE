@@ -33,9 +33,15 @@ namespace lce::loc {
         size_t getSize() const override;
         uint8_t *serialize() const override;
 
+        Language *createLanguage(const std::string &name,
+                                 const uint8_t _byte = 2,
+                                 const uint32_t _shouldReadByte = 1);
+
         Language *getLanguage(const std::string &name);
 
-        uint32_t &createString(uint32_t id);
+        bool languageExists(const std::string &name);
+
+        uint32_t createString(uint32_t id);
 
         /** Nicer looking way to add data-driven strings
          *

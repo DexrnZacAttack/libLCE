@@ -29,7 +29,7 @@ namespace lce::loc {
             }
 
             const uint32_t ss = io.readBE<uint16_t>();
-            mStrings.emplace(std::cref(keys[s]), io.readString(ss));
+            mStrings.emplace(keys[s], io.readString(ss));
         }
     }
 
@@ -76,14 +76,13 @@ namespace lce::loc {
         return addString(str, std::hash<std::string>{}(str));
     }
 
-    std::unordered_map<LocStringId, std::string, LocIdHash, LocIdKeyEqual> &
-    Language::getStrings() {
+    std::unordered_map<uint32_t, std::string> &Language::getStrings() {
         return this->mStrings;
     }
 
     const std::string &Language::getName() const { return this->mName; }
 
-    void Language::setString(uint32_t id, const std::string &str) {
+    void Language::setString(const uint32_t id, const std::string &str) {
         if (!mStrings.count(id))
             throw std::runtime_error("String has does not exist in map");
 
@@ -98,7 +97,7 @@ namespace lce::loc {
         return h;
     }
 
-    std::string &Language::getString(uint32_t id) { return mStrings[id]; }
+    std::string &Language::getString(const uint32_t id) { return mStrings[id]; }
 
     std::string &Language::getString(const std::string &id) {
         return getString(std::hash<std::string>{}(id));

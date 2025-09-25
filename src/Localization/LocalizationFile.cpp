@@ -99,6 +99,19 @@ namespace lce::loc {
 
         return io.getData();
     }
+    Language *LocalizationFile::createLanguage(const std::string &name,
+                                               const uint8_t _byte,
+                                               const uint32_t _shouldReadByte) {
+        if (languageExists(name))
+            throw std::runtime_error("Language already exists with name: " +
+                                     name);
+
+        Language::Id id = Language::Id(name);
+        Language language = Language(_byte, _shouldReadByte, name, this->mKeys);
+        this->mLanguages.emplace(id, language);
+
+        return getLanguage(name);
+    }
 
     Language *LocalizationFile::getLanguage(const std::string &name) {
         for (auto &[id, lang] : mLanguages) {
@@ -108,19 +121,23 @@ namespace lce::loc {
 
         return nullptr;
     }
+    bool LocalizationFile::languageExists(const std::string &name) {
+        for (auto &[id, lang] : mLanguages) {
+            if (id.getName() == name)
+                return true;
+        }
 
-    uint32_t &LocalizationFile::createString(const uint32_t id) {
+        return false;
+    }
+
+    uint32_t LocalizationFile::createString(const uint32_t id) {
         mKeys.reserve(mKeys.size() + 1);
         mKeys.push_back(id);
 
-        // TODO: fix, we have access to mKeys in the Language anyways...
-        // we keep taking references to the ID everywhere lol
-        uint32_t &key = this->mKeys.back();
-
         for (auto &[i, lang] : mLanguages)
-            lang.addString("", key);
+            lang.addString("", id);
 
-        return key;
+        return id;
     }
 
     uint32_t LocalizationFile::setString(const std::string &language,
@@ -139,15 +156,10 @@ namespace lce::loc {
         if (!lang)
             throw std::runtime_error("Language not found: " + language);
 
-        uint32_t *h;
+        const auto n = std::find(mKeys.begin(), mKeys.end(), id);
+        const uint32_t h = (n == mKeys.end()) ? createString(id) : *n;
 
-        auto n = std::find(mKeys.begin(), mKeys.end(), id);
-        if (n == mKeys.end())
-            h = &createString(id);
-        else
-            h = &(*n);
-
-        lang->setString(*h, str);
+        lang->setString(h, str);
     }
 
     std::pair<const Language::Id, Language> *
