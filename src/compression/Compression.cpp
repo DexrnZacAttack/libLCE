@@ -3,7 +3,7 @@
 //
 
 #include "LCE/compression/Compression.h"
-#include <BinaryIO/BinaryBuffer.h>
+#include <BinaryIO/buffer/BinaryBuffer.h>
 #include <zlib/zlib.h>
 
 #include <fstream>
@@ -115,7 +115,7 @@ namespace lce::compression {
     bool Compression::decompressChunk(std::vector<uint8_t> &in,
                                       std::vector<uint8_t> &out) {
         // todo: could make it auto allocate out to 0x40000 like LCE does
-        bio::BinaryBuffer io(in.data());
+        bio::buffer::BinaryBuffer io(in.data());
 
         int i = 0;
 
@@ -169,12 +169,12 @@ namespace lce::compression {
                                      const uint32_t outSize,
                                      const uint32_t offset) {
         // todo: could make it auto allocate out to 0x40000 like LCE does
-        bio::BinaryBuffer io(in.data());
+        bio::buffer::BinaryBuffer io(in.data());
         io.seek(offset);
 
         out.reserve(outSize);
 
-        while (io.getPosition() < in.size()) {
+        while (io.getOffset() < in.size()) {
             // read a byte, if it's 0x00, then it needs to be decoded...
             // otherwise copy it directly to the output vec.
             if (uint8_t byte = io.readByte(); byte == 0x00) {
@@ -210,7 +210,7 @@ namespace lce::compression {
     uint32_t
     Compression::getCompressedSaveFileSize(std::vector<uint8_t> &in,
                                            const bio::util::ByteOrder byteOrder) {
-        bio::BinaryBuffer io(in.data());
+        bio::buffer::BinaryBuffer io(in.data());
         io.seek(4);
 
         return io.read<uint32_t>(byteOrder);

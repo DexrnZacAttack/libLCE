@@ -8,7 +8,7 @@
 #include <vector>
 
 #include "LCE/libLCE.h"
-#include <BinaryIO/BinaryBuffer.h>
+#include <BinaryIO/buffer/BinaryBuffer.h>
 
 namespace lce::compression {
     /** Compression methods

@@ -8,7 +8,7 @@
 
 #include "LCE/filesystem/Filesystem.h"
 #include "LCE/libLCE.h"
-#include <BinaryIO/BinaryBuffer.h>
+#include <BinaryIO/buffer/BinaryBuffer.h>
 #include <optional>
 #include <string>
 #include <variant>

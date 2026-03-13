@@ -94,11 +94,11 @@ namespace lce::color {
             const std::unordered_map<std::string, WorldColor> &worldColors)
             : ColorFileCommons(colors, 4), mWorldColors(worldColors) {}
 
-        explicit ColorFile(uint8_t *data) : ColorFile(bio::BinaryBuffer(data)) {}
+        explicit ColorFile(uint8_t *data) : ColorFile(bio::buffer::BinaryBuffer(data)) {}
         explicit ColorFile(std::vector<uint8_t> &data)
-            : ColorFile(bio::BinaryBuffer(data.data())) {}
-        explicit ColorFile(bio::BinaryBuffer &&io) : ColorFile(io) {};
-        explicit ColorFile(bio::BinaryBuffer &io);
+            : ColorFile(bio::buffer::BinaryBuffer(data.data())) {}
+        explicit ColorFile(bio::buffer::BinaryBuffer &&io) : ColorFile(io) {};
+        explicit ColorFile(bio::buffer::BinaryBuffer &io);
 
         void addWorldColor(const std::string &name, WorldColor color);
 
@@ -141,12 +141,12 @@ namespace lce::color {
                      uint32_t version);
 
         explicit ColorFileOld(uint8_t *data)
-            : ColorFileOld(bio::BinaryBuffer(data)) {}
+            : ColorFileOld(bio::buffer::BinaryBuffer(data)) {}
         explicit ColorFileOld(std::vector<uint8_t> &data)
-            : ColorFileOld(bio::BinaryBuffer(data.data())) {}
+            : ColorFileOld(bio::buffer::BinaryBuffer(data.data())) {}
 
-        explicit ColorFileOld(bio::BinaryBuffer &&io) : ColorFileOld(io) {};
-        explicit ColorFileOld(bio::BinaryBuffer &io);
+        explicit ColorFileOld(bio::buffer::BinaryBuffer &&io) : ColorFileOld(io) {};
+        explicit ColorFileOld(bio::buffer::BinaryBuffer &io);
 
         uint8_t *serialize() const override;
         size_t getSize() const override;

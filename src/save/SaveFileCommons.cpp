@@ -2,7 +2,7 @@
 // Created by DexrnZacAttack on 12/21/2024.
 //
 
-#include <BinaryIO/BinaryBuffer.h>
+#include <BinaryIO/buffer/BinaryBuffer.h>
 
 #include "LCE/save/SaveFile.h"
 #include "LCE/save/SaveFileCommons.h"
@@ -37,7 +37,7 @@ namespace lce::save {
     uint16_t
     SaveFileCommons::getVersionFromData(std::vector<uint8_t> &data,
                                         const bio::util::ByteOrder byteOrder) {
-        bio::BinaryBuffer io(data.data());
+        bio::buffer::BinaryBuffer io(data.data());
         io.seek(10);
         return io.read<uint16_t>(byteOrder);
     }
@@ -65,11 +65,11 @@ namespace lce::save {
     }
 
     bio::util::ByteOrder SaveFileCommons::detectByteOrder(std::vector<uint8_t> data) {
-        bio::BinaryBuffer io(data.data());
+        bio::buffer::BinaryBuffer io(data.data());
 
         io.seek(4 + 4 + 2);
 
-        const uint8_t *s = io.getDataRelative();
+        const uint8_t *s = io.beginRelative();
 
         return *s != 0x00 ? bio::util::ByteOrder::LITTLE : bio::util::ByteOrder::BIG;
     }

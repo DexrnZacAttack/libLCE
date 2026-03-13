@@ -4,7 +4,7 @@
 
 #include "LCE/archive/Archive.h"
 
-#include <BinaryIO/BinaryBuffer.h>
+#include <BinaryIO/buffer/BinaryBuffer.h>
 #include <BinaryIO/util/string/StringConverter.h>
 
 namespace lce::arc {
@@ -14,7 +14,7 @@ namespace lce::arc {
     Archive::Archive(std::vector<uint8_t> data) : Archive(data.data()) {}
 
     Archive::Archive(uint8_t *data) {
-        bio::BinaryBuffer io(data);
+        bio::buffer::BinaryBuffer io(data);
         const uint32_t fileCount = io.readBE<uint32_t>();
 
         for (uint32_t i = 0; i < fileCount; i++) {
@@ -26,7 +26,7 @@ namespace lce::arc {
             std::vector<uint8_t> d;
             d.resize(size);
 
-            const uint32_t oldPos = io.getPosition();
+            const uint32_t oldPos = io.getOffset();
             io.seek(offset);
             io.readInto(d.data(), size);
             io.seek(oldPos);
@@ -40,7 +40,7 @@ namespace lce::arc {
     }
 
     uint8_t *Archive::serialize() const {
-        bio::BinaryBuffer io(new uint8_t[this->getSize()]);
+        bio::buffer::BinaryBuffer io(new uint8_t[this->getSize()]);
 
         const fs::Directory *root = getRoot();
 
@@ -60,7 +60,7 @@ namespace lce::arc {
                     bio::util::string::StringConverter::wstringToString(path),
                     false);
                 // this stores the area where the file offset is written.
-                offsetPositions[i] = io.getPosition();
+                offsetPositions[i] = io.getOffset();
                 io.writeBE<uint32_t>(0);
                 io.writeBE<uint32_t>(f.getSize());
 
@@ -72,13 +72,13 @@ namespace lce::arc {
             [&j, &io, &offsetPositions](const std::wstring &n,
                                         const fs::File &f) {
                 // get current position (this is the position of the file)
-                const uint32_t fPos = io.getPosition();
+                const uint32_t fPos = io.getOffset();
                 // write the file
-                io.writeBytes(f.getData().data(), f.getSize());
+                io.writeBytes(f.begin().data(), f.getSize());
 
                 // get the position after the file was written (we return here
                 // to write the next one)
-                const uint32_t last = io.getPosition();
+                const uint32_t last = io.getOffset();
 
                 // go to the offset's offset (lol) and write the actual offset.
                 io.seek(offsetPositions[j]);
@@ -91,7 +91,7 @@ namespace lce::arc {
                 j++;
             });
 
-        return io.getData();
+        return io.begin();
     }
 
     size_t Archive::getSize() const {

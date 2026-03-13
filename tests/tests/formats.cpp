@@ -12,7 +12,7 @@
 #include "LCE/soundbank/Soundbank.h"
 #include "util.h"
 
-#include <BinaryIO/BinaryBuffer.h>
+#include <BinaryIO/buffer/BinaryBuffer.h>
 
 namespace lce::tests::formats {
     void arcTest() {

@@ -6,14 +6,14 @@
 
 #include "BinaryIO/util/string/StringConverter.h"
 
-#include <BinaryIO/BinaryBuffer.h>
+#include <BinaryIO/buffer/BinaryBuffer.h>
 
 #include <filesystem>
 #include <utility>
 
 namespace lce::msscmp {
     Soundbank::Soundbank(uint8_t *data) {
-        bio::BinaryBuffer io(data);
+        bio::buffer::BinaryBuffer io(data);
 
         const std::string magic = io.readString(4);
 
@@ -73,7 +73,7 @@ namespace lce::msscmp {
             io.seek(entryOffset);
 
             const uint32_t nameOffset = io.read<uint32_t>(mByteOrder);
-            const uint32_t currentOffset = io.getPosition();
+            const uint32_t currentOffset = io.getOffset();
 
             io.seek(nameOffset);
             std::string fileName = io.readStringNT();
@@ -88,7 +88,7 @@ namespace lce::msscmp {
             uint32_t sampleRate = io.read<uint32_t>(mByteOrder);
             const uint32_t fileSize = io.read<uint32_t>(mByteOrder);
 
-            const size_t oldPos = io.getPosition();
+            const size_t oldPos = io.getOffset();
 
             std::vector<uint8_t> d;
             d.resize(fileSize);
@@ -116,7 +116,7 @@ namespace lce::msscmp {
     Soundbank::Soundbank(std::vector<uint8_t> data) : Soundbank(data.data()) {}
 
     bool Soundbank::isSoundbank(uint8_t *data) {
-        bio::BinaryBuffer io(data);
+        bio::buffer::BinaryBuffer io(data);
         const std::string magic = io.readString(4);
 
         return magic == "BANK" || magic == "KNAB";

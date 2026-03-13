@@ -6,7 +6,7 @@
 
 namespace lce::loc {
 
-    Language::Language(bio::BinaryBuffer &io, std::vector<uint32_t> &keys)
+    Language::Language(bio::buffer::BinaryBuffer &io, std::vector<uint32_t> &keys)
         : mKeys(&keys) {
         // could be a version?
         this->mShouldReadByte = io.readBE<uint32_t>();
@@ -52,7 +52,7 @@ namespace lce::loc {
     uint8_t *Language::serialize() const {
         const uint32_t fileSize = this->getSize();
         uint8_t *data = new uint8_t[fileSize];
-        bio::BinaryBuffer io(data);
+        bio::buffer::BinaryBuffer io(data);
 
         io.writeBE<uint32_t>(mShouldReadByte);
         if (mShouldReadByte > 0)
@@ -69,7 +69,7 @@ namespace lce::loc {
             io.writeString(s->second, false);
         }
 
-        return io.getData();
+        return io.begin();
     }
 
     uint32_t Language::addString(const std::string &str) {

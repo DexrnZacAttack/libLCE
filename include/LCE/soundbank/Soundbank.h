@@ -8,7 +8,7 @@
 #include "LCE/filesystem/Filesystem.h"
 #include "LCE/libLCE.h"
 #include "LCE/soundbank/BinkaFile.h"
-#include <BinaryIO/BinaryBuffer.h>
+#include <BinaryIO/buffer/BinaryBuffer.h>
 #include <vector>
 
 namespace lce::msscmp {
@@ -29,7 +29,7 @@ namespace lce::msscmp {
         bio::util::ByteOrder mByteOrder;
         Type mType;
 
-        static uint64_t readUintByType(bio::BinaryBuffer &io,
+        static uint64_t readUintByType(bio::buffer::BinaryBuffer &io,
                                        const bio::util::ByteOrder byteOrder,
                                        const Type type) {
             return type == NEW_GEN ? io.read<uint64_t>(byteOrder)

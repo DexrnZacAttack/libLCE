@@ -5,7 +5,7 @@
 #ifndef THUMB_H
 #define THUMB_H
 #include "LCE/libLCE.h"
-#include <BinaryIO/BinaryBuffer.h>
+#include <BinaryIO/buffer/BinaryBuffer.h>
 #include <string>
 #include <unordered_map>
 #include <vector>

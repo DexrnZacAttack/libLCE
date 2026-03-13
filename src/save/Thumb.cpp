@@ -17,7 +17,7 @@ namespace lce::save {
         this->mName = L"New World"; // default name
 
         if (headerSize != 0) {
-            bio::BinaryBuffer io((data.data()));
+            bio::buffer::BinaryBuffer io((data.data()));
             if (!use4ByteWideChar) {
                 this->mName =
                     bio::util::string::StringConverter::u16stringToWstring(

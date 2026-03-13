@@ -9,7 +9,7 @@
 #include "LCE/libLCE.h"
 #include <string>
 
-#include <BinaryIO/BinaryBuffer.h>
+#include <BinaryIO/buffer/BinaryBuffer.h>
 
 namespace lce::color {
     /** ARGB Color structure */
@@ -36,8 +36,8 @@ namespace lce::color {
 
         explicit Color(uint8_t *data);
         explicit Color(std::vector<uint8_t> &data);
-        explicit Color(bio::BinaryBuffer &&io);
-        explicit Color(bio::BinaryBuffer &io);
+        explicit Color(bio::buffer::BinaryBuffer &&io);
+        explicit Color(bio::buffer::BinaryBuffer &io);
 
         std::uint8_t *serialize() const override;
         size_t getSize() const override;
@@ -54,8 +54,8 @@ namespace lce::color {
 
         explicit WorldColor(uint8_t *data);
         explicit WorldColor(std::vector<uint8_t> &data);
-        explicit WorldColor(bio::BinaryBuffer &&io);
-        explicit WorldColor(bio::BinaryBuffer &io);
+        explicit WorldColor(bio::buffer::BinaryBuffer &&io);
+        explicit WorldColor(bio::buffer::BinaryBuffer &io);
 
         uint8_t *serialize() const override;
         size_t getSize() const override;

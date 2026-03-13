@@ -13,7 +13,7 @@
 #include "BinaryIO/util/string/StringConverter.h"
 #include "util/StringUtilities.h"
 
-#include <BinaryIO/BinaryBuffer.h>
+#include <BinaryIO/buffer/BinaryBuffer.h>
 
 namespace lce::save {
     SaveFile::SaveFile(const bio::util::ByteOrder byteOrder,
@@ -33,7 +33,7 @@ namespace lce::save {
     SaveFile::SaveFile(std::vector<uint8_t> data,
                        bio::util::ByteOrder byteOrder) {
         this->mByteOrder = byteOrder;
-        bio::BinaryBuffer io(data.data());
+        bio::buffer::BinaryBuffer io(data.data());
 
         const uint32_t indexOffset = io.read<uint32_t>(this->mByteOrder);
 
@@ -41,7 +41,7 @@ namespace lce::save {
             throw std::runtime_error("Index offset points to an area that is "
                                      "out of bounds of the data given.");
 
-        DebugLog("" << io.getPosition());
+        DebugLog("" << io.getOffset());
         const uint32_t fileCount = io.read<uint32_t>(this->mByteOrder);
 
         if (fileCount >
@@ -95,7 +95,7 @@ namespace lce::save {
      * @return Pointer to the save file
      */
     uint8_t *SaveFile::serialize() const {
-        bio::BinaryBuffer io(this->getSize());
+        bio::buffer::BinaryBuffer io(this->getSize());
         const fs::Directory *root = getRoot();
 
         uint32_t indexOffset = calculateIndexOffset();
@@ -115,11 +115,11 @@ namespace lce::save {
                                            const fs::File &innerFile) {
             const std::wstring path = innerFile.getPath().substr(1);
 
-            const uint32_t offset = io.getPosition();
+            const uint32_t offset = io.getOffset();
 
-            io.writeBytes(innerFile.getData().data(), innerFile.getSize());
+            io.writeBytes(innerFile.begin().data(), innerFile.getSize());
 
-            const size_t last = io.getPosition();
+            const size_t last = io.getOffset();
 
             io.seek(indexOffset + (getIndexEntrySize() * i));
 
@@ -148,7 +148,7 @@ namespace lce::save {
         io.seek(0);
         io.write<uint32_t>(indexOffset, this->mByteOrder);
 
-        return io.getData();
+        return io.begin();
     }
 
     SaveFileCommons *SaveFile::migrateVersion(const uint16_t version) {

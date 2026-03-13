@@ -15,7 +15,7 @@
 #endif
 
 namespace lce {
-    TO_SECTION(".dexrn.me") // constant exec segment to see library string
+    TO_SECTION(".data.liblce.dexrn.me")
     constexpr const char *const LIBRARY_STRING =
         "libLCE v" LIBLCE_VERSION " (" LIBLCE_COMPILER_NAME
         " / " LIBLCE_BUILD_TYPE " | " LIBLCE_PLATFORM_NAME
@@ -23,12 +23,12 @@ namespace lce {
 
     // clang-format off
     extern "C" {
-        LIBLCE_API NO_DISCARD constexpr const char *lce_get_build_type(); // NOLINT
-        LIBLCE_API NO_DISCARD constexpr const char *lce_get_compiler_name(); // NOLINT
-        LIBLCE_API NO_DISCARD constexpr const char *lce_get_platform_arch(); // NOLINT
-        LIBLCE_API NO_DISCARD constexpr const char *lce_get_platform(); // NOLINT
-        LIBLCE_API NO_DISCARD constexpr const char *lce_get_version(); // NOLINT
-        LIBLCE_API NO_DISCARD constexpr const char *lce_get_library_string(); // NOLINT
+        TO_SECTION(".liblce.dexrn.me") LIBLCE_API NO_DISCARD constexpr const char *lce_get_build_type(); // NOLINT
+        TO_SECTION(".liblce.dexrn.me") LIBLCE_API NO_DISCARD constexpr const char *lce_get_compiler_name(); // NOLINT
+        TO_SECTION(".liblce.dexrn.me") LIBLCE_API NO_DISCARD constexpr const char *lce_get_platform_arch(); // NOLINT
+        TO_SECTION(".liblce.dexrn.me") LIBLCE_API NO_DISCARD constexpr const char *lce_get_platform(); // NOLINT
+        TO_SECTION(".liblce.dexrn.me") LIBLCE_API NO_DISCARD constexpr const char *lce_get_version(); // NOLINT
+        TO_SECTION(".liblce.dexrn.me") LIBLCE_API NO_DISCARD constexpr const char *lce_get_library_string(); // NOLINT
     }
     // clang-format on
 } // namespace lce

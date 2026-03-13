@@ -4,7 +4,7 @@
 #pragma once
 #include "LCE/color/ColorFile.h"
 #include "util.h"
-#include <BinaryIO/BinaryBuffer.h>
+#include <BinaryIO/buffer/BinaryBuffer.h>
 
 namespace lce {
     namespace io {

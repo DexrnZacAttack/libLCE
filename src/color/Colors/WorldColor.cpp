@@ -11,27 +11,27 @@ namespace lce::color {
           fogColor(fogColor) {}
 
     WorldColor::WorldColor(std::vector<uint8_t> &data)
-        : WorldColor(bio::BinaryBuffer(data.data())) {}
+        : WorldColor(bio::buffer::BinaryBuffer(data.data())) {}
 
     WorldColor::WorldColor(uint8_t *data)
-        : WorldColor(bio::BinaryBuffer(data)) {}
+        : WorldColor(bio::buffer::BinaryBuffer(data)) {}
 
-    WorldColor::WorldColor(bio::BinaryBuffer &&io) : WorldColor(io) {}
+    WorldColor::WorldColor(bio::buffer::BinaryBuffer &&io) : WorldColor(io) {}
 
-    WorldColor::WorldColor(bio::BinaryBuffer &io) {
+    WorldColor::WorldColor(bio::buffer::BinaryBuffer &io) {
         this->waterColor = io.readLE<ARGB>();
         this->underwaterColor = io.readLE<ARGB>();
         this->fogColor = io.readLE<ARGB>();
     }
 
     uint8_t *WorldColor::serialize() const {
-        bio::BinaryBuffer io(getSize());
+        bio::buffer::BinaryBuffer io(getSize());
 
         io.writeLE<ARGB>(waterColor);
         io.writeLE<ARGB>(underwaterColor);
         io.writeLE<ARGB>(fogColor);
 
-        return io.getData();
+        return io.begin();
     }
 
     size_t WorldColor::getSize() const { return sizeof(ARGB) * 3; }

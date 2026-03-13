@@ -10,7 +10,7 @@
 #include <vector>
 
 #include "LCE/save/SaveFileCommons.h"
-#include <BinaryIO/BinaryBuffer.h>
+#include <BinaryIO/buffer/BinaryBuffer.h>
 
 namespace lce::save {
     /**

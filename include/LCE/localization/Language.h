@@ -8,7 +8,7 @@
 #include "LCE/io/Serializable.h"
 
 #include "LCE/libLCE.h"
-#include <BinaryIO/BinaryBuffer.h>
+#include <BinaryIO/buffer/BinaryBuffer.h>
 
 #include <functional>
 #include <string>
@@ -44,13 +44,13 @@ namespace lce::loc {
             const std::string &getName() const { return mName; }
 
             std::uint8_t *serialize() const override {
-                bio::BinaryBuffer io(this->getSize());
+                bio::buffer::BinaryBuffer io(this->getSize());
 
                 io.writeBE<uint16_t>(mName.size());
                 io.writeString(mName, false);
                 io.writeBE<uint32_t>(mId);
 
-                return io.getData();
+                return io.begin();
             };
 
             size_t getSize() const override {
@@ -62,7 +62,7 @@ namespace lce::loc {
             uint32_t mId;
         };
 
-        explicit Language(bio::BinaryBuffer &io, std::vector<uint32_t> &keys);
+        explicit Language(bio::buffer::BinaryBuffer &io, std::vector<uint32_t> &keys);
 
         Language(const uint8_t _byte, const uint32_t _shouldReadByte,
                  std::string _code, std::vector<uint32_t> &keys)

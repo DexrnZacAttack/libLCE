@@ -1,18 +1,18 @@
 cmake_minimum_required(VERSION 3.26)
-project(LCE VERSION 1.2.4)
+project(LCE VERSION 2.0.0)
 
-set(VERSION_SUFFIX "-dev.3") # used for non-stable versions
+set(VERSION_SUFFIX "-dev.4") # used for non-stable versions
 set(CMAKE_CXX_STANDARD 17)
 
 message(STATUS "${CMAKE_SYSTEM_PROCESSOR}")
 
 include(FetchContent)
 FetchContent_Declare(
-        BIO
-        GIT_REPOSITORY https://github.com/DexrnZacAttack/libBIO.git
-        GIT_TAG main
+        bio
+        GIT_REPOSITORY https://codeberg.org/Dexrn/libBIO.git
+        GIT_TAG 3.1.0
 )
-FetchContent_MakeAvailable(BIO)
+FetchContent_MakeAvailable(bio)
 
 include_directories(include external)
 
@@ -20,9 +20,6 @@ include_directories(include external)
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_definitions(-DCMAKE_BUILD_DEBUG)
 endif ()
-
-include_directories(external/emsdk/upstream/emscripten/system/include)
-link_directories(external/emsdk/upstream/emscripten/system/lib)
 
 set(LODEPNG_FILES
         external/lodepng/lodepng.h
@@ -75,14 +72,11 @@ set(HEADERS
         include/LCE/filesystem/Directory.h
         include/LCE/filesystem/Filesystem.h
         include/LCE/filesystem/File.h
-        # Bindings
-        include/LCE/bindings/EmscriptenBindings.h
         # Unsorted
 )
 
 set(FILES
         src/libLCEExports.cpp
-        src/bindings/EmscriptenBindings.cpp
         src/save/SaveFile.cpp
         src/filesystem/Filesystem.cpp
         src/archive/Archive.cpp
@@ -106,44 +100,36 @@ set(FILES
 
 option(ENABLE_OPTIMIZATIONS "Enable compiler optimizations" OFF)
 
-if (CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
-    set(ENVIRONMENT_TYPE "Emscripten")
-    # weird?
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -sNO_DISABLE_EXCEPTION_CATCHING -s USE_ZLIB=1 -s WASM_BIGINT -s MODULARIZE=1 -sEXPORT_ES6=1 -s EXPORT_ALL=1 -s EXPORTED_RUNTIME_METHODS=['ccall','cwrap','getValue','setValue'] -s EXPORTED_FUNCTIONS=['_malloc'] -s ALLOW_MEMORY_GROWTH=1")
-    add_executable(LCE ${HEADERS} ${FILES} ${LODEPNG_FILES})
-    #    target_link_options(LCE PRIVATE --emit-tsd libLCE.d.ts)
-else ()
-    if (ENABLE_OPTIMIZATIONS STREQUAL "ON")
-        add_compile_options(
-                "$<$<COMPILE_LANGUAGE:CXX>:-O3;-ffast-math;-march=native;-fpic;-ftree-vectorize>"
-        )
-    endif ()
-    unset(ENABLE_OPTIMIZATIONS CACHE)
-
-    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-        add_compile_options(
-                "-D_GLIBCXX_DEBUG"
-        )
-    endif ()
-
-    set(ENVIRONMENT_TYPE "Native")
-    set(LIB_TYPE SHARED)
-    add_library(LCE ${LIB_TYPE} ${HEADERS} ${FILES} ${LODEPNG_FILES} ${ZLIB_FILES})
-
-    target_include_directories(LCE
-            PUBLIC
-            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-            PRIVATE
-            ${CMAKE_CURRENT_SOURCE_DIR}/include/LCE
+if (ENABLE_OPTIMIZATIONS STREQUAL "ON")
+    add_compile_options(
+            "$<$<COMPILE_LANGUAGE:CXX>:-O3;-ffast-math;-march=native;-fpic;-ftree-vectorize>"
     )
-    target_compile_definitions(LCE PRIVATE LIBLCE_EXPORTS)
-
-    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/tests EXCLUDE_FROM_ALL)
 endif ()
+unset(ENABLE_OPTIMIZATIONS CACHE)
+
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_compile_options(
+            "-D_GLIBCXX_DEBUG"
+    )
+endif ()
+
+set(ENVIRONMENT_TYPE "Native")
+set(LIB_TYPE SHARED)
+add_library(LCE ${LIB_TYPE} ${HEADERS} ${FILES} ${LODEPNG_FILES} ${ZLIB_FILES})
+
+target_include_directories(LCE
+        PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/LCE
+)
+target_compile_definitions(LCE PRIVATE LIBLCE_EXPORTS)
+
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/tests EXCLUDE_FROM_ALL)
 # me: "why don't we use c++20 for std::endian?"
 # them: "c++20 is in my nightmares"
 
-target_link_libraries(LCE PRIVATE BIO)
+target_link_libraries(LCE PRIVATE bio)
 
 target_compile_definitions(LCE PUBLIC
         LIBLCE_COMPILER_NAME="${CMAKE_CXX_COMPILER_ID}"

@@ -9,22 +9,22 @@ namespace lce::color {
     Color::Color(const ARGB color) : color(color) {}
 
     Color::Color(std::vector<uint8_t> &data)
-        : Color(bio::BinaryBuffer(data.data())) {}
+        : Color(bio::buffer::BinaryBuffer(data.data())) {}
 
-    Color::Color(uint8_t *data) : Color(bio::BinaryBuffer(data)) {}
+    Color::Color(uint8_t *data) : Color(bio::buffer::BinaryBuffer(data)) {}
 
-    Color::Color(bio::BinaryBuffer &&io) : Color(io) {}
+    Color::Color(bio::buffer::BinaryBuffer &&io) : Color(io) {}
 
-    Color::Color(bio::BinaryBuffer &io) { this->color = io.readLE<ARGB>(); }
+    Color::Color(bio::buffer::BinaryBuffer &io) { this->color = io.readLE<ARGB>(); }
 
     size_t Color::getSize() const { return sizeof(ARGB); }
 
     uint8_t *Color::serialize() const {
-        bio::BinaryBuffer io(getSize());
+        bio::buffer::BinaryBuffer io(getSize());
 
         io.writeLE<ARGB>(color);
 
-        return io.getData();
+        return io.begin();
     }
 
     ColorCommons::ColorCommons() {}

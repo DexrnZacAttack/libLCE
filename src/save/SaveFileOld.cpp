@@ -8,7 +8,7 @@
 #include "save/SaveFile.h"
 #include "util/StringUtilities.h"
 
-#include <BinaryIO/BinaryBuffer.h>
+#include <BinaryIO/buffer/BinaryBuffer.h>
 
 #include <stack>
 
@@ -30,7 +30,7 @@ namespace lce::save {
     SaveFileOld::SaveFileOld(std::vector<uint8_t> data,
                              const bio::util::ByteOrder byteOrder) {
         this->mByteOrder = byteOrder;
-        bio::BinaryBuffer io(data.data());
+        bio::buffer::BinaryBuffer io(data.data());
 
         const uint32_t indexOffset = io.read<uint32_t>(this->mByteOrder);
 
@@ -38,7 +38,7 @@ namespace lce::save {
             throw std::runtime_error("Index offset points to an area that is "
                                      "out of bounds of the data given.");
 
-        DebugLog("" << io.getPosition());
+        DebugLog("" << io.getOffset());
         const uint32_t fileCount = io.read<uint32_t>(this->mByteOrder) /
                                    this->SaveFileOld::getIndexEntrySize();
 
@@ -91,7 +91,7 @@ namespace lce::save {
      * @return Pointer to the save file
      */
     uint8_t *SaveFileOld::serialize() const {
-        bio::BinaryBuffer io(this->getSize());
+        bio::buffer::BinaryBuffer io(this->getSize());
         const fs::Directory *root = getRoot();
 
         uint32_t indexOffset = calculateIndexOffset();
@@ -115,11 +115,11 @@ namespace lce::save {
 
             DebugLogW(path);
 
-            const uint32_t offset = io.getPosition();
+            const uint32_t offset = io.getOffset();
 
-            io.writeBytes(innerFile.getData().data(), innerFile.getSize());
+            io.writeBytes(innerFile.begin().data(), innerFile.getSize());
 
-            const size_t last = io.getPosition();
+            const size_t last = io.getOffset();
 
             io.seek(indexOffset + (getIndexEntrySize() * i));
 
@@ -146,7 +146,7 @@ namespace lce::save {
         io.seek(0);
         io.write<uint32_t>(indexOffset, this->mByteOrder);
 
-        return io.getData();
+        return io.begin();
     }
 
     SaveFileCommons *SaveFileOld::migrateVersion(const uint16_t version) {

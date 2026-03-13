@@ -6,7 +6,7 @@
 // https://team-lodestone.github.io/Documentation/LCE/File%20Types/LOC.html
 
 #include "LCE/localization/LocalizationFile.h"
-#include <BinaryIO/BinaryBuffer.h>
+#include <BinaryIO/buffer/BinaryBuffer.h>
 #include <algorithm>
 
 #include <utility>
@@ -26,7 +26,7 @@ namespace lce::loc {
           mLanguages(std::move(languages)) {}
 
     LocalizationFile::LocalizationFile(uint8_t *data) {
-        bio::BinaryBuffer io(data);
+        bio::buffer::BinaryBuffer io(data);
 
         mVersion = io.readBE<uint32_t>();
         const uint32_t lc = io.readBE<uint32_t>();
@@ -76,7 +76,7 @@ namespace lce::loc {
     uint8_t *LocalizationFile::serialize() const {
         const uint32_t fileSize = this->getSize();
         uint8_t *data = new uint8_t[fileSize];
-        bio::BinaryBuffer io(data);
+        bio::buffer::BinaryBuffer io(data);
 
         io.writeBE<uint32_t>(mVersion);
         io.writeBE<uint32_t>(mLanguages.size());
@@ -97,7 +97,7 @@ namespace lce::loc {
             io.writeBytes(lang.serialize(), lang.getSize());
         }
 
-        return io.getData();
+        return io.begin();
     }
     Language *LocalizationFile::createLanguage(const std::string &name,
                                                const uint8_t _byte,
