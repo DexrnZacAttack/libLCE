@@ -17,5 +17,7 @@ int main(int argc, char **argv) {
     ADD_TESTS(RUN_FORMATS_TESTS, lce::tests::formats::run);
     ADD_TESTS(RUN_VFS_TESTS, lce::tests::vfs::run);
 
+    tfw::TestFramework::getInstance()->run();
+
     return 0;
 };

@@ -13,17 +13,17 @@ namespace lce::msscmp {
       public:
         BinkaFile() = delete;
 
-        BinkaFile(const std::wstring &_name, const std::vector<uint8_t> &_data,
+        BinkaFile(const FSObject::name_t &_name, const std::vector<uint8_t> &_data,
                   const uint32_t sampleRate, fs::Directory *parent)
-            : fs::File(_name, _data, parent), mSampleRate(sampleRate) {}
+            : fs::File(_name, _data, parent), m_sampleRate(sampleRate) {}
 
-        [[nodiscard]] uint32_t getSampleRate() const { return mSampleRate; }
+        [[nodiscard]] uint32_t getSampleRate() const { return m_sampleRate; }
         void setSampleRate(const uint32_t _sampleRate) {
-            mSampleRate = _sampleRate;
+            m_sampleRate = _sampleRate;
         }
 
       private:
-        uint32_t mSampleRate;
+        uint32_t m_sampleRate;
     };
 
 } // namespace lce::msscmp

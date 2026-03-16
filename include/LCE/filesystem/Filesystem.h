@@ -28,7 +28,7 @@ namespace lce::fs {
       public:
         // const const constexpr const const const
         /** Root directory path */
-        static constexpr const wchar_t *const ROOT = L"/";
+        static constexpr const FSObject::char_t *const ROOT = "/";
 
         // hope I did this right
         Filesystem(const Filesystem &f)
@@ -41,7 +41,7 @@ namespace lce::fs {
         /// Gets a directory by path, but if it doesn't already exist, it
         /// creates a new one and returns that.
         [[nodiscard]] Directory *
-        getOrCreateDirByPath(const std::wstring &path) const;
+        getOrCreateDirByPath(const FSObject::path_t &path) const;
 
         /// Get root directory (/)
         [[nodiscard]] Directory *getRoot() const { return root.get(); };
@@ -49,30 +49,30 @@ namespace lce::fs {
         /// Get an object by path
         ///
         /// Returns nullptr if it doesn't exist. (or in case of other error)
-        [[nodiscard]] FSObject *getByPath(const std::wstring &path) const;
+        [[nodiscard]] FSObject *getByPath(const FSObject::path_t &path) const;
 
         /// Recursively creates a file (create all directories leading down to
         /// it)
-        FSObject *createFileRecursive(const std::wstring &path,
+        FSObject *createFileRecursive(const FSObject::path_t &path,
                                       const std::vector<uint8_t> &data) const;
 
         /// Converts Windows' path delimiters ("\") to Unix's ("/")
-        static std::wstring windowsToUnixDelimiter(const std::wstring &name);
+        static FSObject::path_t windowsToUnixDelimiter(const FSObject::path_t &name);
         /// Converts Unix's path delimiters ("/") to Windows' ("\")
-        static std::wstring unixToWindowsDelimiter(const std::wstring &name);
+        static FSObject::path_t unixToWindowsDelimiter(const FSObject::path_t &name);
 
-        [[nodiscard]] virtual std::wstring toString() const {
-            return L"Filesystem[fileCount=" +
-                   std::to_wstring(root->getFileCount()) +
-                   L", directoryCount=" +
-                   std::to_wstring(root->getDirectoryCount()) +
-                   L", childCount=" +
-                   std::to_wstring(root->getFileCount() +
+        [[nodiscard]] virtual FSObject::string_t toString() const {
+            return "Filesystem[fileCount=" +
+                   std::to_string(root->getFileCount()) +
+                   ", directoryCount=" +
+                   std::to_string(root->getDirectoryCount()) +
+                   ", childCount=" +
+                   std::to_string(root->getFileCount() +
                                    root->getDirectoryCount()) +
-                   L", creationTime=" +
-                   std::to_wstring(root->getCreationTimestamp()) +
-                   L", modifiedTime=" +
-                   std::to_wstring(root->getModifiedTimestamp()) + L"]";
+                   ", creationTime=" +
+                   std::to_string(root->getCreationTimestamp()) +
+                   ", modifiedTime=" +
+                   std::to_string(root->getModifiedTimestamp()) + "]";
         };
 
         virtual ~Filesystem() = default;

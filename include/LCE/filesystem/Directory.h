@@ -36,12 +36,12 @@ namespace lce::fs {
          * Filesystem::ROOT)
          * @param parent The parent directory (if root, specify none)
          */
-        explicit Directory(std::wstring name, Directory *parent)
+        explicit Directory(FSObject::name_t name, Directory *parent)
             : fs::FSObject(std::move(name)) {
-            this->mParent = parent;
+            this->m_parent = parent;
         }
 
-        bool contains(const std::wstring &name) const {
+        bool contains(const FSObject::name_t &name) const {
             return this->children.count(name);
         }
 
@@ -56,16 +56,16 @@ namespace lce::fs {
          * @param name The name you'd like to give to the newly created file
          * @param data The data that the file will hold
          */
-        File *createFile(const std::wstring &name,
+        File *createFile(const FSObject::name_t &name,
                          const std::vector<uint8_t> &&data);
-        FSObject *createFileRecursive(const std::wstring &path,
+        FSObject *createFileRecursive(const FSObject::path_t &path,
                                       const std::vector<uint8_t> &&data);
         /** Creates a directory with the specified name
          *
          * @param name The name you'd like to give to the newly created
          * directory
          */
-        Directory *createDirectory(const std::wstring &name);
+        Directory *createDirectory(const FSObject::name_t &name);
 
         /** Gets a child with the specified name (if available)
          *
@@ -73,21 +73,21 @@ namespace lce::fs {
          *
          * If the child is not found, the method will return a nullptr.
          */
-        FSObject *getChild(const std::wstring &name) const;
+        FSObject *getChild(const FSObject::name_t &name) const;
 
         /** Calls a method for each file in directory (recursive)
          *
          * @param l The function/lambda to call on all files
          */
         void forEachFilesRecursive(
-            const std::function<void(std::wstring name, File &file)> &l) const;
+            const std::function<void(FSObject::name_t name, File &file)> &l) const;
 
         /** Calls a method for each directory in directory (recursive)
          *
          * @param l The function/lambda to call on all directories
          */
         void forEachDirectoriesRecursive(
-            const std::function<void(std::wstring name, Directory &dir)> &l)
+            const std::function<void(FSObject::name_t name, Directory &dir)> &l)
             const;
 
         /** Calls a method for each object in directory (recursive)
@@ -95,7 +95,7 @@ namespace lce::fs {
          * @param l The function/lambda to call on all objects (file, folder)
          */
         void forEachRecursive(
-            const std::function<void(std::wstring name, FSObject &obj)> &l)
+            const std::function<void(FSObject::name_t name, FSObject &obj)> &l)
             const;
 
         /** Calls a method for each file in directory
@@ -103,21 +103,21 @@ namespace lce::fs {
          * @param l The function/lambda to call on all files
          */
         void forEachFiles(
-            const std::function<void(std::wstring name, File &file)> &l) const;
+            const std::function<void(FSObject::name_t name, File &file)> &l) const;
 
         /** Calls a method for each directory in directory
          *
          * @param l The function/lambda to call on all directories
          */
         void forEachDirectories(
-            const std::function<void(std::wstring name, Directory &dir)> &l)
+            const std::function<void(FSObject::name_t name, Directory &dir)> &l)
             const;
 
         /** Calls a method for each object in directory
          *
          * @param l The function/lambda to call on all objects (file, folder)
          */
-        void forEach(const std::function<void(std::wstring name, FSObject &obj)>
+        void forEach(const std::function<void(FSObject::name_t name, FSObject &obj)>
                          &l) const;
 
         /** Adds the given FSObject to the directory
@@ -132,7 +132,7 @@ namespace lce::fs {
          *
          * @param name The name of the child you would like to remove
          */
-        bool removeChild(const std::wstring &name);
+        bool removeChild(const FSObject::name_t &name);
 
         /** Takes a child, which removes it and returns the unique ptr
          *
@@ -140,27 +140,27 @@ namespace lce::fs {
          *
          * @param name The name of the child you would like to take
          */
-        std::unique_ptr<FSObject> takeChild(const std::wstring &name);
+        std::unique_ptr<FSObject> takeChild(const FSObject::name_t &name);
 
         /** Renames a child
          *
          * @param child The name of the child you would like to rename
          * @param n The new name to give to the child
          */
-        bool renameChild(const std::wstring &child, const std::wstring &n);
+        bool renameChild(const FSObject::name_t &child, const FSObject::name_t &n);
 
         /** Moves a child to another Directory
          *
          * @param name The name of the child you would like to move
          * @param to The directory you would like to move the child to
          */
-        bool moveChild(const std::wstring &name, Directory *to);
+        bool moveChild(const FSObject::name_t &name, Directory *to);
 
         /** Gets the size of the directory and all files under it (recursive) */
         size_t getSize() const override;
 
         /** Returns the map of FSObjects under this directory */
-        const std::unordered_map<std::wstring, std::unique_ptr<FSObject>> &
+        const std::unordered_map<FSObject::name_t, std::unique_ptr<FSObject>> &
         getChildren() const {
             return children;
         }
@@ -191,29 +191,29 @@ namespace lce::fs {
          *
          * @param path The physical path to write into
          */
-        void writeOut(const std::wstring &path) const;
+        void writeOut(const FSObject::path_t &path) const;
 
-        std::wstring toString() const override {
-            return L"Directory[name=" + this->getName() + L", fileCount=" +
-                   std::to_wstring(this->getFileCount()) +
-                   L", directoryCount=" +
-                   std::to_wstring(this->getDirectoryCount()) +
-                   L", childCount=" +
-                   std::to_wstring(this->getFileCount() +
+        FSObject::string_t toString() const override {
+            return "Directory[name=" + this->getName() + ", fileCount=" +
+                   std::to_string(this->getFileCount()) +
+                   ", directoryCount=" +
+                   std::to_string(this->getDirectoryCount()) +
+                   ", childCount=" +
+                   std::to_string(this->getFileCount() +
                                    this->getDirectoryCount()) +
-                   L", creationTime=" +
-                   std::to_wstring(this->getCreationTimestamp()) +
-                   L", modifiedTime=" +
-                   std::to_wstring(this->getModifiedTimestamp()) + L"]";
+                   ", creationTime=" +
+                   std::to_string(this->getCreationTimestamp()) +
+                   ", modifiedTime=" +
+                   std::to_string(this->getModifiedTimestamp()) + "]";
         };
 
-        friend std::wostream &operator<<(std::wostream &wos,
+        friend std::basic_ostream<FSObject::char_t> &operator<<(std::basic_ostream<FSObject::char_t> &wos,
                                          const Directory &d) {
             wos << d.toString();
             return wos;
         }
 
-        friend std::wostream &operator<<(std::wostream &wos,
+        friend std::basic_ostream<FSObject::char_t> &operator<<(std::basic_ostream<FSObject::char_t> &wos,
                                          const Directory *d) {
             wos << d->toString();
             return wos;
@@ -221,7 +221,7 @@ namespace lce::fs {
 
         // THIS WAS PAIN IN THE ASS I NEVER WANT TO DO THIS AGAIN NO
         Directory(const Directory &d)
-            : FSObject(d.mName, d.mCreationTime, d.mModifiedTime, d.mParent) {
+            : FSObject(d.m_name, d.m_creationTime, d.m_modifiedTime, d.m_parent) {
             for (auto &[n, child] : d.children) {
                 // god, I feel like this will probably be really slow
                 // why does it use copy constructor anyway for making derived
@@ -233,13 +233,13 @@ namespace lce::fs {
                     children[n] = std::make_unique<File>(*f);
                 }
 
-                children[n]->mParent = this;
+                children[n]->m_parent = this;
             }
         };
 
       private:
         /** Child objects inside the Directory */
-        std::unordered_map<std::wstring, std::unique_ptr<FSObject>> children;
+        std::unordered_map<FSObject::name_t, std::unique_ptr<FSObject>> children;
     };
 
 } // namespace lce::fs

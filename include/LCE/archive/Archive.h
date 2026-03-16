@@ -84,12 +84,12 @@ public:
 
         uint32_t i = 0;
         root->forEachFilesRecursive(
-            [&i, &writable, &offsetPositions](const std::wstring &n,
+            [&i, &writable, &offsetPositions](const lce::fs::FSObject::name_t &n,
                                         const lce::fs::File &f) {
-                std::wstring path = f.getPath().substr(1);
+                std::string path = f.getPath().substr(1);
                 lce::fs::Filesystem::unixToWindowsDelimiter(path);
 
-                writable.template writeString<char>(bio::util::string::StringConverter::wstringToString(path), util::ByteOrder::BIG, util::string::StringLengthEncoding::LENGTH_PREFIX);
+                writable.template writeString<char>(path, util::ByteOrder::BIG, util::string::StringLengthEncoding::LENGTH_PREFIX);
 
                 // this stores the area where the file offset is written.
                 offsetPositions[i] = writable.getOffset();
@@ -101,7 +101,7 @@ public:
 
         uint32_t j = 0;
         root->forEachFilesRecursive(
-            [&j, &writable, &offsetPositions](const std::wstring &n,
+            [&j, &writable, &offsetPositions](const lce::fs::FSObject::name_t &n,
                                         const lce::fs::File &f) {
                 // get current position (this is the position of the file)
                 const uint32_t fPos = writable.getOffset();
@@ -150,7 +150,7 @@ public:
             std::vector<uint8_t> d = readable.readOfSizeVec(size);
 
             arc->createFileRecursive(lce::fs::Filesystem::windowsToUnixDelimiter(
-            bio::util::string::StringConverter::stringToWString(name)
+            name
             ), std::move(d));
         }
 

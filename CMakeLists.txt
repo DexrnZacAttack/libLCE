@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.26)
 project(LCE VERSION 2.0.0)
 
-set(VERSION_SUFFIX "-dev.5") # used for non-stable versions
+set(VERSION_SUFFIX "-dev.6") # used for non-stable versions
 set(CMAKE_CXX_STANDARD 20)
 
 message(STATUS "${CMAKE_SYSTEM_PROCESSOR}")

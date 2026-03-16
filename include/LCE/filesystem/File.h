@@ -26,18 +26,18 @@ namespace lce::fs {
 
         // TODO: allowing for Parent to be set detaches the file from the actual
         // directory doesn't it??? like the children map isn't synced
-        File(std::wstring name, std::vector<uint8_t> data, Directory *parent)
-            : FSObject(std::move(name)), mData(std::move(data)) {
-            this->mParent = parent;
+        File(FSObject::name_t name, std::vector<uint8_t> data, Directory *parent)
+            : FSObject(std::move(name)), m_data(std::move(data)) {
+            this->m_parent = parent;
         }
 
       public:
-        File(std::wstring name, std::vector<uint8_t> data)
-            : FSObject(std::move(name)), mData(std::move(data)) {}
+        File(FSObject::name_t name, std::vector<uint8_t> data)
+            : FSObject(std::move(name)), m_data(std::move(data)) {}
 
         /** Creates a File from a physical file on the user's filesystem */
         explicit File(const std::filesystem::path &path)
-            : FSObject(path.filename().wstring()) {
+            : FSObject(path.filename().string()) {
             if (!std::filesystem::exists(path) ||
                 !std::filesystem::is_regular_file(path)) {
                 throw std::runtime_error(
@@ -56,10 +56,10 @@ namespace lce::fs {
                 throw std::ios_base::failure(
                     std::string("Failed to open file ") + (path).string());
 
-            this->mData =
+            this->m_data =
                 std::vector<uint8_t>(std::filesystem::file_size(path));
-            name.read(reinterpret_cast<char *>(this->mData.data()),
-                      this->mData.size());
+            name.read(reinterpret_cast<char *>(this->m_data.data()),
+                      this->m_data.size());
         }
 
         File(File &&) = default;
@@ -68,21 +68,21 @@ namespace lce::fs {
         /// Writes the file to the physical filesystem into the given path with
         /// the given filename
         void writeOut(const std::filesystem::path &path,
-                      const std::wstring &name) const;
+                      const FSObject::name_t &name) const;
 
         /// Writes the file to the physical filesystem into the given path with
         /// the given filename
-        void writeOut(const std::wstring &path, const std::wstring &name) const;
+        void writeOut(const FSObject::path_t &path, const FSObject::name_t &name) const;
 
         /// Writes the file to the physical filesystem into the given path
-        void writeOut(const std::wstring &path) const;
+        void writeOut(const FSObject::path_t &path) const;
 
         /// Writes the file to the physical filesystem into the given path
         void writeOut(const std::filesystem::path &path) const;
 
         /// Writes the file to the physical filesystem into the given path
         /// (using end of path as filename)
-        void writeOutFullPath(const std::wstring &path) const;
+        void writeOutFullPath(const FSObject::path_t &path) const;
 
         /// Writes the file to the physical filesystem into the given path
         /// (using end of path as filename)
@@ -97,7 +97,7 @@ namespace lce::fs {
 
         /// Writes the file and parent directories to the physical filesystem
         /// into the given path
-        void writeOutWithDirs(const std::wstring &path) const;
+        void writeOutWithDirs(const FSObject::path_t &path) const;
 
         /// Writes the file and parent directories to the physical filesystem
         /// into the given path
@@ -105,13 +105,13 @@ namespace lce::fs {
 
         /// Writes the file and parent directories to the physical filesystem
         /// into the given path with the given filename
-        void writeOutWithDirs(const std::wstring &path,
-                              const std::wstring &name) const;
+        void writeOutWithDirs(const FSObject::path_t &path,
+                              const FSObject::name_t &name) const;
 
         /// Writes the file and parent directories to the physical filesystem
         /// into the given path with the given filename
         void writeOutWithDirs(const std::filesystem::path &path,
-                              const std::wstring &name) const;
+                              const FSObject::name_t &name) const;
 
         /// Gets if the FSObject is a file or not
         ///
@@ -120,66 +120,66 @@ namespace lce::fs {
 
         /// Gets the file's data
         [[nodiscard]] const std::vector<uint8_t> &getData() const {
-            return mData;
+            return m_data;
         }
         /// Gets the file's size (equiv. getData().size())
-        size_t getSize() const override { return mData.size(); }
+        size_t getSize() const override { return m_data.size(); }
 
-        [[nodiscard]] std::wstring toString() const override {
-            return L"File[name=" + this->getName() + L", size=" +
-                   std::to_wstring(this->getSize()) + L", creationTime=" +
-                   std::to_wstring(this->getCreationTimestamp()) +
-                   L", modifiedTime=" +
-                   std::to_wstring(this->getModifiedTimestamp()) + L"]";
+        [[nodiscard]] FSObject::string_t toString() const override {
+            return "File[name=" + this->getName() + ", size=" +
+                   std::to_string(this->getSize()) + ", creationTime=" +
+                   std::to_string(this->getCreationTimestamp()) +
+                   ", modifiedTime=" +
+                   std::to_string(this->getModifiedTimestamp()) + "]";
         }
 
         /// Output file data
         friend std::ostream &operator<<(std::ostream &os, const File &f) {
-            os.write(reinterpret_cast<const char *>(f.mData.data()),
-                     f.mData.size());
+            os.write(reinterpret_cast<const char *>(f.m_data.data()),
+                     f.m_data.size());
             return os;
         }
 
         /// Output file data
         friend std::ostream &operator<<(std::ostream &os, const File *f) {
-            os.write(reinterpret_cast<const char *>(f->mData.data()),
-                     f->mData.size());
+            os.write(reinterpret_cast<const char *>(f->m_data.data()),
+                     f->m_data.size());
             return os;
         }
 
         /// Output file info as string
-        friend std::wostream &operator<<(std::wostream &wos, const File &f) {
+        friend FSObject::ostringstream_t &operator<<(FSObject::ostringstream_t &wos, const File &f) {
             wos << f.toString();
             return wos;
         }
 
         /// Output file info as string
-        friend std::wostream &operator<<(std::wostream &wos, const File *f) {
+        friend FSObject::ostringstream_t &operator<<(FSObject::ostringstream_t &wos, const File *f) {
             wos << f->toString();
             return wos;
         }
 
         /// Push a byte into the file
         File &operator<<(const uint8_t b) {
-            mData.push_back(b);
+            m_data.push_back(b);
             return *this;
         }
 
         /// Read/Write a byte from the file
-        uint8_t &operator[](const int i) { return mData[i]; }
+        uint8_t &operator[](const int i) { return m_data[i]; }
 
         /// Read a byte from the file
-        uint8_t operator[](const int i) const { return mData[i]; }
+        uint8_t operator[](const int i) const { return m_data[i]; }
 
         /// Overwrites all data in the file with the given data
-        void setData(const std::vector<uint8_t> &d) { this->mData = d; }
+        void setData(const std::vector<uint8_t> &d) { this->m_data = d; }
 
         File(const File &c)
-            : FSObject(c.mName, c.mCreationTime, c.mModifiedTime, c.mParent),
-              mData(c.mData) {}
+            : FSObject(c.m_name, c.m_creationTime, c.m_modifiedTime, c.m_parent),
+              m_data(c.m_data) {}
 
       private:
-        std::vector<uint8_t> mData;
+        std::vector<uint8_t> m_data;
     };
 } // namespace lce::fs
 

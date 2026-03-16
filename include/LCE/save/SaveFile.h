@@ -169,12 +169,12 @@ public:
         std::vector<lce::save::SaveFile::FileEntry> written;
 
         // write data for each file
-        root->forEachFilesRecursive([&writable, &written](const std::wstring &name, const lce::fs::File &innerFile) {
+        root->forEachFilesRecursive([&writable, &written](const lce::fs::FSObject::name_t &name, const lce::fs::File &innerFile) {
             writable.writeBytes(innerFile.getData().data(), innerFile.getSize());
 
             //push into the vector
             written.push_back(lce::save::SaveFile::FileEntry {
-                bio::util::string::StringConverter::wstringToU16string(innerFile.getPath().substr(1)),
+                bio::util::string::StringConverter::stringToU16String(innerFile.getPath().substr(1)),
                 static_cast<uint32_t>(innerFile.getSize()),
                 static_cast<uint32_t>(writable.getOffset()),
                 innerFile.getModifiedTimestamp()
@@ -282,7 +282,7 @@ public:
             std::vector<uint8_t> data = readable.readOfSizeVec(file.size);
 
             // create the file
-            (void)save->createFileRecursive(util::string::StringConverter::u16stringToWstring(file.name), std::move(data));
+            (void)save->createFileRecursive(util::string::StringConverter::u16stringToString(file.name), std::move(data));
         }
 
         return std::move(save);

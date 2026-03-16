@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.26)
 project(libLCE.Tests)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 
 message(STATUS "${CMAKE_SYSTEM_PROCESSOR}")
 
@@ -14,9 +14,19 @@ set(FILES
         tests/vfs.h
 )
 
+include(FetchContent)
+FetchContent_Declare(tfw
+        GIT_REPOSITORY https://codeberg.org/Dexrn/TFW
+        GIT_TAG        1.0.2
+        GIT_PROGRESS   TRUE
+        GIT_SHALLOW    TRUE
+        EXCLUDE_FROM_ALL
+)
+FetchContent_MakeAvailable(tfw)
+
 add_executable(libLCE.Tests ${FILES})
 
-target_link_libraries(libLCE.Tests PRIVATE LCE bio)
+target_link_libraries(libLCE.Tests PRIVATE LCE bio-cpp23 tfw)
 
 target_include_directories(libLCE.Tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 

@@ -3,11 +3,12 @@
 //
 #include "vfs.h"
 
+#include "TestFramework/TestFramework.h"
 #include "LCE/filesystem/Directory.h"
 #include "LCE/filesystem/Filesystem.h"
 
 namespace lce::tests::vfs {
-    void runForEachRecursive() {
+    void runForEachRecursive(tfw::test::util::TestOutputLogger &logger) {
         const std::filesystem::path p(util::examples / "VFSTestFolder");
         const fs::Directory *d = new fs::Directory(p);
 
@@ -17,74 +18,75 @@ namespace lce::tests::vfs {
         std::cout << "(" << d->getFileCount() << " files, ";
         std::cout << d->getDirectoryCount() << " directories)" << std::endl;
 
-        d->forEachRecursive([](const std::wstring &name,
+        d->forEachRecursive([](const fs::FSObject::name_t &name,
                                const fs::FSObject &f) {
             if (f.isFile()) {
-                std::wcout << dynamic_cast<const fs::File &>(f) << std::endl;
+                std::cout << dynamic_cast<const fs::File &>(f) << std::endl;
             } else {
-                std::wcout << dynamic_cast<const fs::Directory &>(f)
+                std::cout << dynamic_cast<const fs::Directory &>(f)
                            << std::endl;
             }
         });
     }
 
-    void runForEachFilesOnlyRecursive() {
+    void runForEachFilesOnlyRecursive(tfw::test::util::TestOutputLogger &logger) {
         const fs::Directory *d =
             new fs::Directory(util::examples / "VFSTestFolder");
 
         d->forEachFilesRecursive(
-            [](const std::wstring &name, const fs::File &f) {
-                std::wcout << f << std::endl;
+            [](const fs::FSObject::name_t &name, const fs::File &f) {
+                std::cout << f << std::endl;
             });
     }
 
-    void runForEachDirectoriesOnlyRecursive() {
+    void runForEachDirectoriesOnlyRecursive(tfw::test::util::TestOutputLogger &logger) {
         const fs::Directory *d =
             new fs::Directory(util::examples / "VFSTestFolder");
 
         d->forEachDirectoriesRecursive(
-            [](const std::wstring &name, const fs::Directory &f) {
-                std::wcout << f << std::endl;
+            [](const fs::FSObject::name_t &name, const fs::Directory &f) {
+                std::cout << f << std::endl;
             });
     }
-    void runForEach() {
+
+    void runForEach(tfw::test::util::TestOutputLogger &logger) {
         std::filesystem::create_directories(util::examples / "VFSTestFolder");
         const fs::Directory *d =
             new fs::Directory(util::examples / "VFSTestFolder");
 
-        d->forEach([](const std::wstring &name, const fs::FSObject &f) {
+        d->forEach([](const fs::FSObject::name_t &name, const fs::FSObject &f) {
             if (f.isFile()) {
-                std::wcout << dynamic_cast<const fs::File &>(f) << std::endl;
+                std::cout << dynamic_cast<const fs::File &>(f) << std::endl;
             } else {
-                std::wcout << dynamic_cast<const fs::Directory &>(f)
+                std::cout << dynamic_cast<const fs::Directory &>(f)
                            << std::endl;
             }
         });
     }
 
-    void runForEachFilesOnly() {
+    void runForEachFilesOnly(tfw::test::util::TestOutputLogger &logger) {
         const fs::Directory *d =
             new fs::Directory(util::examples / "VFSTestFolder");
 
-        d->forEachFiles([](const std::wstring &name, const fs::File &f) {
-            std::wcout << f << std::endl;
+        d->forEachFiles([](const fs::FSObject::name_t &name, const fs::File &f) {
+            std::cout << f << std::endl;
         });
     }
 
-    void runForEachDirectoriesOnly() {
+    void runForEachDirectoriesOnly(tfw::test::util::TestOutputLogger &logger) {
         const fs::Directory *d =
             new fs::Directory(util::examples / "VFSTestFolder");
 
         d->forEachDirectories(
-            [](const std::wstring &name, const fs::Directory &f) {
-                std::wcout << f << std::endl;
+            [](const fs::FSObject::name_t &name, const fs::Directory &f) {
+                std::cout << f << std::endl;
             });
     }
 
-    void createFileFromReal() {
+    void createFileFromReal(tfw::test::util::TestOutputLogger &logger) {
         const fs::File file(util::examples / "VFSTestFile");
 
-        std::wcout << file << std::endl;
+        std::cout << file << std::endl;
 
         file.writeOut(util::output / "VFSTestFileOutput");
     }

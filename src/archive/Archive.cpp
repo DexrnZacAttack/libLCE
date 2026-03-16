@@ -14,8 +14,8 @@ namespace lce::arc {
         uint32_t size = 4; // file count
 
         getRoot()->forEachFilesRecursive(
-            [&size](std::wstring n, const fs::File &f) {
-                std::wstring path = f.getPath().substr(1);
+            [&size](fs::FSObject::name_t n, const fs::File &f) {
+                const fs::FSObject::path_t path = f.getPath().substr(1);
                 unixToWindowsDelimiter(path);
 
                 size += 2;             // string length prefix

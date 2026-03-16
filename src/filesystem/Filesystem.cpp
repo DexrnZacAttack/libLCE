@@ -19,15 +19,15 @@ namespace lce::fs {
     }
 
     Directory *
-    Filesystem::getOrCreateDirByPath(const std::wstring &path) const {
+    Filesystem::getOrCreateDirByPath(const FSObject::path_t &path) const {
         if (path.empty())
             return nullptr;
 
         Directory *c = root.get();
-        std::wstringstream ss(path);
-        std::wstring name;
+        std::basic_stringstream<FSObject::char_t> ss(path);
+        FSObject::path_t name;
 
-        while (std::getline(ss, name, L'/')) { // go through the entire path
+        while (std::getline(ss, name, '/')) { // go through the entire path
             if (name.empty())
                 continue; // leading / (so we can do /test/test2/test3.png and
                           // test/test2/test3.png)
@@ -54,15 +54,15 @@ namespace lce::fs {
         return c;
     }
 
-    FSObject *Filesystem::getByPath(const std::wstring &path) const {
+    FSObject *Filesystem::getByPath(const FSObject::path_t &path) const {
         if (path.empty())
             return nullptr;
 
         Directory *c = root.get();
-        std::wstringstream ss(path);
-        std::wstring name;
+        std::basic_stringstream<FSObject::char_t> ss(path);
+        FSObject::path_t name;
 
-        while (std::getline(ss, name, L'/')) { // go through the entire path
+        while (std::getline(ss, name, '/')) { // go through the entire path
             if (name.empty())
                 continue; // leading / (so we can do /test/test2/test3.png and
                           // test/test2/test3.png)
@@ -91,26 +91,26 @@ namespace lce::fs {
         return c;
     }
 
-    std::wstring Filesystem::windowsToUnixDelimiter(const std::wstring &name) {
-        std::wstring n(name);
-        std::ranges::replace_if(n, [](const wchar_t &c) {
-            return c == L'\\';
-        }, L'/');
+    FSObject::path_t Filesystem::windowsToUnixDelimiter(const FSObject::path_t &name) {
+        FSObject::path_t n(name);
+        std::ranges::replace_if(n, [](const FSObject::char_t &c) {
+            return c == '\\';
+        }, '/');
 
         return n;
     }
 
-    std::wstring Filesystem::unixToWindowsDelimiter(const std::wstring &name) {
-        std::wstring n(name);
-        std::ranges::replace_if(n, [](const wchar_t &c) {
-            return c == L'/';
-        }, L'\\');
+    FSObject::path_t Filesystem::unixToWindowsDelimiter(const FSObject::path_t &name) {
+        FSObject::path_t n(name);
+        std::ranges::replace_if(n, [](const FSObject::char_t &c) {
+            return c == '/';
+        }, '\\');
 
         return n;
     }
 
     FSObject *
-    Filesystem::createFileRecursive(const std::wstring &path,
+    Filesystem::createFileRecursive(const FSObject::path_t &path,
                                     const std::vector<uint8_t> &data) const {
         return getRoot()->createFileRecursive(path, std::move(data));
     }

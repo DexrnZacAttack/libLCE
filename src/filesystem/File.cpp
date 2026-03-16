@@ -9,7 +9,7 @@
 
 namespace lce::fs {
     void File::writeOut(const std::filesystem::path &path,
-                        const std::wstring &name) const {
+                        const FSObject::name_t &name) const {
         std::filesystem::create_directories(path);
 
         std::ofstream os(path / name);
@@ -18,23 +18,23 @@ namespace lce::fs {
 
         // TODO: write time and other metadata
     }
-    void File::writeOut(const std::wstring &path,
-                        const std::wstring &name) const {
+    void File::writeOut(const FSObject::path_t &path,
+                        const FSObject::name_t &name) const {
         writeOut(std::filesystem::path(path), name);
     }
 
-    void File::writeOut(const std::wstring &path) const {
+    void File::writeOut(const FSObject::path_t &path) const {
         writeOut(path, getName());
     };
 
-    void File::writeOutFullPath(const std::wstring &path) const {
+    void File::writeOutFullPath(const FSObject::path_t &path) const {
         const std::filesystem::path p(path);
 
-        writeOut(p.parent_path(), p.filename().wstring());
+        writeOut(p.parent_path(), p.filename().string());
     };
 
     void File::writeOutFullPath(const std::filesystem::path &path) const {
-        writeOut(path.parent_path(), path.filename().wstring());
+        writeOut(path.parent_path(), path.filename().string());
     };
 
     void File::writeOut(const std::filesystem::path &path) const {
@@ -50,7 +50,7 @@ namespace lce::fs {
                  getName());
     }
 
-    void File::writeOutWithDirs(const std::wstring &path) const {
+    void File::writeOutWithDirs(const FSObject::path_t &path) const {
         writeOut(path /
                      std::filesystem::path(getPath().substr(1)).parent_path(),
                  getName());
@@ -61,15 +61,15 @@ namespace lce::fs {
                      std::filesystem::path(getPath().substr(1)).parent_path(),
                  getName());
     }
-    void File::writeOutWithDirs(const std::wstring &path,
-                                const std::wstring &name) const {
+    void File::writeOutWithDirs(const FSObject::path_t &path,
+                                const FSObject::name_t &name) const {
         writeOut(path /
                      std::filesystem::path(getPath().substr(1)).parent_path(),
                  name);
     }
 
     void File::writeOutWithDirs(const std::filesystem::path &path,
-                                const std::wstring &name) const {
+                                const FSObject::name_t &name) const {
         writeOut(path /
                      std::filesystem::path(getPath().substr(1)).parent_path(),
                  name);

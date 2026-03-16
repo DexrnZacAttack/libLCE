@@ -4,20 +4,22 @@
 
 #include "LCE/filesystem/Directory.h"
 #include "LCE/filesystem/File.h"
+
 #include <filesystem>
 #include <fstream>
+#include <ranges>
 #include <stack>
 
 namespace lce::fs {
     Directory::Directory(const std::filesystem::path &path)
-        : FSObject(path.filename().wstring()) {
-        this->mParent = nullptr;
+        : FSObject(path.filename().string()) {
+        this->m_parent = nullptr;
 
         for (const auto &o :
              std::filesystem::recursive_directory_iterator(path)) {
             if (o.is_regular_file()) {
-                std::wstring a =
-                    std::filesystem::relative(o.path(), path).wstring();
+                FSObject::path_t a =
+                    std::filesystem::relative(o.path(), path).string();
 
                 std::ifstream name(o.path(), std::ifstream::binary);
                 if (!name.is_open())
@@ -32,10 +34,10 @@ namespace lce::fs {
         }
     }
 
-    File *Directory::createFile(const std::wstring &name,
+    File *Directory::createFile(const FSObject::name_t &name,
                                 const std::vector<uint8_t> &&data) {
         // should we except instead of just returning?
-        if (children.count(name))
+        if (children.contains(name))
             return nullptr; // file exists already... can't have 2 of them
                             // (although we are NOT case-insensitive)
 
@@ -48,16 +50,16 @@ namespace lce::fs {
         return ptr;
     }
 
-    FSObject *Directory::createFileRecursive(const std::wstring &path,
+    FSObject *Directory::createFileRecursive(const FSObject::path_t &path,
                                              const std::vector<uint8_t> &&data) {
         if (path.empty())
             return nullptr;
 
         Directory *current = this;
-        std::wstringstream ss(path);
-        std::wstring name;
+        std::basic_stringstream<FSObject::char_t> ss(path);
+        FSObject::name_t name;
 
-        while (std::getline(ss, name, L'/')) {
+        while (std::getline(ss, name, '/')) {
             if (name.empty())
                 continue;
 
@@ -82,7 +84,7 @@ namespace lce::fs {
         return nullptr; // should never get here
     }
 
-    Directory *Directory::createDirectory(const std::wstring &name) {
+    Directory *Directory::createDirectory(const FSObject::name_t &name) {
         if (children.count(name))
             return nullptr; // already exists
 
@@ -94,7 +96,7 @@ namespace lce::fs {
         return ptr;
     }
 
-    FSObject *Directory::getChild(const std::wstring &name) const {
+    FSObject *Directory::getChild(const FSObject::name_t &name) const {
         const auto it = children.find(name); // const auto
         if (it == children.end())
             return nullptr; // does not exist
@@ -103,7 +105,7 @@ namespace lce::fs {
     }
 
     void Directory::forEachFilesRecursive(
-        const std::function<void(std::wstring name, File &file)> &l) const {
+        const std::function<void(FSObject::name_t name, File &file)> &l) const {
         std::stack<const Directory *> stack;
         stack.push(this);
 
@@ -124,7 +126,7 @@ namespace lce::fs {
     }
 
     void Directory::forEachDirectoriesRecursive(
-        const std::function<void(std::wstring name, Directory &dir)> &l) const {
+        const std::function<void(FSObject::name_t name, Directory &dir)> &l) const {
         std::stack<const Directory *> stack;
         stack.push(this);
 
@@ -148,7 +150,7 @@ namespace lce::fs {
     }
 
     void Directory::forEachRecursive(
-        const std::function<void(std::wstring name, FSObject &obj)> &l) const {
+        const std::function<void(FSObject::name_t name, FSObject &obj)> &l) const {
         std::stack<const Directory *> stack;
         stack.push(this);
 
@@ -175,7 +177,7 @@ namespace lce::fs {
     }
 
     void Directory::forEachFiles(
-        const std::function<void(std::wstring name, File &file)> &l) const {
+        const std::function<void(FSObject::name_t name, File &file)> &l) const {
         for (auto &[n, c] : children) {
             if (c->isFile())
                 l(n, *dynamic_cast<File *>(c.get()));
@@ -183,7 +185,7 @@ namespace lce::fs {
     }
 
     void Directory::forEachDirectories(
-        const std::function<void(std::wstring name, Directory &dir)> &l) const {
+        const std::function<void(FSObject::name_t name, Directory &dir)> &l) const {
         for (auto &[n, c] : children) {
             if (!c->isFile())
                 l(n, *dynamic_cast<Directory *>(c.get()));
@@ -191,44 +193,44 @@ namespace lce::fs {
     }
 
     void Directory::forEach(
-        const std::function<void(std::wstring name, FSObject &obj)> &l) const {
+        const std::function<void(FSObject::name_t name, FSObject &obj)> &l) const {
         for (auto &[n, c] : this->children) {
             l(n, *c.get());
         }
     }
 
     bool Directory::addChild(std::unique_ptr<FSObject> child) {
-        const std::wstring name = child->getName();
+        const FSObject::name_t name = child->getName();
 
         if (children.contains(name))
             return false; // exists
 
-        child->mParent = this;
+        child->m_parent = this;
         children[name] = std::move(child);
         return true;
     }
 
-    bool Directory::removeChild(const std::wstring &name) {
+    bool Directory::removeChild(const FSObject::name_t &name) {
         return children.erase(name);
     }
 
-    std::unique_ptr<FSObject> Directory::takeChild(const std::wstring &name) {
+    std::unique_ptr<FSObject> Directory::takeChild(const FSObject::name_t &name) {
         const auto it = children.find(name);
 
         if (it == children.end())
             return nullptr; // does not exist
 
         std::unique_ptr<FSObject> obj = std::move(it->second);
-        obj->mParent = nullptr;
+        obj->m_parent = nullptr;
         children.erase(it); // nuke it from the dir (since whatever took it now
                             // has full control over it)
         return obj;
     }
 
     bool
-    Directory::renameChild(const std::wstring &child,
-                           const std::wstring &n) { // thanks for taking `new`
-        if (child == n || children.count(n))
+    Directory::renameChild(const FSObject::name_t &child,
+                           const FSObject::name_t &n) { // thanks for taking `new`
+        if (child == n || children.contains(n))
             return false; // if old is the same or new name already exists
 
         std::unique_ptr<FSObject> obj = takeChild(child);
@@ -241,8 +243,8 @@ namespace lce::fs {
         return true;
     }
 
-    bool Directory::moveChild(const std::wstring &name, Directory *to) {
-        if (!to || to == this || to->children.count(name))
+    bool Directory::moveChild(const FSObject::name_t &name, Directory *to) {
+        if (!to || to == this || to->children.contains(name))
             return false; // if `to` is nullptr, or `to` is literally this, or
                           // `to` contains an object with the same name already
 
@@ -250,8 +252,8 @@ namespace lce::fs {
         if (!obj)
             return false;
 
-        obj->mParent = to;
-        obj->mModifiedTime = lce::system::getTimestamp();
+        obj->m_parent = to;
+        obj->m_modifiedTime = lce::system::getTimestamp();
         to->children[name] = std::move(obj); // drop it into the new dir
         return true;
     }
@@ -259,7 +261,7 @@ namespace lce::fs {
     size_t Directory::getSize() const {
         size_t s = 0;
 
-        for (const auto &[name, child] : children) {
+        for (const auto &child : children | std::views::values) {
             if (!child->isFile())
                 if (const Directory *dir =
                         dynamic_cast<const Directory *>(child.get()))
@@ -278,12 +280,12 @@ namespace lce::fs {
             if (!child->isFile()) {
                 if (const Directory *d =
                         dynamic_cast<Directory *>(child.get())) {
-                    std::wcout << L"[D | " << d->getSize() << L"] "
+                    std::cout << "[D | " << d->getSize() << "] "
                                << d->getName() << std::endl;
                 }
             } else {
                 if (const File *f = dynamic_cast<File *>(child.get())) {
-                    std::wcout << L"[F | " << f->getSize() << L"] "
+                    std::cout << "[F | " << f->getSize() << "] "
                                << f->getName() << std::endl;
                 }
             }
@@ -320,12 +322,12 @@ namespace lce::fs {
 
     void Directory::writeOut(const std::filesystem::path &path) const {
         // would it be bad to use name here?
-        forEachFilesRecursive([path](const std::wstring &name, const File &f) {
+        forEachFilesRecursive([path](const FSObject::name_t &name, const File &f) {
             f.writeOutWithDirs(path, f.getName());
         });
     }
 
-    void Directory::writeOut(const std::wstring &path) const {
+    void Directory::writeOut(const FSObject::path_t &path) const {
         this->writeOut(std::filesystem::path(path));
     }
 } // namespace lce::fs

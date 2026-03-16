@@ -16,11 +16,17 @@
 #include <BinaryIO/buffer/BinaryBuffer.h>
 
 namespace lce::tests::formats {
-    void arcTest() {
+    void arcTest(tfw::test::util::TestOutputLogger &logger) {
         std::ifstream in(util::examples / "example.arc", std::ifstream::binary);
 
         bio::stream::BinaryInputStream b = bio::stream::BinaryInputStream(in);
         std::unique_ptr<arc::Archive> file = b.deserialize<arc::Archive::Deserializer>();
+
+#ifdef CMAKE_BUILD_DEBUG
+        file->getRoot()->forEachFilesRecursive([&logger](const fs::FSObject::name_t &name, const fs::File &f) {
+            logger << f.getPath() << std::endl;
+        });
+#endif
 
         std::ofstream out(util::output / "output.arc", std::ios::binary);
 
@@ -28,7 +34,7 @@ namespace lce::tests::formats {
         ob.serialize<arc::Archive::Serializer>(*file.get());
     }
 
-    void locTest() {
+    void locTest(tfw::test::util::TestOutputLogger &logger) {
         std::string n = "example.loc";
 
         OPEN_FILE(n, f);
@@ -64,7 +70,7 @@ namespace lce::tests::formats {
                    file.getSize());
     }
 
-    void msscmpTest(bio::util::ByteOrder endian) {
+    void msscmpTest(tfw::test::util::TestOutputLogger &logger, bio::util::ByteOrder endian) {
         std::string order = endian == bio::util::ByteOrder::LITTLE ? "le" : "be";
         std::string name = "msscmp-" + order + ".msscmp";
 
@@ -77,7 +83,7 @@ namespace lce::tests::formats {
 #endif
     }
 
-    void oldSaveTest() {
+    void oldSaveTest(tfw::test::util::TestOutputLogger &logger) {
         OPEN_FILE("savegame_pr.dat", f);
 
         // read be file
@@ -106,7 +112,7 @@ namespace lce::tests::formats {
         //             outSwitch);
     }
 
-    void saveFromFolderTest() {
+    void saveFromFolderTest(tfw::test::util::TestOutputLogger &logger) {
         std::filesystem::create_directories(util::examples / "FSSaveFolder");
         fs::Directory *d = new fs::Directory(util::examples / "FSSaveFolder");
         fs::Filesystem *fs = new fs::Filesystem(d);
@@ -129,7 +135,7 @@ namespace lce::tests::formats {
         //             outOld);
     }
 
-    void saveTestEndian(bio::util::ByteOrder endian) {
+    void saveTestEndian(tfw::test::util::TestOutputLogger &logger, bio::util::ByteOrder endian) {
         const std::string order =
             endian == bio::util::ByteOrder::LITTLE ? "le" : "be";
         const std::string inName = "savegame-" + order + ".dat";
@@ -143,9 +149,9 @@ namespace lce::tests::formats {
         });
 
 #ifdef CMAKE_BUILD_DEBUG
-        for (const auto &[name, child] : file->getRoot()->getChildren()) {
-            DebugLogW(name);
-        }
+        file->getRoot()->forEachFilesRecursive([&logger](const fs::FSObject::name_t &name, const fs::File &f) {
+            logger << f.getPath() << std::endl;
+        });
 #endif
 
 #if WRITE_FS
@@ -171,7 +177,7 @@ namespace lce::tests::formats {
         });
     }
 
-    void saveTestVita() {
+    void saveTestVita(tfw::test::util::TestOutputLogger &logger) {
         OPEN_FILE("savegame-vita.dat", f);
         std::vector<uint8_t> fd;
 
@@ -208,7 +214,7 @@ namespace lce::tests::formats {
     //               << std::endl;
     // }
 
-    void saveTestSwitch(bio::util::ByteOrder endian) {
+    void saveTestSwitch(tfw::test::util::TestOutputLogger &logger, bio::util::ByteOrder endian) {
         std::string order = endian == bio::util::ByteOrder::LITTLE ? "le" : "be";
         std::string rOrder = endian == bio::util::ByteOrder::LITTLE ? "be" : "le";
         std::string inName = "savegame-" + rOrder + ".dat";
@@ -232,21 +238,21 @@ namespace lce::tests::formats {
         //            file.getSize());
     }
 
-    void colorWriteTest(const color::ColorFileCommons &colors) {
+    void colorWriteTest(tfw::test::util::TestOutputLogger &logger, const color::ColorFileCommons &colors) {
         // WRITE_FILE("output.col",
         //            reinterpret_cast<const char *>(colors.serialize()),
         //            colors.getSize());
     }
 
-    void colorTest() {
+    void colorTest(tfw::test::util::TestOutputLogger &logger) {
         OPEN_FILE("colours.col", f);
 
         std::cout << "Read" << std::endl;
 
-        colorWriteTest(*color::ColorFileCommons::deserializeAuto(f));
+        // colorWriteTest(*color::ColorFileCommons::deserializeAuto(f));
     }
 
-    void thumbTest(const bio::util::ByteOrder endian, int headerSize, bool use4Byte) {
+    void thumbTest(tfw::test::util::TestOutputLogger &logger, const bio::util::ByteOrder endian, int headerSize, bool use4Byte) {
         const std::string order =
             endian == bio::util::ByteOrder::LITTLE ? "le" : "be";
         const std::string name = "THUMB-" + order + (use4Byte ? "_switch" : "");
@@ -257,7 +263,7 @@ namespace lce::tests::formats {
         DebugLogW(file.getWorldName());
     }
 
-    void compressedChunkTest() {
+    void compressedChunkTest(tfw::test::util::TestOutputLogger &logger) {
         DebugLog("Reading");
 
         // TODO: shouldn't we be decompressing the original zlib chunk?

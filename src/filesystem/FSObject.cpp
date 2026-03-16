@@ -13,37 +13,37 @@
 
 namespace lce::fs {
     void FSObject::remove() {
-        if (!mParent)
+        if (!m_parent)
             return;
 
         // I should probably find a better way of doing this
-        this->mParent->removeChild(mName);
-        this->mParent = nullptr;
+        this->m_parent->removeChild(m_name);
+        this->m_parent = nullptr;
     }
 
-    std::wstring FSObject::getPath() const {
+    FSObject::path_t FSObject::getPath() const {
         std::vector<const FSObject *> objs;
         const FSObject *c = this;
 
         while (c) {
             objs.push_back(c);
 
-            if (!c->mParent)
+            if (!c->m_parent)
                 break;
 
-            c = c->mParent;
+            c = c->m_parent;
         }
 
-        std::wostringstream oss;
+        FSObject::ostringstream_t oss;
 
         for (auto i = objs.rbegin(); i != objs.rend(); ++i) {
-            if (const FSObject *obj = *i; obj->mParent == nullptr) {
+            if (const FSObject *obj = *i; obj->m_parent == nullptr) {
                 oss << obj->getName(); // is parent is nullptr then we hit the
                                        // root directory
             } else {
-                if (std::wstring oName = obj->getName();
+                if (FSObject::name_t oName = obj->getName();
                     oName == Filesystem::ROOT ||
-                    obj->mParent->getName() == Filesystem::ROOT) {
+                    obj->m_parent->getName() == Filesystem::ROOT) {
                     oss << oName; // if parent is root or the current object is
                                   // root then we don't want double path
                                   // delimiters

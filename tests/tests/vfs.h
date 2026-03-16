@@ -3,36 +3,31 @@
 //
 #pragma once
 #include "util.h"
+#include <TestFramework/TestFramework.h>
 
 namespace lce::tests::vfs {
-    void runForEachRecursive();
-    void runForEachFilesOnlyRecursive();
-    void runForEachDirectoriesOnlyRecursive();
+    void runForEachRecursive(tfw::test::util::TestOutputLogger &logger);
+    void runForEachFilesOnlyRecursive(tfw::test::util::TestOutputLogger &logger);
+    void runForEachDirectoriesOnlyRecursive(tfw::test::util::TestOutputLogger &logger);
 
-    void runForEach();
-    void runForEachFilesOnly();
-    void runForEachDirectoriesOnly();
+    void runForEach(tfw::test::util::TestOutputLogger &logger);
+    void runForEachFilesOnly(tfw::test::util::TestOutputLogger &logger);
+    void runForEachDirectoriesOnly(tfw::test::util::TestOutputLogger &logger);
 
-    void createFileFromReal();
+    void createFileFromReal(tfw::test::util::TestOutputLogger &logger);
 
     inline void run() {
-        ADD_TEST(FOREACH_ALL, lce::tests::vfs::runForEach, util::types::VFS,
-                 "Foreach (All)");
-        ADD_TEST(FOREACH_FILES, lce::tests::vfs::runForEachFilesOnly,
-                 util::types::VFS, "Foreach (Files)");
-        ADD_TEST(FOREACH_DIRS, lce::tests::vfs::runForEachDirectoriesOnly,
-                 util::types::VFS, "Foreach (Directories)");
+        tfw::TestFramework *testFramework = tfw::TestFramework::getInstance();
 
-        ADD_TEST(FOREACH_ALL_RECURSE, lce::tests::vfs::runForEachRecursive,
-                 util::types::VFS, "Foreach (All, Recursive)");
-        ADD_TEST(FOREACH_FILES_RECURSE,
-                 lce::tests::vfs::runForEachFilesOnlyRecursive,
-                 util::types::VFS, "Foreach (Files, Recursive)");
-        ADD_TEST(FOREACH_DIRS_RECURSE,
-                 lce::tests::vfs::runForEachDirectoriesOnlyRecursive,
-                 util::types::VFS, "Foreach (Directories, Recursive)");
 
-        ADD_TEST(FILE_FROM_REAL_FILE, lce::tests::vfs::createFileFromReal,
-                 util::types::VFS, "Create file from real FS file");
+        testFramework->addTest(FOREACH_ALL, "Foreach (All)", lce::tests::vfs::runForEach);
+        testFramework->addTest(FOREACH_FILES, "Foreach (Files)", lce::tests::vfs::runForEachFilesOnly);
+        testFramework->addTest(FOREACH_DIRS, "Foreach (Directories)", lce::tests::vfs::runForEachDirectoriesOnly);
+
+        testFramework->addTest(FOREACH_ALL_RECURSE, "Foreach (All, Recursive)", lce::tests::vfs::runForEachRecursive);
+        testFramework->addTest(FOREACH_FILES_RECURSE, "Foreach (Files, Recursive)", lce::tests::vfs::runForEachFilesOnlyRecursive);
+        testFramework->addTest(FOREACH_DIRS_RECURSE, "Foreach (Directories, Recursive)", lce::tests::vfs::runForEachDirectoriesOnlyRecursive);
+
+        testFramework->addTest(FILE_FROM_REAL_FILE, "Create file from real FS file", lce::tests::vfs::createFileFromReal);
     }
 } // namespace lce::tests::vfs

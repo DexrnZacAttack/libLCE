@@ -105,9 +105,9 @@ namespace lce::msscmp {
                         // inside the FS class
 
             std::unique_ptr<BinkaFile> f = std::make_unique<BinkaFile>(
-                path.filename().wstring() + L".binka", d, sampleRate, nullptr);
+                path.filename().string() + ".binka", d, sampleRate, nullptr);
             fs::Directory *dir =
-                getOrCreateDirByPath(path.parent_path().wstring());
+                getOrCreateDirByPath(path.parent_path().string());
 
             dir->addChild(std::move(f));
         }
