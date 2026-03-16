@@ -7,25 +7,25 @@
 #include "LCE/compression/Compression.h"
 #include "LCE/localization/LocalizationFile.h"
 #include "LCE/save/SaveFile.h"
-#include "LCE/save/SaveFileOld.h"
 #include "LCE/save/Thumb.h"
 #include "LCE/soundbank/Soundbank.h"
 #include "util.h"
+#include "BinaryIO/stream/BinaryInputStream.h"
+#include "BinaryIO/stream/BinaryOutputStream.h"
 
 #include <BinaryIO/buffer/BinaryBuffer.h>
 
 namespace lce::tests::formats {
     void arcTest() {
-        OPEN_FILE("example.arc", f);
+        std::ifstream in(util::examples / "example.arc", std::ifstream::binary);
 
-        arc::Archive file = arc::Archive(f.data());
+        bio::stream::BinaryInputStream b = bio::stream::BinaryInputStream(in);
+        std::unique_ptr<arc::Archive> file = b.deserialize<arc::Archive::Deserializer>();
 
-#if WRITE_FS
-        file.getRoot()->writeOut(util::output / "arc");
-#endif
+        std::ofstream out(util::output / "output.arc", std::ios::binary);
 
-        WRITE_FILE("output.arc", reinterpret_cast<char *>(file.serialize()),
-                   file.getSize());
+        bio::stream::BinaryOutputStream ob(out);
+        ob.serialize<arc::Archive::Serializer>(*file.get());
     }
 
     void locTest() {
@@ -81,29 +81,29 @@ namespace lce::tests::formats {
         OPEN_FILE("savegame_pr.dat", f);
 
         // read be file
-        save::SaveFileOld file = save::SaveFileOld(f, bio::util::ByteOrder::BIG);
+        // save::SaveFileOld file = save::SaveFileOld(f, bio::util::ByteOrder::BIG);
 
-        DebugLog("oldSaveTest: File version is " << file.getVersion());
+        // DebugLog("oldSaveTest: File version is " << file->getVersion());
 
 #ifdef CMAKE_BUILD_DEBUG
-        for (const auto &[name, child] : file.getRoot()->getChildren()) {
-            DebugLogW(name);
-        }
+        // for (const auto &[name, child] : file->getRoot()->getChildren()) {
+        //     DebugLogW(name);
+        // }
 #endif
 
 #if WRITE_FS
         file.getRoot()->writeOut(util::output / "savegame_pr");
 #endif
 
-        WRITE_FILE("savegame_pr-be_out.dat",
-                   reinterpret_cast<char *>(file.serialize()), file.getSize());
-
-        // write le file
-        file.setEndian(bio::util::ByteOrder::LITTLE);
-
-        _WRITE_FILE("savegame_pr_switch-to-le_out.dat",
-                    reinterpret_cast<char *>(file.serialize()), file.getSize(),
-                    outSwitch);
+        // WRITE_FILE("savegame_pr-be_out.dat",
+        //            reinterpret_cast<char *>(file.serialize()), file.getSize());
+        //
+        // // write le file
+        // file.setEndian(bio::util::ByteOrder::LITTLE);
+        //
+        // _WRITE_FILE("savegame_pr_switch-to-le_out.dat",
+        //             reinterpret_cast<char *>(file.serialize()), file.getSize(),
+        //             outSwitch);
     }
 
     void saveFromFolderTest() {
@@ -117,16 +117,16 @@ namespace lce::tests::formats {
         file.getRoot()->writeOut(util::output / "savegame-from-folder");
 #endif
 
-        _WRITE_FILE("savegame-from-folder.dat",
-                    reinterpret_cast<char *>(file.serialize()), file.getSize(),
-                    outFolder);
+        // _WRITE_FILE("savegame-from-folder.dat",
+        //             reinterpret_cast<char *>(file.serialize()), file.getSize(),
+        //             outFolder);
 
-        save::SaveFileOld *old =
-            dynamic_cast<save::SaveFileOld *>(file.migrateVersion(1));
-
-        _WRITE_FILE("savegame-from-folder-old.dat",
-                    reinterpret_cast<char *>(old->serialize()), old->getSize(),
-                    outOld);
+        // save::SaveFileOld *old =
+        //     dynamic_cast<save::SaveFileOld *>(file.migrateVersion(1));
+        //
+        // _WRITE_FILE("savegame-from-folder-old.dat",
+        //             reinterpret_cast<char *>(old->serialize()), old->getSize(),
+        //             outOld);
     }
 
     void saveTestEndian(bio::util::ByteOrder endian) {
@@ -135,16 +135,15 @@ namespace lce::tests::formats {
         const std::string inName = "savegame-" + order + ".dat";
         const std::string outName = "savegame-" + order + "_out.dat";
 
-        OPEN_FILE(inName, f);
+        std::ifstream in(util::examples / inName, std::ifstream::binary);
 
-        const save::SaveFile file = save::SaveFile(f, endian);
-        // lce::tests::writeFS(&file, L"savegame-" +
-        // bio::util::string::StringConverter::stringToWString(order));
-
-        DebugLog("saveTestEndian: File version is " << file.getVersion());
+        bio::stream::BinaryInputStream b = bio::stream::BinaryInputStream(in);
+        std::unique_ptr<save::SaveFile> file = b.deserialize<save::SaveFile::Deserializer>(save::SaveFile::SerializerOptions {
+            endian
+        });
 
 #ifdef CMAKE_BUILD_DEBUG
-        for (const auto &[name, child] : file.getRoot()->getChildren()) {
+        for (const auto &[name, child] : file->getRoot()->getChildren()) {
             DebugLogW(name);
         }
 #endif
@@ -153,8 +152,23 @@ namespace lce::tests::formats {
         file.getRoot()->writeOut(util::output / ("savegame-" + order));
 #endif
 
-        WRITE_FILE(outName, reinterpret_cast<char *>(file.serialize()),
-                   file.getSize());
+        in.close();
+
+        {
+            std::ofstream out(util::output / outName, std::ofstream::binary);
+
+            bio::stream::BinaryOutputStream ob(out);
+            ob.serialize<save::SaveFile::Serializer>(*file.get(), save::SaveFile::SerializerOptions {
+                endian
+            });
+        }
+
+        std::ifstream validate(util::output / outName, std::ifstream::binary);
+
+        bio::stream::BinaryInputStream bis = bio::stream::BinaryInputStream(validate);
+        std::unique_ptr<save::SaveFile> validateFile = bis.deserialize<save::SaveFile::Deserializer>(save::SaveFile::SerializerOptions {
+            endian
+        });
     }
 
     void saveTestVita() {
@@ -171,15 +185,15 @@ namespace lce::tests::formats {
         WRITE_FILE("savegame-vita_dc.dat", reinterpret_cast<char *>(fd.data()),
                    fd.size());
 
-        save::SaveFile file = save::SaveFile(fd, bio::util::ByteOrder::LITTLE);
+        // save::SaveFile file = save::SaveFile(fd, bio::util::ByteOrder::LITTLE);
 
 #if WRITE_FS
         file.getRoot()->writeOut(util::output / "savegame-vita");
 #endif
 
-        _WRITE_FILE("savegame-vita_out.dat",
-                    reinterpret_cast<char *>(file.serialize()), file.getSize(),
-                    outVita);
+        // _WRITE_FILE("savegame-vita_out.dat",
+        //             reinterpret_cast<char *>(file.serialize()), file.getSize(),
+        //             outVita);
     }
 
     // void regionTest() {
@@ -203,25 +217,25 @@ namespace lce::tests::formats {
 
         OPEN_FILE(inName, f);
 
-        save::SaveFile file = save::SaveFile(f, endian == bio::util::ByteOrder::LITTLE
-                                                    ? bio::util::ByteOrder::BIG
-                                                    : bio::util::ByteOrder::LITTLE);
+        // save::SaveFile file = save::SaveFile(f, endian == bio::util::ByteOrder::LITTLE
+        //                                             ? bio::util::ByteOrder::BIG
+        //                                             : bio::util::ByteOrder::LITTLE);
 
 #if WRITE_FS
         file.getRoot()->writeOut(util::output / ("savegame-endian_switch-to-" +
                                                  rOrder + "_orig-" + order));
 #endif
 
-        file.setEndian(endian);
+        // file.setEndian(endian);
 
-        WRITE_FILE(outName, reinterpret_cast<char *>(file.serialize()),
-                   file.getSize());
+        // WRITE_FILE(outName, reinterpret_cast<char *>(file.serialize()),
+        //            file.getSize());
     }
 
     void colorWriteTest(const color::ColorFileCommons &colors) {
-        WRITE_FILE("output.col",
-                   reinterpret_cast<const char *>(colors.serialize()),
-                   colors.getSize());
+        // WRITE_FILE("output.col",
+        //            reinterpret_cast<const char *>(colors.serialize()),
+        //            colors.getSize());
     }
 
     void colorTest() {

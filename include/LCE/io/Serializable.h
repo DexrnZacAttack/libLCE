@@ -18,7 +18,9 @@ namespace lce::io {
          * @see getSize() - Used to get the size of the serialized data
          * @returns The serialized object
          */
-        virtual std::uint8_t *serialize() const = 0;
+        virtual std::uint8_t *serialize() const {
+            return nullptr;
+        }
 
         /** Gets the size of the serialized data */
         virtual size_t getSize() const = 0;

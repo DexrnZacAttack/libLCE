@@ -91,25 +91,27 @@ namespace lce::fs {
         return c;
     }
 
-    void Filesystem::windowsToUnixDelimiter(std::wstring &name) {
-        for (wchar_t &c : name) {
-            if (c == L'\\') {
-                c = L'/';
-            }
-        }
+    std::wstring Filesystem::windowsToUnixDelimiter(const std::wstring &name) {
+        std::wstring n(name);
+        std::ranges::replace_if(n, [](const wchar_t &c) {
+            return c == L'\\';
+        }, L'/');
+
+        return n;
     }
 
-    void Filesystem::unixToWindowsDelimiter(std::wstring &name) {
-        for (wchar_t &c : name) {
-            if (c == L'/') {
-                c = L'\\';
-            }
-        }
+    std::wstring Filesystem::unixToWindowsDelimiter(const std::wstring &name) {
+        std::wstring n(name);
+        std::ranges::replace_if(n, [](const wchar_t &c) {
+            return c == L'/';
+        }, L'\\');
+
+        return n;
     }
 
     FSObject *
     Filesystem::createFileRecursive(const std::wstring &path,
                                     const std::vector<uint8_t> &data) const {
-        return getRoot()->createFileRecursive(path, data);
+        return getRoot()->createFileRecursive(path, std::move(data));
     }
 } // namespace lce::fs

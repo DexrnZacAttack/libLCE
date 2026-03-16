@@ -70,7 +70,7 @@ BEGIN
             VALUE "FileDescription", "C++ Library for Minecraft: Legacy Console Edition file formats"
             VALUE "FileVersion", LIBLCE_VERSION
             VALUE "InternalName", "libLCE"
-            VALUE "LegalCopyright", "Copyright (C) 2025 DexrnZacAttack"
+            VALUE "LegalCopyright", "Copyright (C) 2026 DexrnZacAttack"
             VALUE "OriginalFilename", "LCE.dll"
             VALUE "ProductName", "libLCE"
             VALUE "ProductVersion", LIBLCE_VERSION

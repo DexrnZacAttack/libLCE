@@ -8,12 +8,23 @@
 namespace lce::util {
     class StringUtilities {
       public:
-        static void trimEndNullBytes(std::wstring &in);
+        template <typename CharT>
+        constexpr static std::basic_string<CharT> trimEndNullBytes(const std::basic_string_view<CharT> &in) {
+            size_t len = in.size();
+            while (len && in[len - 1] == 0)
+                --len;
 
-        class View {
-          public:
-            static std::wstring_view trimEndNullBytes(const std::wstring &in);
-        };
+            return std::basic_string(in.begin(), in.begin() + len);
+        }
+
+        template <typename CharT>
+        constexpr static std::basic_string_view<CharT> nullBytesTrimmedView(const std::basic_string_view<CharT> &in) {
+            size_t len = in.size();
+            while (len && in[len - 1] == 0)
+                --len;
+
+            return std::basic_string_view(in.begin(), in.begin() + len);
+        }
     };
 } // namespace lce::util
 

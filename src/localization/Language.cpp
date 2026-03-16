@@ -7,42 +7,41 @@
 namespace lce::loc {
 
     Language::Language(bio::buffer::BinaryBuffer &io, std::vector<uint32_t> &keys)
-        : mKeys(&keys) {
+        : m_keys(&keys) {
         // could be a version?
-        this->mShouldReadByte = io.readBE<uint32_t>();
+        this->m_shouldReadByte = io.readBE<uint32_t>();
 
-        this->mUnk = 0;
-        if (mShouldReadByte > 0)
-            this->mUnk = io.readByte();
+        this->m_unk = 0;
+        if (m_shouldReadByte > 0)
+            this->m_unk = io.readByte();
 
-        this->mName = io.readString(io.readBE<uint16_t>());
+        this->m_name = io.readStringWithLength<char>(bio::util::ByteOrder::BIG, bio::util::string::StringLengthEncoding::NULL_TERMINATE);
 
         const uint32_t c = io.readBE<uint32_t>();
 
-        if (mKeys->size() < c)
-            mKeys->reserve(c);
+        if (m_keys->size() < c)
+            m_keys->reserve(c);
 
-        mStrings.reserve(c);
+        m_strings.reserve(c);
         for (int s = 0; s < c; s++) {
-            if (s >= mKeys->size()) {
-                mKeys->push_back(s);
+            if (s >= m_keys->size()) {
+                m_keys->push_back(s);
             }
 
-            const uint32_t ss = io.readBE<uint16_t>();
-            mStrings.emplace(keys[s], io.readString(ss));
+            m_strings.emplace(keys[s], io.readStringWithLength<char>(bio::util::ByteOrder::BIG, bio::util::string::StringLengthEncoding::NULL_TERMINATE));
         }
     }
 
     size_t Language::getSize() const {
         uint32_t size = 0;
 
-        size += sizeof(mShouldReadByte);
-        if (mShouldReadByte > 0)
-            size += sizeof(mUnk);
-        size += sizeof(uint16_t) + mName.size();
+        size += sizeof(m_shouldReadByte);
+        if (m_shouldReadByte > 0)
+            size += sizeof(m_unk);
+        size += sizeof(uint16_t) + m_name.size();
         size += sizeof(uint32_t);
 
-        for (const auto &[id, str] : this->mStrings) {
+        for (const auto &[id, str] : this->m_strings) {
             size += sizeof(uint16_t) + str.size();
         }
 
@@ -54,19 +53,17 @@ namespace lce::loc {
         uint8_t *data = new uint8_t[fileSize];
         bio::buffer::BinaryBuffer io(data);
 
-        io.writeBE<uint32_t>(mShouldReadByte);
-        if (mShouldReadByte > 0)
-            io.writeByte(mUnk);
+        io.writeBE<uint32_t>(m_shouldReadByte);
+        if (m_shouldReadByte > 0)
+            io.writeByte(m_unk);
 
-        io.writeBE<uint16_t>(mName.size());
-        io.writeString(mName, false);
+        io.writeString<char>(m_name, bio::util::ByteOrder::BIG, bio::util::string::StringLengthEncoding::LENGTH_PREFIX);
 
-        io.writeBE<uint32_t>(mStrings.size());
-        for (const uint32_t k : *this->mKeys) {
-            const auto &s = this->mStrings.find(k);
+        io.writeBE<uint32_t>(m_strings.size());
+        for (const uint32_t k : *this->m_keys) {
+            const auto &s = this->m_strings.find(k);
 
-            io.writeBE<uint16_t>(s->second.size());
-            io.writeString(s->second, false);
+            io.writeString<char>(s->second, bio::util::ByteOrder::BIG, bio::util::string::StringLengthEncoding::LENGTH_PREFIX);
         }
 
         return io.begin();
@@ -77,16 +74,16 @@ namespace lce::loc {
     }
 
     std::unordered_map<uint32_t, std::string> &Language::getStrings() {
-        return this->mStrings;
+        return this->m_strings;
     }
 
-    const std::string &Language::getName() const { return this->mName; }
+    const std::string &Language::getName() const { return this->m_name; }
 
     void Language::setString(const uint32_t id, const std::string &str) {
-        if (!mStrings.count(id))
+        if (!m_strings.count(id))
             throw std::runtime_error("String has does not exist in map");
 
-        this->mStrings[id] = std::move(str);
+        this->m_strings[id] = std::move(str);
     }
 
     uint32_t Language::setString(const std::string &id,
@@ -97,24 +94,24 @@ namespace lce::loc {
         return h;
     }
 
-    std::string &Language::getString(const uint32_t id) { return mStrings[id]; }
+    std::string &Language::getString(const uint32_t id) { return m_strings[id]; }
 
     std::string &Language::getString(const std::string &id) {
         return getString(std::hash<std::string>{}(id));
     }
 
     uint32_t Language::addString(const std::string &str, const uint32_t &hash) {
-        if (mStrings.count(hash))
+        if (m_strings.count(hash))
             throw std::runtime_error("String hash already exists in map");
 
-        mStrings[hash] = std::move(str);
+        m_strings[hash] = std::move(str);
 
         return hash;
     }
 
-    uint8_t Language::getUnk() const { return this->mUnk; }
+    uint8_t Language::getUnk() const { return this->m_unk; }
 
     uint32_t Language::getShouldReadByte() const {
-        return this->mShouldReadByte;
+        return this->m_shouldReadByte;
     }
 } // namespace lce::loc

@@ -1,172 +1,65 @@
 //
-// Created by DexrnZacAttack on 12/19/2024.
+// Created by DexrnZacAttack on 12/21/2024.
 //
-
-#include "save/SaveFileOld.h"
-
-#include <chrono>
-#include <stack>
-#include <vector>
-
-#include "save/SaveFile.h"
-
-#include "BinaryIO/util/string/StringConverter.h"
-#include "util/StringUtilities.h"
 
 #include <BinaryIO/buffer/BinaryBuffer.h>
 
+#include "LCE/save/SaveFile.h"
+
 namespace lce::save {
-    SaveFile::SaveFile(const bio::util::ByteOrder byteOrder,
-                       const uint16_t origVersion, const uint16_t version)
-        : SaveFileCommons(byteOrder, origVersion, version) {}
+    size_t SaveFile::getSize() const {
+        uint64_t size = HEADER_SIZE +
+            (getRoot()->getFileCount() *
+             getIndexEntrySize()); // for each index entry there is 144 bytes
+                                   // (136 bytes with old save file format)
+        size += this->getRoot()->getSize();
 
-    SaveFile::SaveFile(const Filesystem &fs,
-                       const bio::util::ByteOrder byteOrder,
-                       const uint16_t origVersion, const uint16_t version)
-        : SaveFileCommons(fs, byteOrder, origVersion, version) {};
+        return size;
+    }
 
-    /**
-     * Reads a save file from a pointer to the data
-     * @param data The data you want to read (a save file)
-     * @param byteOrder The endianness of the data being read
-     */
-    SaveFile::SaveFile(std::vector<uint8_t> data,
-                       bio::util::ByteOrder byteOrder) {
-        this->mByteOrder = byteOrder;
+    uint32_t SaveFile::calculateIndexOffset() const {
+        return HEADER_SIZE + this->getRoot()->getSize();
+    }
+
+    SaveFile *
+    SaveFile::deserializeAuto(std::vector<uint8_t> &data) {
+        // const bio::util::ByteOrder e = detectByteOrder(data);
+        //
+        // if (const uint16_t v = getVersionFromData(data, e); v > B0033)
+        //     return new SaveFile(data, e);
+        //
+        // return new SaveFileOld(data, e);
+
+        return new SaveFile(1, 1);
+    }
+
+    uint16_t
+    SaveFile::getVersionFromData(std::vector<uint8_t> &data,
+                                        const bio::util::ByteOrder byteOrder) {
         bio::buffer::BinaryBuffer io(data.data());
-
-        const uint32_t indexOffset = io.read<uint32_t>(this->mByteOrder);
-
-        if (indexOffset > data.size())
-            throw std::runtime_error("Index offset points to an area that is "
-                                     "out of bounds of the data given.");
-
-        DebugLog("" << io.getOffset());
-        const uint32_t fileCount = io.read<uint32_t>(this->mByteOrder);
-
-        if (fileCount >
-            (0xFFFFFFFF - HEADER_SIZE) / this->SaveFile::getIndexEntrySize())
-            throw std::runtime_error("File count (" +
-                                     std::to_string(fileCount) +
-                                     ") makes the file too big for it's index "
-                                     "offset to stored in a 32-bit integer.");
-
-        this->mOriginalVersion = io.read<uint16_t>(this->mByteOrder);
-        this->mVersion = io.read<uint16_t>(this->mByteOrder);
-
-        if (this->mVersion <= B0033) {
-            throw std::runtime_error("Version mismatch, got version " +
-                                     std::to_string(this->mVersion) + ".");
-        }
-
-        DebugLog("Index offset: " << indexOffset);
-        DebugLog("Index file count: " << fileCount);
-        DebugLog("Version: " << this->mVersion);
-        DebugLog("Orig version: " << this->mOriginalVersion);
-
-        for (int i = 0; i < fileCount; ++i) {
-            io.seek(indexOffset + (SaveFile::getIndexEntrySize() * i));
-            // read the index entry
-
-            std::wstring name =
-                bio::util::string::StringConverter::u16stringToWstring(
-                    io.readU16String(64, this->mByteOrder));
-            lce::util::StringUtilities::trimEndNullBytes(name);
-
-            const uint32_t size = io.read<uint32_t>(this->mByteOrder);
-            const uint32_t offset = io.read<uint32_t>(this->mByteOrder);
-            const uint64_t modifiedTimestamp =
-                io.read<uint64_t>(this->mByteOrder); // unused for now
-
-            // read the data, maybe should be changed
-            io.seek(offset);
-
-            std::vector<uint8_t> d;
-            d.resize(size);
-            io.readInto(d.data(), size);
-
-            // create the file
-            (void)this->createFileRecursive(name, d);
-        }
+        io.seek(10);
+        return io.read<uint16_t>(byteOrder);
     }
 
-    /**
-     * Writes the save file
-     * @return Pointer to the save file
-     */
-    uint8_t *SaveFile::serialize() const {
-        bio::buffer::BinaryBuffer io(this->getSize());
-        const fs::Directory *root = getRoot();
-
-        uint32_t indexOffset = calculateIndexOffset();
-
-        if (indexOffset > 0xFFFFFFFF - HEADER_SIZE)
-            throw std::runtime_error(
-                "Index offset is too big to be stored in a 32-bit integer.");
-
-        io.write<uint32_t>(0, this->mByteOrder);
-        io.write<uint32_t>(root->getFileCount(), this->mByteOrder);
-        io.write<uint16_t>(this->mOriginalVersion, this->mByteOrder);
-        io.write<uint16_t>(this->mVersion, this->mByteOrder);
-
-        size_t i = 0;
-        root->forEachFilesRecursive([&i, &io, &indexOffset,
-                                     this](const std::wstring &name,
-                                           const fs::File &innerFile) {
-            const std::wstring path = innerFile.getPath().substr(1);
-
-            const uint32_t offset = io.getOffset();
-
-            io.writeBytes(innerFile.begin().data(), innerFile.getSize());
-
-            const size_t last = io.getOffset();
-
-            io.seek(indexOffset + (getIndexEntrySize() * i));
-
-            std::u16string n =
-                bio::util::string::StringConverter::wstringToU16string(path);
-
-            if (path.length() > 64) {
-                std::wcerr << L"Filename '" << path
-                           << L"' is too long. The path will be truncated, "
-                              L"however this may cause weird paths, invalid "
-                              L"names, or other issues in the output file."
-                           << std::endl;
-            }
-            n.resize(64);
-
-            io.writeU16String(n, this->mByteOrder, false);
-            io.write<uint32_t>(innerFile.getSize(), this->mByteOrder);
-            io.write<uint32_t>(offset, this->mByteOrder);
-            io.write<uint64_t>(innerFile.getModifiedTimestamp(),
-                               this->mByteOrder);
-
-            io.seek(last);
-            i++;
-        });
-
-        io.seek(0);
-        io.write<uint32_t>(indexOffset, this->mByteOrder);
-
-        return io.begin();
+    uint16_t SaveFile::getOriginalVersion() const {
+        return this->m_originalVersion;
     }
 
-    SaveFileCommons *SaveFile::migrateVersion(const uint16_t version) {
-        uint16_t originalVersion;
-        if (version > TU5)
-            originalVersion = this->mVersion;
-        else
-            originalVersion = 0;
+    uint16_t SaveFile::getVersion() const { return this->m_version; }
 
-        if (version != B0033) {
-            this->setVersion(version);
-            this->setOriginalVersion(originalVersion);
+    void SaveFile::setOriginalVersion(const uint16_t version) {
+        this->m_originalVersion = version;
+    }
 
-            return this;
+    void SaveFile::setVersion(const uint16_t version) {
+        this->m_version = version;
+    }
+
+    size_t SaveFile::getIndexEntrySize() const {
+        if (this->m_version <= B0033) {
+            return SaveFile::OLD_FILE_ENTRY_SIZE;
         }
 
-        return new SaveFileOld(*this, this->mByteOrder, originalVersion,
-                               version);
+        return SaveFile::FILE_ENTRY_SIZE;
     }
-
 } // namespace lce::save

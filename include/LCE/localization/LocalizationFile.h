@@ -64,9 +64,9 @@ namespace lce::loc {
 
         void renameLanguage(const std::string &name, const std::string &n);
 
-        size_t getLanguageCount() const { return this->mLanguages.size(); };
+        size_t getLanguageCount() const { return this->m_languages.size(); };
 
-        size_t getStringCount() const { return this->mKeys.size(); };
+        size_t getStringCount() const { return this->m_keys.size(); };
 
         /** Nicer looking way to get data-driven strings
          * This only works properly if you use the setString(const std::string
@@ -93,12 +93,12 @@ namespace lce::loc {
         uint32_t getVersion() const;
 
       private:
-        uint32_t mVersion;
+        uint32_t m_version;
 
-        bool mUseUIDs;
-        std::vector<uint32_t> mKeys;
+        bool m_useUniqueIds;
+        std::vector<uint32_t> m_keys;
 
-        std::unordered_map<Language::Id, Language> mLanguages;
+        std::unordered_map<Language::Id, Language> m_languages;
     };
 } // namespace lce::loc
 

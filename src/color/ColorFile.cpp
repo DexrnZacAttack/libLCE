@@ -11,16 +11,14 @@ namespace lce::color {
 
         const uint32_t colorCount = io.readBE<uint32_t>();
         for (uint32_t i = 0; i < colorCount; i++) {
-            const uint16_t l = io.readBE<uint16_t>();
-            std::string name = io.readString(l);
+            std::string name = io.readStringWithLength<char>(bio::util::ByteOrder::BIG, bio::util::string::StringLengthEncoding::LENGTH_PREFIX);
 
             this->mColors.emplace(name, Color(io));
         }
 
         const uint32_t worldColorCount = io.readBE<uint32_t>();
         for (uint32_t i = 0; i < worldColorCount; i++) {
-            const uint16_t l = io.readBE<uint16_t>();
-            std::string name = io.readString(l);
+            std::string name = io.readStringWithLength<char>(bio::util::ByteOrder::BIG, bio::util::string::StringLengthEncoding::LENGTH_PREFIX);
 
             this->mWorldColors.emplace(name, WorldColor(io));
         }
@@ -68,8 +66,7 @@ namespace lce::color {
         io.writeBE<uint32_t>(this->mColors.size());
 
         for (auto [name, color] : this->mColors) {
-            io.writeBE<uint16_t>(name.size());
-            io.writeString(name, false);
+            io.writeString<char>(name, bio::util::ByteOrder::BIG, bio::util::string::StringLengthEncoding::LENGTH_PREFIX);
 
             io.writeBytes(color.serialize(), color.getSize());
         }
@@ -77,8 +74,7 @@ namespace lce::color {
         io.writeBE<uint32_t>(this->mWorldColors.size());
 
         for (auto [name, color] : this->mWorldColors) {
-            io.writeBE<uint16_t>(name.size());
-            io.writeString(name, false);
+            io.writeString<char>(name, bio::util::ByteOrder::BIG, bio::util::string::StringLengthEncoding::LENGTH_PREFIX);
 
             io.writeBytes(color.serialize(), color.getSize());
         }

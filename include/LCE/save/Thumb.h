@@ -39,9 +39,9 @@ namespace lce::save {
         void setImage(std::vector<uint8_t> image);
 
       protected:
-        std::wstring mName;
-        std::unordered_map<std::string, std::string> mProperties;
-        std::vector<uint8_t> mImage;
+        std::wstring m_name;
+        std::unordered_map<std::string, std::string> m_properties;
+        std::vector<uint8_t> m_image;
     };
 
 } // namespace lce::save

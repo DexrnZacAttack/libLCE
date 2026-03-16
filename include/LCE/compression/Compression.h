@@ -29,15 +29,14 @@ namespace lce::compression {
              * Only used on Xbox 360 Edition
              */
             LZX,
-            /** Propriatary RLE only used for modern region files (split saves)
-             **/
+            /** Proprietary RLE only used for modern region files (split saves) */
             SPLIT_SAVE,
-            /** Propriatary RLE only used for compressing chunks (which usually
+            /** Proprietary RLE only used for compressing chunks (which usually
                have 2 layers of compression not including region & save file
                compression)
              */
             CHUNK,
-            /** Propriatary RLE only used on PlayStation Vita Edition */
+            /** Proprietary RLE only used on PlayStation Vita Edition */
             VITA,
             /** [Deflate](https://en.wikipedia.org/wiki/Deflate)
              *

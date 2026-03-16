@@ -14,18 +14,18 @@ namespace lce::save {
     Thumb::Thumb(std::vector<uint8_t> data,
                  const bio::util::ByteOrder byteOrder, const int headerSize,
                  const bool use4ByteWideChar) {
-        this->mName = L"New World"; // default name
+        this->m_name = L"New World"; // default name
 
         if (headerSize != 0) {
             bio::buffer::BinaryBuffer io((data.data()));
             if (!use4ByteWideChar) {
-                this->mName =
+                this->m_name =
                     bio::util::string::StringConverter::u16stringToWstring(
-                        io.readU16StringNT(byteOrder));
+                        io.readStringWithLength<char16_t>(byteOrder, bio::util::string::StringLengthEncoding::NULL_TERMINATE));
             } else {
-                this->mName =
+                this->m_name =
                     bio::util::string::StringConverter::u32stringToWstring(
-                        io.readU32StringNT(byteOrder));
+                    io.readStringWithLength<char32_t>(byteOrder, bio::util::string::StringLengthEncoding::NULL_TERMINATE));
             }
         }
 
@@ -43,30 +43,30 @@ namespace lce::save {
             std::cout << "decode error: " << err << ": "
                       << lodepng_error_text(err) << std::endl;
 
-        this->mImage = pixels;
+        this->m_image = pixels;
 
         for (int t = 0; t < state.info_png.text_num; t++) {
-            this->mProperties.emplace(state.info_png.text_keys[t],
+            this->m_properties.emplace(state.info_png.text_keys[t],
                                       state.info_png.text_strings[t]);
         }
     }
 
-    std::wstring Thumb::getWorldName() const { return this->mName; }
+    std::wstring Thumb::getWorldName() const { return this->m_name; }
 
-    void Thumb::setWorldName(const std::wstring &name) { this->mName = name; }
+    void Thumb::setWorldName(const std::wstring &name) { this->m_name = name; }
 
     std::unordered_map<std::string, std::string> Thumb::getProperties() const {
-        return this->mProperties;
+        return this->m_properties;
     }
 
     void Thumb::setProperties(
         std::unordered_map<std::string, std::string> properties) {
-        this->mProperties = std::move(properties);
+        this->m_properties = std::move(properties);
     }
 
-    std::vector<uint8_t> Thumb::getImage() const { return this->mImage; }
+    std::vector<uint8_t> Thumb::getImage() const { return this->m_image; }
 
     void Thumb::setImage(std::vector<uint8_t> image) {
-        this->mImage = std::move(image);
+        this->m_image = std::move(image);
     }
 } // namespace lce::save

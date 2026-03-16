@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.26)
 project(LCE VERSION 2.0.0)
 
-set(VERSION_SUFFIX "-dev.4") # used for non-stable versions
-set(CMAKE_CXX_STANDARD 17)
+set(VERSION_SUFFIX "-dev.5") # used for non-stable versions
+set(CMAKE_CXX_STANDARD 20)
 
 message(STATUS "${CMAKE_SYSTEM_PROCESSOR}")
 
@@ -10,7 +10,7 @@ include(FetchContent)
 FetchContent_Declare(
         bio
         GIT_REPOSITORY https://codeberg.org/Dexrn/libBIO.git
-        GIT_TAG 3.1.0
+        GIT_TAG 4.0.0-dev.3
 )
 FetchContent_MakeAvailable(bio)
 
@@ -48,8 +48,6 @@ set(HEADERS
         include/LCE/libLCEExports.h
         # Save
         include/LCE/save/SaveFile.h
-        include/LCE/save/SaveFileOld.h
-        include/LCE/save/SaveFileCommons.h
         include/LCE/save/Thumb.h
         # IO
         include/LCE/io/Serializable.h
@@ -87,8 +85,6 @@ set(FILES
         src/localization/LocalizationFile.cpp
         src/localization/Language.cpp
         src/soundbank/Soundbank.cpp
-        src/save/SaveFileOld.cpp
-        src/save/SaveFileCommons.cpp
         src/compression/Compression.cpp
         src/save/Thumb.cpp
         src/filesystem/FSObject.cpp
@@ -107,13 +103,12 @@ if (ENABLE_OPTIMIZATIONS STREQUAL "ON")
 endif ()
 unset(ENABLE_OPTIMIZATIONS CACHE)
 
-if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-    add_compile_options(
-            "-D_GLIBCXX_DEBUG"
-    )
-endif ()
+#if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+#    add_compile_options(
+#            "-D_GLIBCXX_DEBUG"
+#    )
+#endif ()
 
-set(ENVIRONMENT_TYPE "Native")
 set(LIB_TYPE SHARED)
 add_library(LCE ${LIB_TYPE} ${HEADERS} ${FILES} ${LODEPNG_FILES} ${ZLIB_FILES})
 
@@ -129,7 +124,8 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/tests EXCLUDE_FROM_ALL)
 # me: "why don't we use c++20 for std::endian?"
 # them: "c++20 is in my nightmares"
 
-target_link_libraries(LCE PRIVATE bio)
+target_compile_features(bio PRIVATE cxx_std_20)
+target_link_libraries(LCE PUBLIC bio-cpp20)
 
 target_compile_definitions(LCE PUBLIC
         LIBLCE_COMPILER_NAME="${CMAKE_CXX_COMPILER_ID}"

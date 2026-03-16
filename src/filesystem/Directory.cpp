@@ -27,20 +27,20 @@ namespace lce::fs {
                 std::vector<uint8_t> out(std::filesystem::file_size(o.path()));
                 name.read(reinterpret_cast<char *>(out.data()), out.size());
 
-                createFileRecursive(a, out);
+                createFileRecursive(a, std::move(out));
             }
         }
     }
 
     File *Directory::createFile(const std::wstring &name,
-                                const std::vector<uint8_t> &data) {
+                                const std::vector<uint8_t> &&data) {
         // should we except instead of just returning?
         if (children.count(name))
             return nullptr; // file exists already... can't have 2 of them
                             // (although we are NOT case-insensitive)
 
         std::unique_ptr<File> f =
-            std::unique_ptr<File>(new File(name, data, this));
+            std::unique_ptr<File>(new File(name, std::move(data), this));
 
         File *ptr = f.get();
         children[name] = std::move(f);
@@ -49,7 +49,7 @@ namespace lce::fs {
     }
 
     FSObject *Directory::createFileRecursive(const std::wstring &path,
-                                             const std::vector<uint8_t> &data) {
+                                             const std::vector<uint8_t> &&data) {
         if (path.empty())
             return nullptr;
 
@@ -66,7 +66,7 @@ namespace lce::fs {
 
             if (!child) {
                 if (ss.eof())
-                    return current->createFile(name, data);
+                    return current->createFile(name, std::move(data));
 
                 current = current->createDirectory(name);
             } else {
@@ -200,7 +200,7 @@ namespace lce::fs {
     bool Directory::addChild(std::unique_ptr<FSObject> child) {
         const std::wstring name = child->getName();
 
-        if (children.count(name))
+        if (children.contains(name))
             return false; // exists
 
         child->mParent = this;

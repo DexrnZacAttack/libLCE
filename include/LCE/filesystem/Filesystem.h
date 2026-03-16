@@ -57,9 +57,9 @@ namespace lce::fs {
                                       const std::vector<uint8_t> &data) const;
 
         /// Converts Windows' path delimiters ("\") to Unix's ("/")
-        static void windowsToUnixDelimiter(std::wstring &name);
+        static std::wstring windowsToUnixDelimiter(const std::wstring &name);
         /// Converts Unix's path delimiters ("/") to Windows' ("\")
-        static void unixToWindowsDelimiter(std::wstring &name);
+        static std::wstring unixToWindowsDelimiter(const std::wstring &name);
 
         [[nodiscard]] virtual std::wstring toString() const {
             return L"Filesystem[fileCount=" +

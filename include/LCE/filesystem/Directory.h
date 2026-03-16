@@ -57,9 +57,9 @@ namespace lce::fs {
          * @param data The data that the file will hold
          */
         File *createFile(const std::wstring &name,
-                         const std::vector<uint8_t> &data);
+                         const std::vector<uint8_t> &&data);
         FSObject *createFileRecursive(const std::wstring &path,
-                                      const std::vector<uint8_t> &data);
+                                      const std::vector<uint8_t> &&data);
         /** Creates a directory with the specified name
          *
          * @param name The name you'd like to give to the newly created

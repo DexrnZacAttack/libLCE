@@ -16,40 +16,40 @@ namespace lce::loc {
     LocalizationFile::LocalizationFile(
         const uint32_t version,
         std::unordered_map<Language::Id, Language> languages)
-        : mVersion(version), mUseUIDs(version == 2),
-          mLanguages(std::move(languages)) {}
+        : m_version(version), m_useUniqueIds(version == 2),
+          m_languages(std::move(languages)) {}
 
     LocalizationFile::LocalizationFile(
         const uint32_t version, const std::vector<uint32_t> &keys,
         std::unordered_map<Language::Id, Language> languages)
-        : mVersion(version), mUseUIDs(true), mKeys(keys),
-          mLanguages(std::move(languages)) {}
+        : m_version(version), m_useUniqueIds(true), m_keys(keys),
+          m_languages(std::move(languages)) {}
 
     LocalizationFile::LocalizationFile(uint8_t *data) {
         bio::buffer::BinaryBuffer io(data);
 
-        mVersion = io.readBE<uint32_t>();
+        m_version = io.readBE<uint32_t>();
         const uint32_t lc = io.readBE<uint32_t>();
 
-        if (mVersion == 2) {
-            this->mUseUIDs = io.readByte();
+        if (m_version == 2) {
+            this->m_useUniqueIds = io.readByte();
             const uint32_t c = io.readBE<uint32_t>();
             for (size_t i = 0; i < c; i++)
-                this->mKeys.push_back(io.readBE<uint32_t>());
+                this->m_keys.push_back(io.readBE<uint32_t>());
         }
 
         std::vector<Language::Id> ids;
 
         for (int i = 0; i < lc; i++) {
-            const std::string code = io.readString(io.readBE<uint16_t>());
+            const std::string code = io.readStringWithLength<char>(bio::util::ByteOrder::BIG, bio::util::string::StringLengthEncoding::LENGTH_PREFIX);
             const uint32_t id = io.readBE<uint32_t>();
 
             ids.push_back(Language::Id(code, id));
         }
 
         for (int i = 0; i < lc; i++) {
-            Language l = Language(io, this->mKeys);
-            this->mLanguages.emplace(std::move(ids[i]), std::move(l));
+            Language l = Language(io, this->m_keys);
+            this->m_languages.emplace(std::move(ids[i]), std::move(l));
         }
     }
 
@@ -59,13 +59,13 @@ namespace lce::loc {
         size += sizeof(uint32_t); // version
         size += sizeof(uint32_t); // lang count
 
-        if (mVersion == 2) { // keys
+        if (m_version == 2) { // keys
             size += sizeof(bool);
             size += sizeof(uint32_t);
-            size += this->mKeys.size() * sizeof(uint32_t);
+            size += this->m_keys.size() * sizeof(uint32_t);
         }
 
-        for (const auto &[id, lang] : mLanguages) {
+        for (const auto &[id, lang] : m_languages) {
             size += id.getSize();   // ids
             size += lang.getSize(); // languages
         }
@@ -78,22 +78,22 @@ namespace lce::loc {
         uint8_t *data = new uint8_t[fileSize];
         bio::buffer::BinaryBuffer io(data);
 
-        io.writeBE<uint32_t>(mVersion);
-        io.writeBE<uint32_t>(mLanguages.size());
+        io.writeBE<uint32_t>(m_version);
+        io.writeBE<uint32_t>(m_languages.size());
 
-        if (mVersion == 2) {
-            io.writeByte(mUseUIDs);
-            io.writeBE<uint32_t>(mKeys.size());
-            for (const uint32_t k : mKeys) {
+        if (m_version > 1) {
+            io.writeByte(m_useUniqueIds);
+            io.writeBE<uint32_t>(m_keys.size());
+            for (const uint32_t k : m_keys) {
                 io.writeBE<uint32_t>(k);
             }
         }
 
-        for (const auto &[id, lang] : mLanguages) {
+        for (const auto &[id, lang] : m_languages) {
             io.writeBytes(id.serialize(), id.getSize());
         }
 
-        for (const auto &[id, lang] : mLanguages) {
+        for (const auto &[id, lang] : m_languages) {
             io.writeBytes(lang.serialize(), lang.getSize());
         }
 
@@ -107,14 +107,14 @@ namespace lce::loc {
                                      name);
 
         Language::Id id = Language::Id(name);
-        Language language = Language(_byte, _shouldReadByte, name, this->mKeys);
-        this->mLanguages.emplace(id, language);
+        Language language = Language(_byte, _shouldReadByte, name, this->m_keys);
+        this->m_languages.emplace(id, language);
 
         return getLanguage(name);
     }
 
     Language *LocalizationFile::getLanguage(const std::string &name) {
-        for (auto &[id, lang] : mLanguages) {
+        for (auto &[id, lang] : m_languages) {
             if (id.getName() == name)
                 return &lang;
         }
@@ -122,7 +122,7 @@ namespace lce::loc {
         return nullptr;
     }
     bool LocalizationFile::languageExists(const std::string &name) {
-        for (auto &[id, lang] : mLanguages) {
+        for (auto &[id, lang] : m_languages) {
             if (id.getName() == name)
                 return true;
         }
@@ -131,10 +131,10 @@ namespace lce::loc {
     }
 
     uint32_t LocalizationFile::createString(const uint32_t id) {
-        mKeys.reserve(mKeys.size() + 1);
-        mKeys.push_back(id);
+        m_keys.reserve(m_keys.size() + 1);
+        m_keys.push_back(id);
 
-        for (auto &[i, lang] : mLanguages)
+        for (auto &[i, lang] : m_languages)
             lang.addString("", id);
 
         return id;
@@ -156,15 +156,15 @@ namespace lce::loc {
         if (!lang)
             throw std::runtime_error("Language not found: " + language);
 
-        const auto n = std::find(mKeys.begin(), mKeys.end(), id);
-        const uint32_t h = (n == mKeys.end()) ? createString(id) : *n;
+        const auto n = std::find(m_keys.begin(), m_keys.end(), id);
+        const uint32_t h = (n == m_keys.end()) ? createString(id) : *n;
 
         lang->setString(h, str);
     }
 
     std::pair<const Language::Id, Language> *
     LocalizationFile::getLanguageWithId(const std::string &name) {
-        for (std::pair<const Language::Id, Language> &a : mLanguages) {
+        for (std::pair<const Language::Id, Language> &a : m_languages) {
             if (a.first.getName() == name)
                 return &a;
         }
@@ -180,11 +180,11 @@ namespace lce::loc {
         const uint32_t i = it->first.getId();
 
         Language lang = std::move(it->second);
-        mLanguages.erase(it->first);
+        m_languages.erase(it->first);
 
         // shove back in
         lang.setName(n);
-        mLanguages.emplace(Language::Id(n, i), std::move(lang));
+        m_languages.emplace(Language::Id(n, i), std::move(lang));
     }
 
     std::string &LocalizationFile::getString(const std::string &language,
@@ -207,8 +207,8 @@ namespace lce::loc {
 
     std::unordered_map<Language::Id, Language> &
     LocalizationFile::getLanguages() {
-        return this->mLanguages;
+        return this->m_languages;
     }
 
-    uint32_t LocalizationFile::getVersion() const { return this->mVersion; }
+    uint32_t LocalizationFile::getVersion() const { return this->m_version; }
 } // namespace lce::loc

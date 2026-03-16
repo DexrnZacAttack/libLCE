@@ -15,7 +15,7 @@ namespace lce::msscmp {
     Soundbank::Soundbank(uint8_t *data) {
         bio::buffer::BinaryBuffer io(data);
 
-        const std::string magic = io.readString(4);
+        const std::string magic = io.readString<char>(4);
 
         mByteOrder = magic == "BANK" ? bio::util::ByteOrder::BIG
                                      : bio::util::ByteOrder::LITTLE;
@@ -56,7 +56,7 @@ namespace lce::msscmp {
         const Type opposite = (mType == NEW_GEN) ? OLD_GEN : NEW_GEN;
         mIndex2Size = readUintByType(io, mByteOrder, opposite);
 
-        std::string name = io.readString(12);
+        std::string name = io.readString<char>(12);
 
         io.seek(lastEntryOffset + 4);
 
@@ -76,7 +76,7 @@ namespace lce::msscmp {
             const uint32_t currentOffset = io.getOffset();
 
             io.seek(nameOffset);
-            std::string fileName = io.readStringNT();
+            std::string fileName = io.readCharStringNullTerminated<char>();
             io.seek(currentOffset);
 
             io.read<uint32_t>(mByteOrder);
@@ -117,7 +117,7 @@ namespace lce::msscmp {
 
     bool Soundbank::isSoundbank(uint8_t *data) {
         bio::buffer::BinaryBuffer io(data);
-        const std::string magic = io.readString(4);
+        const std::string magic = io.readString<char>(4);
 
         return magic == "BANK" || magic == "KNAB";
     }

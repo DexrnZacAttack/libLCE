@@ -15,12 +15,7 @@
 #include <utility>
 #include <vector>
 
-// TODO: finish API
 namespace lce::loc {
-    // WARNING!!!!: I believe this code is so cursed that it scared off some
-    // people that were trying to help
-    //
-    // Not even I fully understand it...
 
     /** Used to hold strings and language metadata */
     class LIBLCE_API Language final : public io::Serializable {
@@ -31,52 +26,51 @@ namespace lce::loc {
         class Id final : public Serializable {
           public:
             explicit Id(const std::string &name)
-                : mName(name), mId(std::hash<std::string>{}(name)) {};
+                : m_name(name), m_id(std::hash<std::string>{}(name)) {};
             Id(const std::string &name, const uint32_t hash)
-                : mName(name), mId(hash) {};
+                : m_name(name), m_id(hash) {};
 
             bool operator==(const Id &other) const {
-                return mName == other.mName && mId == other.mId;
+                return m_name == other.m_name && m_id == other.m_id;
             }
 
-            uint32_t getId() const { return mId; }
+            uint32_t getId() const { return m_id; }
 
-            const std::string &getName() const { return mName; }
+            const std::string &getName() const { return m_name; }
 
             std::uint8_t *serialize() const override {
                 bio::buffer::BinaryBuffer io(this->getSize());
 
-                io.writeBE<uint16_t>(mName.size());
-                io.writeString(mName, false);
-                io.writeBE<uint32_t>(mId);
+                io.writeString<char>(m_name, bio::util::ByteOrder::BIG, bio::util::string::StringLengthEncoding::LENGTH_PREFIX);
+                io.writeBE<uint32_t>(m_id);
 
                 return io.begin();
             };
 
             size_t getSize() const override {
-                return sizeof(uint16_t) + mName.size() + sizeof(uint32_t);
+                return sizeof(uint16_t) + m_name.size() + sizeof(uint32_t);
             };
 
           private:
-            std::string mName;
-            uint32_t mId;
+            std::string m_name;
+            uint32_t m_id;
         };
 
         explicit Language(bio::buffer::BinaryBuffer &io, std::vector<uint32_t> &keys);
 
         Language(const uint8_t _byte, const uint32_t _shouldReadByte,
                  std::string _code, std::vector<uint32_t> &keys)
-            : mUnk(_byte), mShouldReadByte(_shouldReadByte), mKeys(&keys),
-              mName(std::move(_code)) {
+            : m_unk(_byte), m_shouldReadByte(_shouldReadByte), m_keys(&keys),
+              m_name(std::move(_code)) {
             for (auto &key : keys) {
-                mStrings.emplace(key, "");
+                m_strings.emplace(key, "");
             }
         }
 
         Language(const uint8_t _byte, const uint32_t _shouldReadByte,
                  std::string _code)
-            : mUnk(_byte), mShouldReadByte(_shouldReadByte),
-              mKeys(new std::vector<uint32_t>()), mName(std::move(_code)) {}
+            : m_unk(_byte), m_shouldReadByte(_shouldReadByte),
+              m_keys(new std::vector<uint32_t>()), m_name(std::move(_code)) {}
 
         std::unordered_map<uint32_t, std::string> &getStrings();
 
@@ -123,18 +117,18 @@ namespace lce::loc {
         uint32_t addString(const std::string &str);
         uint32_t addString(const std::string &str, const uint32_t &hash);
 
-        void setName(const std::string &name) { this->mName = name; }
+        void setName(const std::string &name) { this->m_name = name; }
 
       private:
-        uint8_t mUnk;
-        uint32_t mShouldReadByte; // could be version?
+        uint8_t m_unk;
+        uint32_t m_shouldReadByte; // could be version?
 
         std::vector<uint32_t>
-            *mKeys; // TODO: this makes the object not properly movable until
+            *m_keys; // TODO: this makes the object not properly movable until
                     // this is changed...
 
-        std::string mName;
-        std::unordered_map<uint32_t, std::string> mStrings;
+        std::string m_name;
+        std::unordered_map<uint32_t, std::string> m_strings;
     };
 } // namespace lce::loc
 
